@@ -1,0 +1,10 @@
+/node_modules
+/*-cache
+/packages/*/dist
+/packages/*/build
+/packages/*/node_modules
+/packages/*/*-cache
+/packages/frontend/**/*.styles.scss.d.ts
+node_modules
+dist
+build

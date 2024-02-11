@@ -1,0 +1,4 @@
+.root {
+  width: 100%;
+  border-radius: var(--standart-border-radius);
+}

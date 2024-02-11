@@ -1,0 +1,11 @@
+.container,
+.fullHeightContainer {
+  padding: 2em 2em;
+}
+
+.fullHeightContainer {
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-flow: column;
+}

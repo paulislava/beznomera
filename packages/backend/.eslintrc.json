@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "../../.eslintrc.json"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "typescript": {
+      "project": "./tsconfig.json"
+    }
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
+    }
+  }
+}

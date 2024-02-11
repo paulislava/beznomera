@@ -1,0 +1,31 @@
+.option {
+  background: #F6F6F6;
+  padding: 1.2em 1em;
+  border-radius: var(--standart-border-radius);
+  margin-bottom: .6em;
+  font-size: calc(1.15 * var(--text-size));
+  line-height: 1.4;
+
+  .optionSumm {
+   font-weight: 700; 
+  }
+
+  .optionBonus {
+    color: rgba(27, 31, 59, 0.65);
+  }
+
+  .recommended {
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: .5em;
+    font-size: calc(0.92 * var(--text-size));
+  }
+}
+
+.option.selectedOption {
+  background: var(--green);
+  color: white;
+  &>* {
+    color: white;
+  }
+}

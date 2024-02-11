@@ -1,0 +1,120 @@
+version: "3"
+
+services:
+  root:
+    image: node:14.17-slim
+    environment:
+      - HOME=/tmp
+    volumes:
+      - .:/app
+      - .npmrc:/tmp/.npmrc
+    working_dir: /app
+    user: "${UID-1000}:${GID-1000}"
+    command:
+      - sh
+      - -c
+      - |
+        npm install
+        for i in $$(ls -1 packages); do
+          if [ -r "packages/$$i/package.json" ]; then
+            npm install --prefix "packages/$$i"
+          fi
+        done
+        SHELL=sh npm run serve
+
+  database:
+    image: postgres:11-alpine
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME:-postgres}
+      - POSTGRES_USER=${DATABASE_USER:-postgres}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - ${DATABASE_PORT:-5432}:5432
+
+  backend:
+    image: node:14.17-slim
+    environment:
+      - HOME=/tmp
+      - NODE_ENV=development
+      - FRONTEND_URL=${FRONTEND_URL}
+      - BACKEND_URL=${BACKEND_URL}
+      - APP_PORT=${BACKEND_APP_PORT}
+      - ROUTE_PREFIX=${BACKEND_PREFIX}
+    volumes:
+      - .:/app
+    working_dir: /app
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - ${BACKEND_DEBUG_PORT:-9229}:9229
+      - ${BACKEND_APP_PORT:-3000}:${BACKEND_APP_PORT:-3000}
+    command:
+      - sh
+      - -c
+      - |
+        npm run wait
+        npm run start:backend:prod
+
+  frontend:
+    image: node:14.17-slim
+    environment:
+      - HOME=/tmp
+      - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
+      - FRONTEND_PORT=${FRONTEND_PORT:-4000}
+      - NODE_ENV=production
+    volumes:
+      - .:/app
+    working_dir: /app
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - ${FRONTEND_PORT:-4000}:3000
+    command:
+      - sh
+      - -c
+      - |
+        npm run wait
+        npx concurrently --kill-others-on-fail "npm:start:frontend:prod"
+
+  # To add exchanges, queues and bind them in RabbitMQ add following commands to the parenthesis
+  #   rabbitmqadmin declare exchange name=$$BINDINGS_EXCHANGE type=fanout; \
+  #   rabbitmqadmin declare queue name=$$BINDING_QUEUE durable=true; \
+  #   rabbitmqadmin declare binding source=$$BINDINGS_EXCHANGE destination_type="queue" destination=$$BINDING_QUEUE; \
+  message-broker:
+    image: rabbitmq:3.8-management-alpine
+    environment:
+      - MQ_USERNAME=${MQ_USERNAME:-rabbitmq}
+      - MQ_PASSWORD=${MQ_PASSWORD:-rabbitmq}
+    volumes:
+      - mq_data:/var/lib/rabbitmq/data
+    ports:
+      - ${MQ_MGMT_PORT:-15672}:15672
+      - ${MQ_AMQP_PORT:-5672}:5672
+    restart: unless-stopped
+    command:
+      - sh
+      - -c
+      - |
+        (
+          until rabbitmqctl ping; do
+            sleep 2;
+          done;
+          rabbitmqctl await_startup;
+          rabbitmqctl add_user $$MQ_USERNAME $$MQ_PASSWORD;
+          rabbitmqctl set_user_tags $$MQ_USERNAME administrator;
+          rabbitmqctl set_permissions -p / $$MQ_USERNAME '.*' '.*' '.*'
+        ) & rabbitmq-server
+
+  pg-admin:
+    image: dpage/pgadmin4
+    ports:
+      - ${PGADMIN_PORT:-5050}:80
+    env_file:
+      - '.env'
+    depends_on:
+      - database
+
+
+volumes:
+  db_data:
+  mq_data:

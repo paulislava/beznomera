@@ -1,0 +1,23 @@
+.form {
+  flex: 1;
+}
+
+.siteInfo {
+  text-align: center;
+}
+
+.logo {
+  width: 30%;
+  height: auto;
+}
+
+.label {
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  opacity: 0.6;
+  max-width: 25em;
+  text-align: center;
+  margin: 0.5em auto 0;
+}

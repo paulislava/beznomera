@@ -1,0 +1,12 @@
+/.idea
+/.vscode
+/*.iml
+/.coverage
+/.npm-cache
+/.jest-cache
+/.DS_Store
+/packages/*/node_modules
+/packages/**/build
+**/*.scss.d.ts
+package-lock.json
+/packages/*/package-lock.json

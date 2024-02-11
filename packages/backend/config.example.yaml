@@ -1,0 +1,31 @@
+database:
+  host: database
+  port: 5432              # Optional
+  username: postgres      # Optional
+  password: postgres
+  database: postgres      # Optional
+
+sms:
+  login: LOGIN
+  password: PASSWORD
+  baseUrl: https://smsc.ru/sys/send.php
+
+auth:
+  mode: tel
+  codeLength: 4
+  jwtSecret: MY_SECRET
+  jwtCookie: auth
+  passwordSalt: test
+  passwordSaltRounds: 10
+
+mail:
+  host: smtp.mail.com
+  port: 465
+  secure: true
+  login: LOGIN
+  password: PASSWORD
+  defaultFrom: Depomed <no-reply@depomed.online>
+
+webdav:
+  username: guest
+  password: guest

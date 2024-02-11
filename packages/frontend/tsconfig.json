@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "es5",
+    "baseUrl": ".",
+    "outDir": "build",
+    "jsx": "react",
+    "lib": ["dom", "es7", "es2017", "esnext", "esnext.intl", "es2017.intl", "es2018.intl"],
+    "paths": {
+      "~/*": ["src/*"]
+    },
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/",
+    "declaration": false,
+    "typeRoots": ["src/typings", "node_modules/@types"]
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "build", ".vscode", "**/*.styl.d.ts", ".next"],
+  "references": [{ "path": "../shared" }]
+}
