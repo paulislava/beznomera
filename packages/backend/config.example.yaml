@@ -24,7 +24,7 @@ mail:
   secure: true
   login: LOGIN
   password: PASSWORD
-  defaultFrom: Depomed <no-reply@depomed.online>
+  defaultFrom: BezNomera <beznomera@paulislava.space>
 
 webdav:
   username: guest
