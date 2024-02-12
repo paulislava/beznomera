@@ -1,6 +1,8 @@
 import styled from 'styled-components/native'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { TextInput } from 'react-native'
+import Button from '@/components/Button/Button'
+import TelegramLoginButton from 'telegram-login-button'
 
 import { Text } from '../components/Themed'
 
@@ -13,13 +15,14 @@ const LoginContainer = styled(Text)`
 `
 
 export default function LoginPage() {
+  const onTelegramAuth = useCallback(data => {
+    console.dir(data)
+    alert('Auth!')
+  }, [])
+
   return (
     <LoginContainer>
-      <form>
-        <TextInput autoComplete='email' placeholder='Email' />
-        <input type='password' placeholder='Password' />
-        <button type='submit'>Login</button>
-      </form>
+      <TelegramLoginButton botName='beznomera_bot' dataOnauth={onTelegramAuth} />
     </LoginContainer>
   )
 }
