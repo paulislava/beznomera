@@ -40,7 +40,7 @@ services:
       - NODE_ENV=development
       - FRONTEND_URL=${FRONTEND_URL}
       - BACKEND_URL=${BACKEND_URL}
-      - APP_PORT=${BACKEND_APP_PORT}
+      - APP_PORT=${BACKEND_PORT}
       - ROUTE_PREFIX=${BACKEND_PREFIX}
     volumes:
       - .:/app
@@ -48,7 +48,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     ports:
       - ${BACKEND_DEBUG_PORT:-9229}:9229
-      - ${BACKEND_APP_PORT:-3000}:${BACKEND_APP_PORT:-3000}
+      - ${BACKEND_PORT:-3000}:${BACKEND_PORT:-3000}
     command:
       - sh
       - -c

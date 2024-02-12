@@ -3,7 +3,7 @@ database:
   port: 5432              # Optional
   username: postgres      # Optional
   password: postgres
-  database: postgres      # Optional
+  database: beznomera      # Optional
 
 sms:
   login: LOGIN

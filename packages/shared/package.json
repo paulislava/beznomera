@@ -2,7 +2,7 @@
   "name": "@paulislava/shared",
   "private": true,
   "exports": {
-    "./": "./build/"
+    "./*": "./build/*.js"
   },
   "typesVersions": {
     "*": {

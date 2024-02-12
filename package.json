@@ -14,13 +14,12 @@
     "lint:prettier": "prettier --check *.{json,yaml}",
     "lint:packages": "npmPkgJsonLint ./package.json ./packages/*/package.json",
     "build:backend": "tsc --build packages/backend",
-    "start:backend:nodemon": "nodemon --watch packages/backend --ignore packages/backend/build --ext ts,json,yaml,yml --exec 'tsc --build packages/backend && node --inspect=0.0.0.0 packages/backend/build/main.js'",
+    "start:backend:nodemon": "nodemon --watch packages/backend --ignore packages/backend/build --ignore packages/backend/node_modules --ext ts,json,yaml,yml --exec 'tsc --build packages/backend && node --inspect=0.0.0.0 packages/backend/build/main.js'",
     "start:backend:prod": "cd packages/backend; npm run build; npm run start:prod",
     "typeorm": "cd packages/backend; npm run typeorm",
     "build:frontend": "cd packages/frontend; npm run build",
-    "start:frontend:webpack": "cd packages/frontend; npm run start",
-    "start:frontend:prod": "cd packages/frontend; npm run build; npm run prod",
-    "lint:frontend-stylelint": "stylelint ./packages/frontend/**/*.scss"
+    "start:frontend:dev": "cd packages/frontend; npm run web",
+    "start:frontend:prod": "cd packages/frontend; npm run build; npm run prod"
   },
   "repository": {
     "type": "git",
