@@ -1,7 +1,7 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get } from '@nestjs/common';
 
-import { Version } from './config.schema'
-import { ConfigService } from './config.service'
+import { Version } from './config.schema';
+import { ConfigService } from './config.service';
 
 @Controller()
 export class ConfigController {
@@ -9,6 +9,6 @@ export class ConfigController {
 
   @Get('/config/version')
   version(): Version {
-    return this.configService.version
+    return this.configService.version;
   }
 }

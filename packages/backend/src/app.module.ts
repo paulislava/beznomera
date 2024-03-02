@@ -10,8 +10,6 @@ import { HttpClientsModule } from './common/http-clients/http-clients.module';
 import { MailModule } from './app/mail/mail.module';
 import { UserModule } from './app/users/user.module';
 
-const test = 'test';
-
 @Module({
   imports: [
     ConfigModule,

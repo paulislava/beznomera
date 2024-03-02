@@ -1,9 +1,9 @@
-import React, { FC } from 'react'
-import { Text, Pressable } from 'react-native'
+import React, { FC } from 'react';
+import { Text, Pressable } from 'react-native';
 
 interface ButtonProps {
-  children?: React.ReactNode
-  onClick?(): void
+  children?: React.ReactNode;
+  onClick?(): void;
 }
 
 const Button: FC<ButtonProps> = ({ children, onClick }) => {
@@ -11,7 +11,7 @@ const Button: FC<ButtonProps> = ({ children, onClick }) => {
     <Pressable onPress={onClick}>
       <Text>{children}</Text>
     </Pressable>
-  )
-}
+  );
+};
 
-export default Button
+export default Button;

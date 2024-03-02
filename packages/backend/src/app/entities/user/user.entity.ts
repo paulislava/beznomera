@@ -1,12 +1,12 @@
-import { Column, Entity } from 'typeorm'
+import { Column, Entity } from 'typeorm';
 
-import { UserCore } from './user-core.entity'
+import { UserCore } from './user-core.entity';
 
 @Entity('users')
 export class User extends UserCore {
   @Column({ default: 0 })
-  money: number
+  money: number;
 
   @Column({ default: 0 })
-  bonuses: number
+  bonuses: number;
 }

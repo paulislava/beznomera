@@ -4,23 +4,23 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm'
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('organizations')
 export class Organization extends BaseEntity {
   @PrimaryGeneratedColumn()
-  readonly id: number
+  readonly id: number;
 
   @Column()
-  name: string
+  name: string;
 
   @Column('varchar', { name: 'logo_path', nullable: true })
-  logoPath: string | null
+  logoPath: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
-  readonly createdAt: Date
+  readonly createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date
+  updatedAt: Date;
 }

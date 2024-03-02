@@ -1,13 +1,13 @@
-import { join, resolve } from 'path'
+import { join, resolve } from 'path';
 
-import { Module } from '@nestjs/common'
-import { MailerModule, MailerOptions } from '@nestjs-modules/mailer'
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter'
+import { Module } from '@nestjs/common';
+import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
-import { ConfigModule } from '../config/config.module'
-import { ConfigService } from '../config/config.service'
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
 
-import { MailService } from './mail.service'
+import { MailService } from './mail.service';
 
 @Module({
   imports: [
@@ -22,24 +22,24 @@ import { MailService } from './mail.service'
             port: configService.mail.port,
             auth: {
               user: configService.mail.login,
-              pass: configService.mail.password
-            }
+              pass: configService.mail.password,
+            },
           },
           defaults: {
-            from: configService.mail.defaultFrom
+            from: configService.mail.defaultFrom,
           },
           template: {
             dir: join(resolve(__dirname, '..'), 'templates', 'mail'),
             adapter: new HandlebarsAdapter(),
             options: {
-              strict: false
-            }
-          }
-        }
-      }
-    })
+              strict: false,
+            },
+          },
+        };
+      },
+    }),
   ],
   providers: [MailService],
-  exports: [MailService]
+  exports: [MailService],
 })
 export class MailModule {}

@@ -1,4 +1,4 @@
 export interface RequestUser {
-  userId: number
-  organizationId: number
+  userId: number;
+  organizationId: number;
 }

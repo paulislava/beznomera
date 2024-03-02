@@ -1,27 +1,31 @@
-import { Injectable } from '@nestjs/common'
-import { FindOptionsWhere, Repository } from 'typeorm'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Transactional } from 'typeorm-transactional-cls-hooked'
-import { Response } from 'express'
-import { JwtService } from '@nestjs/jwt'
-import * as bcrypt from 'bcrypt'
-import { CurrentAdmin } from 'adminjs'
+import { Injectable } from '@nestjs/common';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { Response } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { CurrentAdmin } from 'adminjs';
 
-import { ConfigService } from '../config/config.service'
-import { authMessage } from '../templates/messages'
-import { MailService } from '../mail/mail.service'
-import { AuthCode } from '../entities/auth-code.entity'
-import { User } from '../entities/user/user.entity'
-import { UserDraft } from '../entities/user/user-draft.entity'
-import { UserCore } from '../entities/user/user-core.entity'
-import { RequestUser } from '../users/user.types'
-import { AdminUser } from '../entities/admin-user.entity'
+import { ConfigService } from '../config/config.service';
+import { authMessage } from '../templates/messages';
+import { MailService } from '../mail/mail.service';
+import { AuthCode } from '../entities/auth-code.entity';
+import { User } from '../entities/user/user.entity';
+import { UserDraft } from '../entities/user/user-draft.entity';
+import { UserCore } from '../entities/user/user-core.entity';
+import { RequestUser } from '../users/user.types';
+import { AdminUser } from '../entities/admin-user.entity';
 
-import { AuthMode } from './auth.types'
-import { AuthServiceException, UserNotFound, WrongAuthCode } from './auth.exceptions'
+import { AuthMode } from './auth.types';
+import {
+  AuthServiceException,
+  UserNotFound,
+  WrongAuthCode,
+} from './auth.exceptions';
 
-import { SmsHttpClientService } from '~/common/http-clients/sms-http-client/sms-http-client.service'
-import { randomDigitsString } from '~/common/utils/randomDigitsString'
+import { SmsHttpClientService } from '~/common/http-clients/sms-http-client/sms-http-client.service';
+import { randomDigitsString } from '~/common/utils/randomDigitsString';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +41,7 @@ export class AuthService {
     @InjectRepository(UserDraft)
     private readonly userDraftRepository: Repository<UserDraft>,
     @InjectRepository(AdminUser)
-    private readonly adminUserRepository: Repository<AdminUser>
+    private readonly adminUserRepository: Repository<AdminUser>,
   ) {}
 
   @Transactional()
@@ -45,144 +49,159 @@ export class AuthService {
     authMode: AuthMode,
     identifier: string,
     code: string,
-    res: Response
+    res: Response,
   ): Promise<void> {
-    const authCode = await this.authCheck(authMode, identifier, code)
-    const user = await this.getOrCreateUserByAuthCode(authCode)
+    const authCode = await this.authCheck(authMode, identifier, code);
+    const user = await this.getOrCreateUserByAuthCode(authCode);
 
-    const now = new Date()
-    const expires = new Date(now.setDate(now.getDate() + 30))
-    const requestUser: RequestUser = { userId: user.id, organizationId: user.organizationId }
-    const token = this.jwtService.sign(requestUser, { expiresIn: '30d' })
+    const now = new Date();
+    const expires = new Date(now.setDate(now.getDate() + 30));
+    const requestUser: RequestUser = {
+      userId: user.id,
+      organizationId: user.organizationId,
+    };
+    const token = this.jwtService.sign(requestUser, { expiresIn: '30d' });
     res.cookie(this.configService.auth.jwtCookie, token, {
-      expires
-    })
+      expires,
+    });
   }
 
   @Transactional()
   async authStart(authMode: AuthMode, identifier: string): Promise<void> {
-    const userParams = this.getUserParams(authMode, identifier)
+    const userParams = this.getUserParams(authMode, identifier);
 
-    const user = await this.userRepository.findOne({ where: userParams })
+    const user = await this.userRepository.findOne({ where: userParams });
 
-    let userDraft: UserDraft | null = null
+    let userDraft: UserDraft | null = null;
 
     if (!user) {
-      userDraft = await this.userDraftRepository.findOne({ where: userParams })
+      userDraft = await this.userDraftRepository.findOne({ where: userParams });
 
       if (!userDraft) {
-        throw new UserNotFound(authMode, identifier)
+        throw new UserNotFound(authMode, identifier);
       }
     }
 
-    const code = randomDigitsString(this.configService.auth.codeLength)
-    const message = authMessage(code)
+    const code = randomDigitsString(this.configService.auth.codeLength);
+    const message = authMessage(code);
 
-    const authCode = await this.authCodeRepository.insert({
+    await this.authCodeRepository.insert({
       authMode,
       identifier,
       code,
       userId: user?.id,
-      userDraftId: userDraft?.id
-    })
+      userDraftId: userDraft?.id,
+    });
 
     switch (authMode) {
       case AuthMode.TEL:
         await this.smsHttpClientService.sendMessage(
           identifier,
-          message.sms ?? message.plain ?? message.content
-        )
-        break
+          message.sms ?? message.plain ?? message.content,
+        );
+        break;
       case AuthMode.EMAIL:
-        await this.mailService.sendAuthCode(identifier, code)
-        break
+        await this.mailService.sendAuthCode(identifier, code);
+        break;
     }
   }
 
   @Transactional()
-  async authAdmin(email: string, password: string): Promise<CurrentAdmin | null> {
-    const adminUser = await this.adminUserRepository.findOneBy({ email })
+  async authAdmin(
+    email: string,
+    password: string,
+  ): Promise<CurrentAdmin | null> {
+    const adminUser = await this.adminUserRepository.findOneBy({ email });
     if (!adminUser) {
-      return null
+      return null;
     }
 
     if (!this.comparePassword(password, adminUser.passwordHash)) {
-      return null
+      return null;
     }
 
-    adminUser.authorizedAt = new Date()
-    await adminUser.save()
+    adminUser.authorizedAt = new Date();
+    await adminUser.save();
 
     return {
       id: String(adminUser.id),
       email: adminUser.email,
-      title: adminUser.title
-    }
+      title: adminUser.title,
+    };
   }
 
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
     if (authCode.user) {
-      return authCode.user
+      return authCode.user;
     }
 
     if (!authCode.userDraftId) {
-      throw new AuthServiceException(`No user draft id for auth code with id ${authCode.id}`)
+      throw new AuthServiceException(
+        `No user draft id for auth code with id ${authCode.id}`,
+      );
     }
 
     const userDraft = await this.userDraftRepository.findOneOrFail({
       where: { id: authCode.userDraftId },
-      relations: ['user']
-    })
+      relations: ['user'],
+    });
 
     if (userDraft.user) {
-      return userDraft.user
+      return userDraft.user;
     }
 
     const user = await this.userRepository.save(
-      this.userRepository.create({ ...userDraft, id: undefined })
-    )
-    userDraft.userId = user.id
-    await userDraft.save()
+      this.userRepository.create({ ...userDraft, id: undefined }),
+    );
+    userDraft.userId = user.id;
+    await userDraft.save();
 
-    return user
+    return user;
   }
 
   private comparePassword(password: string, passwordHash: string): boolean {
-    return bcrypt.compareSync(this.getPasswordPhrase(password), passwordHash)
+    return bcrypt.compareSync(this.getPasswordPhrase(password), passwordHash);
   }
 
   private getPasswordHash(password: string): string {
     return bcrypt.hashSync(
       this.getPasswordPhrase(password),
-      this.configService.auth.passwordSaltRounds
-    )
+      this.configService.auth.passwordSaltRounds,
+    );
   }
 
   private getPasswordPhrase(password: string): string {
-    return password + this.configService.auth.passwordSalt
+    return password + this.configService.auth.passwordSalt;
   }
 
-  private async authCheck(authMode: AuthMode, identifier: string, code: string): Promise<AuthCode> {
+  private async authCheck(
+    authMode: AuthMode,
+    identifier: string,
+    code: string,
+  ): Promise<AuthCode> {
     const authCode = await this.authCodeRepository.findOne({
       where: { identifier, authMode, code, closed: false },
-      relations: ['user']
-    })
+      relations: ['user'],
+    });
 
     if (!authCode) {
-      throw new WrongAuthCode()
+      throw new WrongAuthCode();
     }
 
-    authCode.closed = true
-    await authCode.save()
-    return authCode
+    authCode.closed = true;
+    await authCode.save();
+    return authCode;
   }
 
-  private getUserParams(authMode: AuthMode, identifier: string): FindOptionsWhere<UserCore> {
+  private getUserParams(
+    authMode: AuthMode,
+    identifier: string,
+  ): FindOptionsWhere<UserCore> {
     switch (authMode) {
       case AuthMode.EMAIL:
-        return { email: identifier }
+        return { email: identifier };
       case AuthMode.TEL:
-        return { tel: identifier }
+        return { tel: identifier };
     }
   }
 }

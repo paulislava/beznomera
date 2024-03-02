@@ -1,3 +1,3 @@
 export const subjects = {
-  authCode: 'Код подтверждения Depomed'
-}
+  authCode: 'Код подтверждения Depomed',
+};

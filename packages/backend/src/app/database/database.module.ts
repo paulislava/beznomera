@@ -1,10 +1,10 @@
-import { join } from 'path'
+import { join } from 'path';
 
-import { Module } from '@nestjs/common'
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { Module } from '@nestjs/common';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-import { ConfigModule } from '../config/config.module'
-import { ConfigService } from '../config/config.service'
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
 
 @Module({
   imports: [
@@ -22,10 +22,10 @@ import { ConfigService } from '../config/config.service'
           synchronize: true,
           entities: [join(__dirname, '../', 'entities', '**')],
           migrationsRun: true,
-          migrations: [join(__dirname, '../', 'migrations', '**')]
-        }
-      }
-    })
-  ]
+          migrations: [join(__dirname, '../', 'migrations', '**')],
+        };
+      },
+    }),
+  ],
 })
 export class DatabaseModule {}

@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer'
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDefined,
@@ -8,141 +8,141 @@ import {
   IsNumber,
   IsPositive,
   IsString,
-  ValidateNested
-} from 'class-validator'
+  ValidateNested,
+} from 'class-validator';
 
-import { AuthMode } from '../auth/auth.types'
+import { AuthMode } from '../auth/auth.types';
 
 export class DatabaseConfig {
   @IsString()
   @IsNotEmpty()
-  readonly host: string
+  readonly host: string;
 
   @IsPositive()
   @IsInt()
   @IsNotEmpty()
-  readonly port: number = 5432
+  readonly port: number = 5432;
 
   @IsString()
   @IsNotEmpty()
-  readonly database: string = 'postgres'
+  readonly database: string = 'postgres';
 
   @IsString()
   @IsNotEmpty()
-  readonly username: string = 'postgres'
+  readonly username: string = 'postgres';
 
   @IsString()
   @IsDefined()
-  readonly password: string = ''
+  readonly password: string = '';
 }
 
 export class SmsConfig {
   @IsString()
   @IsDefined()
-  readonly login: string
+  readonly login: string;
 
   @IsString()
   @IsDefined()
-  readonly password: string
+  readonly password: string;
 
   @IsString()
   @IsDefined()
-  readonly baseUrl: string
+  readonly baseUrl: string;
 }
 
 export class AuthConfig {
   @IsIn(Object.values(AuthMode))
   @IsDefined()
-  readonly mode: AuthMode
+  readonly mode: AuthMode;
 
   @IsDefined()
   @IsPositive()
-  readonly codeLength: number
+  readonly codeLength: number;
 
   @IsDefined()
   @IsString()
-  readonly jwtCookie: string
+  readonly jwtCookie: string;
 
   @IsDefined()
   @IsString()
-  readonly jwtSecret: string
+  readonly jwtSecret: string;
 
   @IsDefined()
   @IsString()
-  readonly passwordSalt: string
+  readonly passwordSalt: string;
 
   @IsDefined()
   @IsNumber()
-  readonly passwordSaltRounds: number
+  readonly passwordSaltRounds: number;
 }
 
 export class MailConfig {
   @IsString()
   @IsDefined()
-  readonly host: string
+  readonly host: string;
 
   @IsNumber()
-  readonly port: number = 465
+  readonly port: number = 465;
 
   @IsBoolean()
-  readonly secure: boolean = true
+  readonly secure: boolean = true;
 
   @IsString()
   @IsDefined()
-  readonly login: string
+  readonly login: string;
 
   @IsString()
   @IsDefined()
-  readonly password: string
+  readonly password: string;
 
   @IsDefined()
   @IsString()
-  readonly defaultFrom: string
+  readonly defaultFrom: string;
 }
 
 export class WebdavConfig {
   @IsString()
   @IsDefined()
-  readonly username: string
+  readonly username: string;
 
   @IsString()
   @IsDefined()
-  readonly password: string
+  readonly password: string;
 }
 
 export class ApplicationConfig {
   @IsDefined()
   @ValidateNested()
   @Type(() => DatabaseConfig)
-  readonly database: DatabaseConfig
+  readonly database: DatabaseConfig;
 
   @IsDefined()
   @ValidateNested()
   @Type(() => SmsConfig)
-  readonly sms: SmsConfig
+  readonly sms: SmsConfig;
 
   @IsDefined()
   @ValidateNested()
   @Type(() => AuthConfig)
-  readonly auth: AuthConfig
+  readonly auth: AuthConfig;
 
   @IsDefined()
   @ValidateNested()
   @Type(() => MailConfig)
-  readonly mail: MailConfig
+  readonly mail: MailConfig;
 
   @IsDefined()
   @ValidateNested()
   @Type(() => WebdavConfig)
-  readonly webdav: WebdavConfig
+  readonly webdav: WebdavConfig;
 }
 
 export interface Version {
-  version: string | null
+  version: string | null;
 
-  branch: string | null
+  branch: string | null;
 
-  commit: string | null
+  commit: string | null;
 
-  buildTime: string | null
+  buildTime: string | null;
 }

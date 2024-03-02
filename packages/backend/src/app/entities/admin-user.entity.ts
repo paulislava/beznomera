@@ -1,22 +1,28 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('admin_users')
 export class AdminUser extends BaseEntity {
   @PrimaryGeneratedColumn()
-  readonly id: number
+  readonly id: number;
 
   @Column()
-  email: string
+  email: string;
 
   @Column()
-  title: string
+  title: string;
 
   @Column({ name: 'password_hash' })
-  passwordHash: string
+  passwordHash: string;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date
+  createdAt: Date;
 
   @Column('timestamp', { nullable: true, name: 'authorized_at' })
-  authorizedAt: Date | null
+  authorizedAt: Date | null;
 }

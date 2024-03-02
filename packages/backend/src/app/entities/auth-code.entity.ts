@@ -5,50 +5,48 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm'
+} from 'typeorm';
 
-import { AuthMode } from '../auth/auth.types'
+import { AuthMode } from '../auth/auth.types';
 
-import { UserDraft } from './user/user-draft.entity'
-import { User } from './user/user.entity'
+import { UserDraft } from './user/user-draft.entity';
+import { User } from './user/user.entity';
 
 @Entity('auth_codes')
 export class AuthCode extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  readonly id: string
+  readonly id: string;
 
   @Column()
-  identifier: string
+  identifier: string;
 
   @Column({ name: 'auth_mode' })
-  authMode: AuthMode
+  authMode: AuthMode;
 
   @Column()
-  code: string
+  code: string;
 
   @Column({ name: 'user_id', nullable: true })
-  userId: number | null
+  userId: number | null;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user: User | null
+  user: User | null;
 
   @Column({ name: 'user_draft_id', nullable: true })
-  userDraftId: number | null
+  userDraftId: number | null;
 
   @ManyToOne(() => UserDraft)
   @JoinColumn({ name: 'user_draft_id' })
-  userDraft: UserDraft | null
+  userDraft: UserDraft | null;
 
   @CreateDateColumn({ name: 'created_at' })
-  readonly createdAt: Date
+  readonly createdAt: Date;
 
   @Column('timestamp', { name: 'closed_at', nullable: true })
-  closedAt: Date | null
+  closedAt: Date | null;
 
   @Column({ default: false })
-  closed: boolean
+  closed: boolean;
 }
