@@ -9,10 +9,7 @@ export class MissedEnvironmentVariableException extends Error {
 }
 
 export class ClientResponseError extends FetchError {
-  constructor(
-    readonly status: number,
-    readonly statusText: string,
-  ) {
+  constructor(readonly status: number, readonly statusText: string) {
     super(
       `Server responded with status ${status} and text ${statusText}.`,
       'responseError',

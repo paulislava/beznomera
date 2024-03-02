@@ -29,11 +29,7 @@ export class UserService {
     };
   }
 
-  async changeBalance(
-    userId: number,
-    money: number,
-    bonus: number = 0,
-  ): Promise<void> {
+  async changeBalance(userId: number, money: number, bonus = 0): Promise<void> {
     const user = await this.userRepository.findOneByOrFail({ id: userId });
     await this.balanceChangeRepository.save({
       userId,

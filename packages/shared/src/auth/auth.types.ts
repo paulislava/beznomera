@@ -4,11 +4,11 @@ export enum AuthMode {
 }
 
 export interface AuthStartData {
-  identifier: string
-  authMode: AuthMode
-  organizationId?: number
+  identifier: string;
+  authMode: AuthMode;
+  organizationId?: number;
 }
 
 export interface AuthCheckData extends AuthStartData {
-  code: string
+  code: string;
 }

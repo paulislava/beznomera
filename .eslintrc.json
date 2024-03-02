@@ -28,8 +28,12 @@
     "react": {
       "version": "16.13.1"
     },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
     "import/resolver": {
       "typescript": {
+        "alwaysTryTypes": true,
         "project": "packages/*/tsconfig.json"
       },
       "alias": {

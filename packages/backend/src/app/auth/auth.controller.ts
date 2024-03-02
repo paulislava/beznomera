@@ -39,5 +39,6 @@ export class AuthController implements AuthApi {
 
   @Get(AUTH_ROUTES.checkAuthorized())
   @UseGuards(JwtAuthGuard)
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   async checkAuthorized(): Promise<void> {}
 }

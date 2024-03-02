@@ -1,4 +1,4 @@
-export function randomDigitsString(length: number = 4): string {
+export function randomDigitsString(length = 4): string {
   const str: number[] = new Array<number>();
   for (let i = 1; i <= length; i++) {
     str.push(Math.round(Math.random() * 9));

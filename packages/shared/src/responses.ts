@@ -1,4 +1,4 @@
 export interface ResponseWithCode {
-  code: string
-  message: string
+  code: string;
+  message: string;
 }
