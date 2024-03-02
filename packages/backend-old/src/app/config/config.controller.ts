@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common'
 
-import { Version } from '../config/config.schema'
-import { ConfigService } from '../config/config.service'
+import { Version } from './config.schema'
+import { ConfigService } from './config.service'
 
 @Controller()
 export class ConfigController {

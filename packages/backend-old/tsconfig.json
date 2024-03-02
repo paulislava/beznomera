@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "typeRoots": ["./typings"],
+    "paths": {
+      "~/*": ["src/*"]
+    }
+  },
+  "sourceMap": true,
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", ".coverage", "build"],
+  "references": [{ "path": "../shared" }]
+}
