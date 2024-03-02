@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ESNext",
     "module": "commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["esnext"],
+    "types": ["node"],
     "skipLibCheck": true,
     "declaration": true,
     "strict": true,
