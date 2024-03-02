@@ -1,15 +1,16 @@
-import { Module } from '@nestjs/common'
-import { EventEmitterModule } from '@nestjs/event-emitter'
+import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
-import { AppController } from './app.controller'
-import { ConfigModule } from './app/config/config.module'
-import { DatabaseModule } from './app/database/database.module'
-import { AppService } from './app.service'
-import { AuthModule } from './app/auth/auth.module'
-import { HttpClientsModule } from './common/http-clients/http-clients.module'
-import { MailModule } from './app/mail/mail.module'
-import { AppAdminModule } from './app/admin/admin.module'
-import { UserModule } from './app/users/user.module'
+import { AppController } from './app.controller';
+import { ConfigModule } from './app/config/config.module';
+import { DatabaseModule } from './app/database/database.module';
+import { AppService } from './app.service';
+import { AuthModule } from './app/auth/auth.module';
+import { HttpClientsModule } from './common/http-clients/http-clients.module';
+import { MailModule } from './app/mail/mail.module';
+import { UserModule } from './app/users/user.module';
+
+const test = 'test';
 
 @Module({
   imports: [
@@ -19,10 +20,9 @@ import { UserModule } from './app/users/user.module'
     HttpClientsModule,
     MailModule,
     AuthModule,
-    AppAdminModule,
-    UserModule
+    UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService],
 })
 export class AppModule {}

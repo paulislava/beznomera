@@ -120,6 +120,7 @@
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/restrict-plus-operands": "error",
     "react/prefer-stateless-function": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "semi": ["error", "always"]
   }
 }
