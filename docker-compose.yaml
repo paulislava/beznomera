@@ -60,7 +60,7 @@ services:
     image: node:18.12-slim
     environment:
       - HOME=/tmp
-      - BACKEND_URL=${BACKEND_URL}
+      - EXPO_PUBLIC_BACKEND_URL=${BACKEND_URL}
       - FRONTEND_PORT=${FRONTEND_PORT:-4000}
       - NODE_ENV=development
     volumes:

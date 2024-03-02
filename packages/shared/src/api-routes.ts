@@ -5,3 +5,7 @@ export interface Route {
 export type APIRoutes<T> = {
   [K in keyof T]: Route;
 };
+
+export type API = {
+  [K: string]: (...args: any[]) => any;
+};

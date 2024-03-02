@@ -13,6 +13,7 @@ import {
   DatabaseConfig,
   MailConfig,
   SmsConfig,
+  TelegramConfig,
   Version,
   WebdavConfig,
 } from './config.schema';
@@ -44,6 +45,10 @@ export class ConfigService implements ApplicationConfig {
 
   get webdav(): WebdavConfig {
     return this.config.webdav;
+  }
+
+  get telegram(): TelegramConfig {
+    return this.config.telegram;
   }
 
   get version(): Version {

@@ -5,7 +5,7 @@ import { AuthCheckData, AuthStartData, AuthTelegramData } from './auth.types';
 export interface AuthApi {
   authStart(data: AuthStartData): Promise<void>;
   authFinish(data: AuthCheckData, ...args: any): Promise<void>;
-  authTelegram(data: AuthTelegramData, ...args: any): Promise<void>;
+  authTelegram(data: AuthTelegramData, ...args: any): any;
   checkAuthorized(...args: any): Promise<void>;
 }
 

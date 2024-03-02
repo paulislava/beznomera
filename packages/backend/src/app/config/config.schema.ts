@@ -110,6 +110,12 @@ export class WebdavConfig {
   readonly password: string;
 }
 
+export class TelegramConfig {
+  @IsString()
+  @IsDefined()
+  token: string;
+}
+
 export class ApplicationConfig {
   @IsDefined()
   @ValidateNested()
@@ -135,6 +141,11 @@ export class ApplicationConfig {
   @ValidateNested()
   @Type(() => WebdavConfig)
   readonly webdav: WebdavConfig;
+
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => TelegramConfig)
+  readonly telegram: TelegramConfig;
 }
 
 export interface Version {

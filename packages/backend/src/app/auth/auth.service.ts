@@ -26,6 +26,7 @@ import {
 import { SmsHttpClientService } from '~/common/http-clients/sms-http-client/sms-http-client.service';
 import { randomDigitsString } from '~/common/utils/randomDigitsString';
 import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
+import { createHash, createHmac } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -98,6 +99,8 @@ export class AuthService {
   }
 
   async authTelegram(data: AuthTelegramData, res: Response): Promise<void> {
+    this.checkTelegramData(data);
+
     const findUser = await this.userRepository.findOne({
       where: {
         telegramID: data.id,
@@ -167,6 +170,28 @@ export class AuthService {
       this.getPasswordPhrase(password),
       this.configService.auth.passwordSaltRounds,
     );
+  }
+
+  private checkTelegramData({ hash, ...data }: AuthTelegramData) {
+    const secretKey = createHash('sha256')
+      .update(this.configService.telegram.token)
+      .digest();
+
+    // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
+    const dataCheckString = Object.keys(data)
+      .sort()
+      .map((key) => `${key}=${data[key]}`)
+      .join('\n');
+
+    // run a cryptographic hash function over the data to be authenticated and the secret
+    const hmac = createHmac('sha256', secretKey)
+      .update(dataCheckString)
+      .digest('hex');
+
+    // compare the hash that you calculate on your side (hmac) with what Telegram sends you (hash) and return the result
+    if (hmac !== hash) {
+      throw new AuthServiceException('Telegram authentication failed');
+    }
   }
 
   private getPasswordPhrase(password: string): string {

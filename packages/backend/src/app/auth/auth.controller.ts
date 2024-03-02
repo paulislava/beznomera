@@ -42,7 +42,6 @@ export class AuthController implements AuthApi {
     @Body() data: AuthTelegramDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    console.log('test');
     await this.authService.authTelegram(data, res);
   }
 

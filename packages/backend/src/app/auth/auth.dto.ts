@@ -32,6 +32,9 @@ export class AuthTelegramDto implements AuthTelegramData {
   username: string;
 
   auth_date: number;
+
+  @IsString()
+  @IsNotEmpty()
   first_name: string;
 
   @IsString()

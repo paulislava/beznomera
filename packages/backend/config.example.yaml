@@ -29,3 +29,6 @@ mail:
 webdav:
   username: guest
   password: guest
+
+telegram:
+  token: TOKEN

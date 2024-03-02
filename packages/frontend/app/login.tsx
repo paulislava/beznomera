@@ -1,10 +1,9 @@
 import styled from 'styled-components/native';
 import React, { useCallback } from 'react';
-import { TextInput } from 'react-native';
-import Button from '@/components/Button/Button';
-import TelegramLoginButton from 'telegram-login-button';
+import TelegramLoginButton, { TelegramUser } from 'telegram-login-button';
 
 import { Text } from '../components/Themed';
+import { authService } from '@/services/auth.service';
 
 const LoginContainer = styled(Text)`
   display: flex;
@@ -15,9 +14,15 @@ const LoginContainer = styled(Text)`
 `;
 
 export default function LoginPage(): React.ReactNode {
-  const onTelegramAuth = useCallback(data => {
-    console.dir(data);
-    alert('Auth!');
+  const onTelegramAuth = useCallback((data: TelegramUser) => {
+    authService
+      .authTelegram(data)
+      .then(() => {
+        alert('Logged in!');
+      })
+      .catch(error => {
+        alert(error);
+      });
   }, []);
 
   return (
