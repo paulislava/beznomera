@@ -2,12 +2,8 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-import { Organization } from '../organization.entity';
 
 export abstract class UserCore extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -25,12 +21,11 @@ export abstract class UserCore extends BaseEntity {
   @Column('varchar', { nullable: true })
   tel: string | null;
 
-  @Column({ name: 'organization_id' })
-  organizationId: number;
+  @Column('numeric', { name: 'telegram_id', nullable: true })
+  telegramID: number | null;
 
-  @ManyToOne(() => Organization)
-  @JoinColumn({ name: 'organization_id' })
-  organization: Organization;
+  @Column('varchar', { nullable: true })
+  nickname: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   readonly createdAt: Date;

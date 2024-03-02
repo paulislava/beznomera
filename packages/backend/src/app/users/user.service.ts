@@ -44,16 +44,13 @@ export class UserService {
   async getUserTransactions(userId: number): Promise<UserTransaction[]> {
     const transactions = await this.balanceChangeRepository.find({
       where: { userId },
-      relations: ['payableService'],
     });
 
     return transactions.map((transaction) => ({
       summ: transaction.summ,
       bonusSumm: transaction.bonusSumm,
       date: transaction.date.toISOString(),
-      title: transaction.description
-        ? transaction.description
-        : transaction.payableService?.name ?? null,
+      title: transaction.description,
       id: transaction.id,
     }));
   }

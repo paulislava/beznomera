@@ -11,6 +11,7 @@
       ]
     }
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "telegram-login-button": "^0.1.0"
+  }
 }

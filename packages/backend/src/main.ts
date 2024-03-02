@@ -1,5 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-require('module-alias/register');
+import { addAlias } from 'module-alias';
+
+addAlias('~', __dirname);
 
 import { Encoding } from 'crypto';
 import { ServerResponse } from 'http';

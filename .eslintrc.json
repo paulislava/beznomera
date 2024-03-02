@@ -54,7 +54,7 @@
     "linebreak-style": ["error", "unix"],
     "lines-between-class-members": ["error", "always"],
     "sort-keys": "off",
-    "sort-imports": "off",
+    "sort-imports": "error",
     "import/order": [
       "error",
       {
@@ -100,12 +100,9 @@
     ],
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-inferrable-types": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      {
-        "args": "none"
-      }
-    ],
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "no-unused-vars": "error",
+    "no-unused-expressions": "error",
     "@typescript-eslint/unbound-method": ["off"],
     "@typescript-eslint/no-unsafe-member-access": "warn",
     "@typescript-eslint/explicit-function-return-type": ["off"],

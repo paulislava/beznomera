@@ -5,7 +5,6 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { CurrentAdmin } from 'adminjs';
 
 import { ConfigService } from '../config/config.service';
 import { authMessage } from '../templates/messages';
@@ -26,6 +25,7 @@ import {
 
 import { SmsHttpClientService } from '~/common/http-clients/sms-http-client/sms-http-client.service';
 import { randomDigitsString } from '~/common/utils/randomDigitsString';
+import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -54,16 +54,7 @@ export class AuthService {
     const authCode = await this.authCheck(authMode, identifier, code);
     const user = await this.getOrCreateUserByAuthCode(authCode);
 
-    const now = new Date();
-    const expires = new Date(now.setDate(now.getDate() + 30));
-    const requestUser: RequestUser = {
-      userId: user.id,
-      organizationId: user.organizationId,
-    };
-    const token = this.jwtService.sign(requestUser, { expiresIn: '30d' });
-    res.cookie(this.configService.auth.jwtCookie, token, {
-      expires,
-    });
+    this.saveAuthCookie({ userId: user.id }, res);
   }
 
   @Transactional()
@@ -106,28 +97,26 @@ export class AuthService {
     }
   }
 
-  @Transactional()
-  async authAdmin(
-    email: string,
-    password: string,
-  ): Promise<CurrentAdmin | null> {
-    const adminUser = await this.adminUserRepository.findOneBy({ email });
-    if (!adminUser) {
-      return null;
+  async authTelegram(data: AuthTelegramData, res: Response): Promise<void> {
+    const findUser = await this.userRepository.findOne({
+      where: {
+        telegramID: data.id,
+      },
+    });
+
+    if (findUser) {
+      this.saveAuthCookie({ userId: findUser.id }, res);
     }
 
-    if (!this.comparePassword(password, adminUser.passwordHash)) {
-      return null;
-    }
+    const user = await this.userRepository.save(
+      this.userRepository.create({
+        firstName: data.first_name,
+        nickname: data.username,
+        telegramID: data.id,
+      }),
+    );
 
-    adminUser.authorizedAt = new Date();
-    await adminUser.save();
-
-    return {
-      id: String(adminUser.id),
-      email: adminUser.email,
-      title: adminUser.title,
-    };
+    this.saveAuthCookie({ userId: user.id }, res);
   }
 
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
@@ -157,6 +146,16 @@ export class AuthService {
     await userDraft.save();
 
     return user;
+  }
+
+  private saveAuthCookie(requestUser: RequestUser, res: Response) {
+    const now = new Date();
+    const expires = new Date(now.setDate(now.getDate() + 30));
+
+    const token = this.jwtService.sign(requestUser, { expiresIn: '30d' });
+    res.cookie(this.configService.auth.jwtCookie, token, {
+      expires,
+    });
   }
 
   private comparePassword(password: string, passwordHash: string): boolean {

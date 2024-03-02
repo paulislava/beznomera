@@ -8,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { PayableService } from './payable-service.entity';
 import { User } from './user/user.entity';
 
 @Entity('balance_changes')
@@ -31,13 +30,6 @@ export class BalanceChange extends BaseEntity {
 
   @Column('varchar', { nullable: true })
   description: string | null;
-
-  @Column('varchar', { name: 'payable_service_id', nullable: true })
-  payableServiceId: string | null;
-
-  @JoinColumn({ name: 'payable_service_id' })
-  @ManyToOne(() => PayableService)
-  payableService: PayableService | null;
 
   @CreateDateColumn()
   readonly date: Date;

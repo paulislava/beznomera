@@ -8,7 +8,7 @@ import {
 
 import { ConfigService } from '../config/config.service';
 
-import { AuthCheckDto, AuthStartDto } from './auth.dto';
+import { AuthCheckDto, AuthStartDto, AuthTelegramDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -35,6 +35,15 @@ export class AuthController implements AuthApi {
       data.code,
       res,
     );
+  }
+
+  @Post(AUTH_ROUTES.authTelegram())
+  async authTelegram(
+    @Body() data: AuthTelegramDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    console.log('test');
+    await this.authService.authTelegram(data, res);
   }
 
   @Get(AUTH_ROUTES.checkAuthorized())
