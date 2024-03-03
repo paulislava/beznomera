@@ -62,7 +62,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
 
   async post<Path extends keyof T>(
     path: Path,
-    body: T[Path] extends (...args: any[]) => any ? Parameters<T[Path]>[0] : any,
+    body?: T[Path] extends (...args: any[]) => any ? Parameters<T[Path]>[0] : any,
     pathSegments?: Parameters<APIInfo<T>['simpleRoutes'][Path]>,
     options?: RequestInit
   ): Promise<ReturnType<T[Path]>> {
@@ -76,7 +76,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
           'Content-Type': 'application/json',
           ...options?.headers
         },
-        body: JSON.stringify(body)
+        body: body && JSON.stringify(body)
       }
     });
 
@@ -84,7 +84,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   }
 }
 
-export function createApiService<T>(
+export function createApiService<T extends { [K in keyof T]: (...args: any[]) => any }>(
   api: APIInfo<T>,
   methods?: (service: ApiService<T>) => Partial<T>
 ): T {
@@ -104,7 +104,9 @@ export function createApiService<T>(
 
           switch (route.method) {
             case 'POST':
-              return service.post(key as keyof T, args[0], args.slice(1) as any);
+              const body = route.noBody ? undefined : args[0];
+              const pathSegments = route.noBody ? args : args.slice(1);
+              return service.post(key as keyof T, body, pathSegments as any);
             default:
               return service.get(key as keyof T, args as any);
           }

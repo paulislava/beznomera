@@ -2,6 +2,7 @@ type FunctionalRoute = (...pathSegments: string[]) => string;
 
 interface RouteProps {
   method: 'GET' | 'POST';
+  noBody?: boolean;
 }
 
 const STANDART_API_METHOD: RouteProps['method'] = 'GET';
