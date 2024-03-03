@@ -28,7 +28,7 @@ export class BalanceChange extends BaseEntity {
   @Column({ name: 'bonus_summ', default: 0 })
   bonusSumm: number;
 
-  @Column('varchar', { nullable: true })
+  @Column()
   description: string | null;
 
   @CreateDateColumn()

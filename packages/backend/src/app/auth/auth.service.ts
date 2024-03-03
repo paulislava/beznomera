@@ -158,6 +158,8 @@ export class AuthService {
     const token = this.jwtService.sign(requestUser, { expiresIn: '30d' });
     res.cookie(this.configService.auth.jwtCookie, token, {
       expires,
+      httpOnly: true,
+      path: '/',
     });
   }
 

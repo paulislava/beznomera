@@ -3,6 +3,8 @@ import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import styled from 'styled-components/native';
+import useNeedAuth from '@/hooks/useNeedAuth';
+import withPageTitle from '@/utils/withPageTitle';
 
 const StyledTitle = styled(Text)`
   font-size: 20px;
@@ -10,7 +12,9 @@ const StyledTitle = styled(Text)`
   color: red;
 `;
 
-export default function TabOneScreen() {
+function TabOneScreen() {
+  useNeedAuth();
+
   return (
     <View style={styles.container}>
       <StyledTitle>Tab One</StyledTitle>
@@ -32,3 +36,5 @@ const styles = StyleSheet.create({
     width: '80%'
   }
 });
+
+export default withPageTitle('Чаты', TabOneScreen);

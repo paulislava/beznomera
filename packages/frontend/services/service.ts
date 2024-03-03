@@ -1,6 +1,7 @@
+import env from '@/utils/env';
 import { APIRoutes } from '@paulislava/shared/api-routes';
 
-export const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+export const BACKEND_URL = env('BACKEND_URL');
 
 if (!BACKEND_URL) {
   throw new Error(`BACKEND_URL is not defined`);
@@ -16,19 +17,39 @@ export class ApiService<T> {
     }
 
     this.pathRoutes = pathRoutes;
-    this.basePath = basePath || '/';
+    this.basePath = `/${basePath || ''}`;
   }
 
-  protected async fetch(path: keyof T, options?: RequestInit): Promise<Response> {
+  protected async fetch(
+    path: keyof T,
+    options?: RequestInit,
+    queryParams?: Record<string, any>
+  ): Promise<Response> {
     const route = this.pathRoutes[path]();
 
-    const res = await fetch(`${BACKEND_URL}${this.basePath}${route}`, options);
+    const res = await fetch(
+      `${BACKEND_URL}${this.basePath}${route ? `/${route}` : ''}${
+        queryParams ? `?${new URLSearchParams(queryParams).toString()}` : ''
+      }`,
+      {
+        credentials: 'include',
+        ...options
+      }
+    );
 
     if (res.status < 200 || res.status >= 300) {
       throw new Error(`${res.status}: ${res.statusText}`);
     }
 
     return res;
+  }
+
+  async get<Path extends keyof T>(
+    path: Path,
+    options?: RequestInit,
+    args?: T[Path] extends (...args: any[]) => any ? Parameters<T[Path]>[0] : any
+  ): Promise<Response> {
+    return this.fetch(path, { ...options }, args);
   }
 
   protected post<Path extends keyof T>(

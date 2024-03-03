@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --port 80",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web --port ${FRONTEND_PORT}",
@@ -31,7 +31,8 @@
     "react-native-screens": "~3.29.0",
     "react-native-web": "~0.19.6",
     "styled-components": "^6.1.8",
-    "telegram-login-button": "^0.1.0"
+    "telegram-login-button": "^0.1.0",
+    "expo-device": "~5.9.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

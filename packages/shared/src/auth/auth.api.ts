@@ -9,13 +9,13 @@ export interface AuthApi {
   checkAuthorized(...args: any): Promise<void>;
 }
 
-export const AUTH_CONTROLLER_PATH = '/auth';
+export const AUTH_CONTROLLER_PATH = 'auth';
 
 export const AUTH_ROUTES: APIRoutes<AuthApi> = {
-  authStart: () => '/start',
-  authFinish: () => '/finish',
-  authTelegram: () => '/telegram',
-  checkAuthorized: () => '/check'
+  authStart: () => 'start',
+  authFinish: () => 'finish',
+  authTelegram: () => 'telegram',
+  checkAuthorized: () => 'check'
 };
 
 export const authFullRoute = (route: string): string => `${AUTH_CONTROLLER_PATH}${route}`;

@@ -15,16 +15,16 @@ export abstract class UserCore extends BaseEntity {
   @Column('varchar', { name: 'last_name', nullable: true })
   lastName: string | null;
 
-  @Column('varchar', { nullable: true })
+  @Column()
   email: string | null;
 
-  @Column('varchar', { nullable: true })
+  @Column()
   tel: string | null;
 
   @Column('numeric', { name: 'telegram_id', nullable: true })
   telegramID: number | null;
 
-  @Column('varchar', { nullable: true })
+  @Column()
   nickname: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

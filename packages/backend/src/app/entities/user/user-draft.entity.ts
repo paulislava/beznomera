@@ -5,10 +5,10 @@ import { User } from './user.entity';
 
 @Entity('user_drafts')
 export class UserDraft extends UserCore {
-  @Column({ name: 'user_id', nullable: true })
+  @Column({ nullable: true })
   userId: number | null;
 
   @OneToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn()
   user: User | null;
 }

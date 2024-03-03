@@ -11,3 +11,10 @@ export interface UserTransaction {
   bonusSumm: number;
   id: string;
 }
+
+export interface UserProfile {
+  firstName: string;
+  lastName: string;
+  avatarUrl?: string;
+  nickname: string;
+}

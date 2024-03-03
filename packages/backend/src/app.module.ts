@@ -9,6 +9,7 @@ import { AuthModule } from './app/auth/auth.module';
 import { HttpClientsModule } from './common/http-clients/http-clients.module';
 import { MailModule } from './app/mail/mail.module';
 import { UserModule } from './app/users/user.module';
+import { CarModule } from './app/car/car.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserModule } from './app/users/user.module';
     MailModule,
     AuthModule,
     UserModule,
+    CarModule,
   ],
   controllers: [AppController],
   providers: [AppService],

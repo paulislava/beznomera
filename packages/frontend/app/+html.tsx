@@ -1,3 +1,4 @@
+import { SITE_TITLE } from '@/constants/site';
 import { ScrollViewStyleReset } from 'expo-router/html';
 
 // This file is web-only and used to configure the root HTML for every
@@ -6,11 +7,13 @@ import { ScrollViewStyleReset } from 'expo-router/html';
 // do not have access to the DOM or browser APIs.
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en'>
+    <html lang='ru'>
       <head>
         <meta charSet='utf-8' />
         <meta httpEquiv='X-UA-Compatible' content='IE=edge' />
         <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no' />
+
+        <title>{SITE_TITLE}</title>
 
         {/*
           Disable body scrolling on web. This makes ScrollView components work closer to how they do on native.

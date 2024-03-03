@@ -1,33 +1,43 @@
-import styled from 'styled-components/native';
 import React, { useCallback } from 'react';
 import TelegramLoginButton, { TelegramUser } from 'telegram-login-button';
 
-import { Text } from '../components/Themed';
+import { Text, View } from '../components/Themed';
 import { authService } from '@/services/auth.service';
+import withPageTitle from '@/utils/withPageTitle';
+import withRouter, { WithRouterProps } from '@/utils/withRouter';
+import env from '@/utils/env';
+import { IS_WEB } from '@/constants/site';
+import Button from '@/components/Button/Button';
 
-const LoginContainer = styled(Text)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f0f2f5;
-`;
+const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME');
 
-export default function LoginPage(): React.ReactNode {
+function LoginPage({ router }: WithRouterProps): React.ReactNode {
   const onTelegramAuth = useCallback((data: TelegramUser) => {
     authService
       .authTelegram(data)
       .then(() => {
-        alert('Logged in!');
+        router.replace('/');
       })
       .catch(error => {
-        alert(error);
+        alert('Произошла ошибка при входе. Повторите попытку');
+        console.error(error);
       });
   }, []);
 
   return (
-    <LoginContainer>
-      <TelegramLoginButton botName='beznomera_bot' dataOnauth={onTelegramAuth} />
-    </LoginContainer>
+    <View fullHeight center>
+      <Text>
+        {TELEGRAM_BOT_NAME && IS_WEB && (
+          <TelegramLoginButton botName={TELEGRAM_BOT_NAME} dataOnauth={onTelegramAuth} />
+        )}
+        {!IS_WEB && (
+          <Button externalHref='https://oauth.telegram.org/auth?bot_id=6914096008&origin=http%3A%2F%2F127.0.0.1&embed=1&request_access=write&return_to=http%3A%2F%2F127.0.0.1%2Flogin'>
+            Войти через Telegram
+          </Button>
+        )}
+      </Text>
+    </View>
   );
 }
+
+export default withPageTitle('Вход', withRouter(LoginPage));

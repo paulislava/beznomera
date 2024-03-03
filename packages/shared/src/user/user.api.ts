@@ -13,5 +13,3 @@ export const USER_ROUTES: APIRoutes<UserApi> = {
   balance: () => '/balance',
   transactions: () => '/transactions'
 };
-
-export const userFullRoute = (route: string): string => `${USER_CONTROLLER_PATH}${route}`;

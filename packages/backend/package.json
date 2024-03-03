@@ -28,6 +28,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.2",
+    "@paulislava/shared": "file:../shared",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cjstoesm": "^2.1.2",
@@ -46,8 +47,7 @@
     "rxjs": "^7.8.1",
     "striptags": "^3.2.0",
     "typeorm": "^0.3.20",
-    "typeorm-transactional-cls-hooked": "^0.1.21",
-    "@paulislava/shared": "file:../shared"
+    "typeorm-transactional-cls-hooked": "^0.1.21"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -59,6 +59,11 @@
     "@types/jest": "^29.5.2",
     "@types/module-alias": "^2.0.4",
     "@types/supertest": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",

@@ -18,7 +18,9 @@
     "start:backend:prod": "cd packages/backend; npm run build; npm run start:prod",
     "typeorm": "cd packages/backend; npm run typeorm",
     "build:frontend": "cd packages/frontend; npm run build",
-    "start:frontend:dev": "cd packages/frontend; npm run web",
+    "start:frontend:dev": "cd packages/frontend; npm run start",
+    "start:frontend:web": "cd packages/frontend; npm run web",
+    "start:frontend:ios": "cd packages/frontend; npm run ios",
     "start:frontend:prod": "cd packages/frontend; npm run build; npm run prod"
   },
   "repository": {

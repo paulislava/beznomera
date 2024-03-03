@@ -13,8 +13,8 @@ export class AuthService extends ApiService<AuthApi> implements AuthApi {
   async authTelegram(body: TelegramUser): Promise<void> {
     await this.post('authTelegram', body);
   }
-  checkAuthorized(...args: any): Promise<void> {
-    throw new Error('Method not implemented.');
+  async checkAuthorized(): Promise<void> {
+    await this.get('checkAuthorized');
   }
 }
 

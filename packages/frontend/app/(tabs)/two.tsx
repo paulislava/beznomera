@@ -1,8 +1,22 @@
 import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import useNeedAuth from '@/hooks/useNeedAuth';
+import { useFocusEffect } from 'expo-router';
+import { useState } from 'react';
+import useSetTitle from '@/hooks/useSetTitle';
 
 export default function TabTwoScreen() {
+  useNeedAuth();
+
+  const [changed, setChanged] = useState(false);
+
+  useSetTitle(changed ? 'yes' : 'no');
+
+  useFocusEffect(() => {
+    setTimeout(() => setChanged(true), 3000);
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Two</Text>

@@ -4,10 +4,11 @@
  */
 
 import React from 'react';
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import { ColorValue, Text as DefaultText, View as DefaultView } from 'react-native';
 import Colors from '@/constants/Colors';
 
 import { useColorScheme } from './useColorScheme';
+import styled, { css } from 'styled-components/native';
 
 type ThemeProps = {
   lightColor?: string;
@@ -15,7 +16,27 @@ type ThemeProps = {
 };
 
 export type TextProps = ThemeProps & DefaultText['props'];
-export type ViewProps = ThemeProps & DefaultView['props'];
+export type ViewProps = ThemeProps &
+  DefaultView['props'] & { fullHeight?: boolean; center?: boolean };
+
+const StyledViewContainer = styled(DefaultView)<{
+  $fullHeight?: boolean;
+  $center?: boolean;
+  $backgroundColor?: ColorValue;
+}>`
+  ${({ $fullHeight }) =>
+    $fullHeight &&
+    css`
+      flex: 1;
+    `}
+
+  ${({ $center }) =>
+    $center &&
+    css`
+      align-items: center;
+      justify-content: center;
+    `}
+`;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -39,8 +60,15 @@ export function Text(props: TextProps) {
 }
 
 export function View(props: ViewProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
+  const { style, lightColor, darkColor, fullHeight, center, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
-  return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+  return (
+    <StyledViewContainer
+      $fullHeight={fullHeight}
+      $center={center}
+      style={[{ backgroundColor }, style]}
+      {...otherProps}
+    />
+  );
 }
