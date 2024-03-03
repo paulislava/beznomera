@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthApi, AUTH_API } from '@paulislava/shared/auth/auth.api';
+import AUTH_API, { AuthApi } from '@paulislava/shared/auth/auth.api';
 
 import { ConfigService } from '../config/config.service';
 

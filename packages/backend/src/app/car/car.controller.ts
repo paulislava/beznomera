@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
-import { CAR_API, CODE_PARAM, CarApi } from '@paulislava/shared/car/car.api';
+import CAR_API, { CODE_PARAM, CarApi } from '@paulislava/shared/car/car.api';
 import { CarInfo } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 

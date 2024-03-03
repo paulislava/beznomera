@@ -7,7 +7,7 @@ if (!BACKEND_URL) {
   throw new Error(`BACKEND_URL is not defined`);
 }
 
-class ApiService<T> {
+class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   private readonly basePath: string;
   private readonly api: APIInfo<T>;
 
@@ -50,21 +50,23 @@ class ApiService<T> {
     return res;
   }
 
-  get<Path extends keyof T>(
+  async get<Path extends keyof T>(
     path: Path,
     pathSegments?: Parameters<APIInfo<T>['simpleRoutes'][Path]>,
     options?: RequestInit
-  ): Promise<Response> {
-    return this.fetch({ path, options, pathSegments: pathSegments });
+  ): Promise<ReturnType<T[Path]>> {
+    const res = await this.fetch({ path, options, pathSegments: pathSegments });
+
+    return res.json();
   }
 
-  post<Path extends keyof T>(
+  async post<Path extends keyof T>(
     path: Path,
     body: T[Path] extends (...args: any[]) => any ? Parameters<T[Path]>[0] : any,
     pathSegments?: Parameters<APIInfo<T>['simpleRoutes'][Path]>,
     options?: RequestInit
-  ): Promise<Response> {
-    return this.fetch({
+  ): Promise<ReturnType<T[Path]>> {
+    const res = await this.fetch({
       path,
       pathSegments,
       options: {
@@ -77,6 +79,8 @@ class ApiService<T> {
         body: JSON.stringify(body)
       }
     });
+
+    return res.json();
   }
 }
 

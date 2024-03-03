@@ -1,4 +1,5 @@
 import { Text, View } from '@/components/Themed';
+import useSetTitle from '@/hooks/useSetTitle';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
@@ -8,15 +9,17 @@ const CallUserPage = () => {
   const { code } = useLocalSearchParams<{ code: string }>();
   const [requested, setRequested] = useState(false);
   const [info, setInfo] = useState<CarInfo | null>(null);
+  useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
 
   useEffect(() => {
     carService
       .info(code)
       .then(info => {
         setRequested(true);
+        console.log(info);
         setInfo(info);
       })
-      .then(() => {
+      .catch(() => {
         setRequested(true);
       });
   }, [code]);
@@ -24,7 +27,7 @@ const CallUserPage = () => {
   return (
     <View fullHeight center>
       {requested && !info && <Text>Ошибка: ссылка недействительна</Text>}
-      <div>Code: ${code}</div>
+      <div>Code: {code}</div>
       {info && <Text>{JSON.stringify(info)}</Text>}
     </View>
   );
