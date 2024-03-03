@@ -27,24 +27,22 @@ export class AuthCode extends BaseEntity {
   @Column()
   code: string;
 
-  @Column({ name: 'user_id', nullable: true })
+  @Column({ nullable: true })
   userId: number | null;
 
   @ManyToOne(() => User)
-  @JoinColumn({ name: 'user_id' })
   user: User | null;
 
-  @Column({ name: 'user_draft_id', nullable: true })
+  @Column({ nullable: true })
   userDraftId: number | null;
 
   @ManyToOne(() => UserDraft)
-  @JoinColumn({ name: 'user_draft_id' })
   userDraft: UserDraft | null;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   readonly createdAt: Date;
 
-  @Column('timestamp', { name: 'closed_at', nullable: true })
+  @Column('timestamp', { nullable: true })
   closedAt: Date | null;
 
   @Column({ default: false })

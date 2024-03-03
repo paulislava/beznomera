@@ -9,19 +9,19 @@ export abstract class UserCore extends BaseEntity {
   @PrimaryGeneratedColumn()
   readonly id: number;
 
-  @Column('varchar', { name: 'first_name', nullable: true })
+  @Column({ nullable: true })
   firstName: string | null;
 
-  @Column('varchar', { name: 'last_name', nullable: true })
+  @Column({ nullable: true })
   lastName: string | null;
 
-  @Column()
+  @Column({ nullable: true })
   email: string | null;
 
-  @Column()
+  @Column({ nullable: true })
   tel: string | null;
 
-  @Column('numeric', { name: 'telegram_id', nullable: true })
+  @Column({ nullable: true })
   telegramID: number | null;
 
   @Column()

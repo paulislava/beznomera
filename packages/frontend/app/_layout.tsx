@@ -59,7 +59,7 @@ function RootLayoutNav() {
           <Stack.Screen name='login' options={{ headerShown: false, title: 'Вход' }} />
 
           <Stack.Screen
-            name='g/[user]'
+            name='g/[code]'
             options={{ headerShown: false, title: 'Позвать водителя' }}
           />
         </Stack>

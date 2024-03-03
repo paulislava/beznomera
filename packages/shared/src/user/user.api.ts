@@ -1,4 +1,4 @@
-import { APIRoutes } from '../api-routes';
+import { APIRoutes, apiInfo } from '../api-routes';
 
 import { UserBalance, UserTransaction } from './user.types';
 
@@ -13,3 +13,5 @@ export const USER_ROUTES: APIRoutes<UserApi> = {
   balance: () => '/balance',
   transactions: () => '/transactions'
 };
+
+export const USER_API = apiInfo(USER_ROUTES);

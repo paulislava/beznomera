@@ -1,4 +1,4 @@
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 

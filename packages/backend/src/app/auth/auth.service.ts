@@ -109,6 +109,7 @@ export class AuthService {
 
     if (findUser) {
       this.saveAuthCookie({ userId: findUser.id }, res);
+      return;
     }
 
     const user = await this.userRepository.save(

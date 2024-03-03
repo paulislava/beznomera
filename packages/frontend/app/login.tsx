@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import TelegramLoginButton, { TelegramUser } from 'telegram-login-button';
 
 import { Text, View } from '../components/Themed';
-import { authService } from '@/services/auth.service';
+import { authService } from '@/services';
 import withPageTitle from '@/utils/withPageTitle';
 import withRouter, { WithRouterProps } from '@/utils/withRouter';
 import env from '@/utils/env';
