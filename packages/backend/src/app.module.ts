@@ -10,6 +10,7 @@ import { HttpClientsModule } from './common/http-clients/http-clients.module';
 import { MailModule } from './app/mail/mail.module';
 import { UserModule } from './app/users/user.module';
 import { CarModule } from './app/car/car.module';
+import { TelegramModule } from './app/telegram/telegram.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CarModule } from './app/car/car.module';
     AuthModule,
     UserModule,
     CarModule,
+    TelegramModule,
   ],
   controllers: [AppController],
   providers: [AppService],

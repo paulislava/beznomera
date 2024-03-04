@@ -57,7 +57,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   ): Promise<ReturnType<T[Path]>> {
     const res = await this.fetch({ path, options, pathSegments: pathSegments });
 
-    return res.json();
+    return this.formatResult(res);
   }
 
   async post<Path extends keyof T>(
@@ -80,7 +80,17 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
       }
     });
 
-    return res.json();
+    return this.formatResult(res);
+  }
+
+  private async formatResult(res: Response) {
+    if (res.headers.get('Content-Type') === 'application/json') {
+      return res.json();
+    } else if (res.headers.get('Content-length') === '0') {
+      return;
+    }
+
+    return res.text();
   }
 }
 

@@ -14,6 +14,9 @@ export class Car extends BaseEntity {
   @PrimaryColumn()
   no: string;
 
+  @Column({ nullable: true })
+  title: string | null;
+
   @ManyToOne(() => User)
   owner: User;
 

@@ -5,6 +5,7 @@
   "scripts": {
     "start": "expo start --port 80",
     "android": "expo start --android",
+    "build": "expo export -p web",
     "ios": "expo start --ios",
     "web": "expo start --web --port ${FRONTEND_PORT}",
     "test": "jest --watchAll"
