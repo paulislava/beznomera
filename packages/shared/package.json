@@ -4,6 +4,9 @@
   "exports": {
     "./*": "./build/*.js"
   },
+  "scripts": {
+    "build": "tsc --build ."
+  },
   "typesVersions": {
     "*": {
       "*": [

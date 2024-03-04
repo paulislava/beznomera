@@ -4,7 +4,7 @@ import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import styled from 'styled-components/native';
 import useNeedAuth from '@/hooks/useNeedAuth';
-import withPageTitle from '@/utils/withPageTitle';
+import Head from 'expo-router/head';
 
 const StyledTitle = styled(Text)`
   font-size: 20px;
@@ -17,6 +17,9 @@ function TabOneScreen() {
 
   return (
     <View style={styles.container}>
+      <Head>
+        <title>Чаты</title>
+      </Head>
       <StyledTitle>Tab One</StyledTitle>
       <View style={styles.separator} lightColor='#eee' darkColor='rgba(255,255,255,0.1)' />
       <EditScreenInfo path='app/(tabs)/index.tsx' />
@@ -37,4 +40,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default withPageTitle('Чаты', TabOneScreen);
+export default TabOneScreen;

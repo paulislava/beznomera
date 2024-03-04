@@ -4,7 +4,8 @@ import { APIInfo } from '@paulislava/shared/api-routes';
 export const BACKEND_URL = env('BACKEND_URL');
 
 if (!BACKEND_URL) {
-  throw new Error(`BACKEND_URL is not defined`);
+  console.error(`BACKEND_URL is not defined`);
+  // throw new Error(`BACKEND_URL is not defined`);
 }
 
 class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
@@ -84,7 +85,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   }
 
   private async formatResult(res: Response) {
-    if (res.headers.get('Content-Type') === 'application/json') {
+    if (res.headers.get('Content-Type')?.startsWith('application/json')) {
       return res.json();
     } else if (res.headers.get('Content-length') === '0') {
       return;

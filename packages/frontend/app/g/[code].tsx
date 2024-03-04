@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button';
 import { Text, View } from '@/components/Themed';
-import useSetTitle from '@/hooks/useSetTitle';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
+import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useState } from 'react';
 
 const CallUserPage = () => {
@@ -12,7 +12,7 @@ const CallUserPage = () => {
   const [info, setInfo] = useState<CarInfo | null>(null);
   const [called, setCalled] = useState(false);
 
-  useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
+  // useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
 
   useEffect(() => {
     carService
@@ -37,8 +37,13 @@ const CallUserPage = () => {
       });
   }, []);
 
+  console.log(info);
+
   return (
     <View fullHeight center>
+      <Head>
+        <title>{info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто'}</title>
+      </Head>
       {requested && !info && <Text>Ошибка: ссылка недействительна</Text>}
       <div>Code: {code}</div>
       {info && (

@@ -3,11 +3,11 @@ import TelegramLoginButton, { TelegramUser } from 'telegram-login-button';
 
 import { Text, View } from '../components/Themed';
 import { authService } from '@/services';
-import withPageTitle from '@/utils/withPageTitle';
 import withRouter, { WithRouterProps } from '@/utils/withRouter';
 import env from '@/utils/env';
 import { IS_WEB } from '@/constants/site';
 import Button from '@/components/Button/Button';
+import Head from 'expo-router/head';
 
 const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME');
 
@@ -26,6 +26,9 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
 
   return (
     <View fullHeight center>
+      <Head>
+        <title>Вход</title>
+      </Head>
       <Text>
         {TELEGRAM_BOT_NAME && IS_WEB && (
           <TelegramLoginButton botName={TELEGRAM_BOT_NAME} dataOnauth={onTelegramAuth} />
@@ -40,4 +43,4 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
   );
 }
 
-export default withPageTitle('Вход', withRouter(LoginPage));
+export default withRouter(LoginPage);

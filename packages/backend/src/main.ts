@@ -55,6 +55,6 @@ async function bootstrap() {
 
   app.use(bodyParser.urlencoded({ verify: rawBodyBuffer, extended: true }));
   app.use(bodyParser.json({ verify: rawBodyBuffer }));
-  await app.listen(process.env.APP_PORT);
+  await app.listen(process.env.APP_PORT ?? 3000);
 }
 bootstrap().catch((e: Error) => console.error(e));

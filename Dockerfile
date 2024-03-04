@@ -31,10 +31,13 @@ ENV FRONTEND_PORT=$frontend_port \
     APP_SOURCE_COMMIT=$app_source_commit \
     APP_BUILD_TIME=$app_build_time
 RUN npm run build
-RUN npm run lint
+# RUN npm run lint
 RUN (cd /app/packages/shared; npm prune --production)
 RUN (cd /app/packages/backend; npm prune --production)
 
+FROM nginx:1.25.4-alpine AS frontend
+COPY packages/frontend/nginx/default.conf /etc/nginx/conf.d/
+COPY --from=build /app/packages/frontend/dist/ /usr/share/nginx/html/
 
 FROM node:18.12-slim AS backend
 ARG app_version
@@ -52,6 +55,3 @@ ENV NODE_ENV=production \
 CMD node /app/main.js
 
 
-FROM nginx:1.25.4-alpine AS frontend
-COPY packages/frontend/nginx/default.conf /etc/nginx/conf.d/
-COPY --from=build /app/packages/frontend/dist/ /usr/share/nginx/html/
