@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": false,
     "types": ["node", "jest"],
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
+      "@paulislava/shared/*": ["../shared/src/*"],
     }
   },
   "sourceMap": true,

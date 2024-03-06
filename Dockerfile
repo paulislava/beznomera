@@ -6,9 +6,9 @@ COPY .prettierignore /app
 COPY *.json /app/
 COPY packages/shared/*.json /app/packages/shared/
 COPY packages/frontend/*.json /app/packages/frontend/
-RUN npm ci & \
-  npm ci --prefix=packages/shared & \
-  npm ci --prefix=packages/frontend & \
+RUN npm ci && \
+  npm ci --prefix=packages/shared && \
+  npm ci --prefix=packages/frontend && \
   wait
 COPY packages/shared /app/packages/shared
 COPY packages/frontend /app/packages/frontend
@@ -22,6 +22,7 @@ ENV FRONTEND_PORT=80 \
 RUN npm run build:frontend
 # RUN npm run lint
 RUN (cd /app/packages/shared; npm prune --production)
+RUN (cd /app/packages/frontend; npm prune --production)
 
 FROM node:18.12-slim AS build-backend
 COPY .npmrc /root/.npmrc
@@ -31,9 +32,9 @@ COPY .prettierignore /app
 COPY *.json /app/
 COPY packages/shared/*.json /app/packages/shared/
 COPY packages/backend/*.json /app/packages/backend/
-RUN npm ci & \
-  npm ci --prefix=packages/shared & \
-  npm ci --prefix=packages/backend & \
+RUN npm ci && \
+  npm ci --prefix=packages/shared && \
+  npm ci --prefix=packages/backend && \
   wait
 COPY packages/shared /app/packages/shared
 COPY packages/backend /app/packages/backend
@@ -69,7 +70,7 @@ EXPOSE 3000
 
 COPY --from=build-backend /app/packages/backend/node_modules /app/node_modules
 COPY --from=build-backend /app/packages/shared /app/node_modules/@paulislava/shared
-COPY --from=build-backend /app/packages/backend/dist /app/
+COPY --from=build-backend /app/packages/backend/dist /app
 
 ENV NODE_ENV=production 
 ENTRYPOINT [ "node",  "/app/main.js" ]

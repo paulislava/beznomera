@@ -6,7 +6,6 @@ import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 
 import { TelegramService } from './telegram.service';
-import { TelegramUpdate } from './telegram.update';
 
 @Module({
   imports: [
@@ -20,6 +19,6 @@ import { TelegramUpdate } from './telegram.update';
       }),
     }),
   ],
-  providers: [Telegraf, TelegramService, TelegramUpdate],
+  providers: [Telegraf, TelegramService],
 })
 export class TelegramModule {}
