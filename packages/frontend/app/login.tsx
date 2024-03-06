@@ -9,7 +9,7 @@ import { IS_WEB } from '@/constants/site';
 import Button from '@/components/Button/Button';
 import Head from 'expo-router/head';
 
-const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME');
+const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
 
 function LoginPage({ router }: WithRouterProps): React.ReactNode {
   const onTelegramAuth = useCallback((data: TelegramUser) => {

@@ -1,5 +1,5 @@
-function env(name: string) {
-  return process.env[`EXPO_PUBLIC_${name}`];
+function env(name: string, defaultValue: any) {
+  return process.env[`EXPO_PUBLIC_${name}`] || defaultValue;
 }
 
 export default env;
