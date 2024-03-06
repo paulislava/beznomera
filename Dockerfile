@@ -51,7 +51,7 @@ EXPOSE 80
 ARG frontend_backend_url
 ARG telegram_bot_name
 
-COPY --from=build-frontend /app/packages/frontend /app
+COPY --from=build-frontend /app/packages/frontend/node_modules /app/node_modules
 COPY --from=build-frontend /app/packages/shared /app/node_modules/@paulislava/shared
 COPY --from=build-frontend /app/packages/frontend/dist /app
 
@@ -67,10 +67,6 @@ FROM node:18.12-slim AS backend
 
 EXPOSE 3000
 
-ARG app_version
-ARG app_source_branch
-ARG app_source_commit
-ARG app_build_time
 COPY --from=build-backend /app/packages/backend/node_modules /app/node_modules
 COPY --from=build-backend /app/packages/shared /app/node_modules/@paulislava/shared
 COPY --from=build-backend /app/packages/backend/dist /app/
