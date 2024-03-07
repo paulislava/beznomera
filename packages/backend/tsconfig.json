@@ -1,4 +1,5 @@
 {
+
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
@@ -19,7 +20,8 @@
     "noFallthroughCasesInSwitch": false,
     "types": ["node", "jest"],
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["src/*"],
+      "@paulislava/shared/*": ["../shared/src/*"],
     }
   },
   "sourceMap": true,
@@ -27,3 +29,4 @@
   "exclude": ["node_modules", ".coverage", "dist"],
   "references": [{ "path": "../shared" }]
 }
+

@@ -70,7 +70,7 @@ EXPOSE 3000
 
 COPY --from=build-backend /app/packages/backend/node_modules /app/node_modules
 COPY --from=build-backend /app/packages/shared /app/node_modules/@paulislava/shared
-COPY --from=build-backend /app/packages/backend/dist /app
+COPY --from=build-backend /app/packages/backend/dist/backend /app
 
 ENV NODE_ENV=production 
 ENTRYPOINT [ "node",  "/app/main.js" ]

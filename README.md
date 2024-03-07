@@ -16,7 +16,7 @@ docker run -it -p 80:80 beznomera:frontend
 
 
 # Сборка бэкенда
-sudo docker build --target backend -t beznomera:backend https://github.com/paulislava/beznomera.git
+sudo docker build --target backend --no-cache -t beznomera:backend https://github.com/paulislava/beznomera.git
 
 # Запуск контейнера бэкенда
 sudo docker run -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml beznomera:backend
