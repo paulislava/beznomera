@@ -25,5 +25,5 @@ sudo docker run -it --network host -v /home/admin/web/beznomera.paulislava.space
 frontend_backend_url=http://127.0.0.1:3000 telegram_bot_name=beznomera_bot docker build --target frontend -t beznomera:frontend https://github.com/paulislava/beznomera.git
 
 # Запуск контейнера фронтенда
-docker run -it -p 80:80 beznomera:frontend
+docker run -it -p 80:80 beznomera:frontend:latest
 
