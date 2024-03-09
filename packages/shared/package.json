@@ -1,6 +1,9 @@
 {
   "name": "@paulislava/shared",
   "private": true,
+  "exports": {
+    "./*": "./build/*.js"
+  },
   "scripts": {
     "build": "tsc --build ."
   },
