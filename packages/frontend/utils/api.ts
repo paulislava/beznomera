@@ -1,7 +1,7 @@
 import env from '@/utils/env';
 import { APIInfo } from '@paulislava/shared/api-routes';
 
-export const BACKEND_URL = env('BACKEND_URL', 'http://127.0.0.1:3000');
+export const BACKEND_URL = env('BACKEND_URL', '/api');
 
 if (!BACKEND_URL) {
   console.error(`BACKEND_URL is not defined`);

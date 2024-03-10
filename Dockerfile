@@ -17,7 +17,7 @@ ARG frontend_backend_url=/api
 ARG telegram_bot_name=beznomera_bot
 
 ENV FRONTEND_PORT=80 \
-  EXPO_PUBLIC_BACKEND_URL=$frontend_backend_url \
+  EXPO_PUBLIC_BACKEND_URL=/api \
   EXPO_PUBLIC_TELEGRAM_BOT_NAME=$telegram_bot_name 
 RUN npm run build:frontend
 # RUN npm run lint
