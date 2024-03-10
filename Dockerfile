@@ -66,7 +66,7 @@ ENV NODE_ENV=production \
   EXPO_PUBLIC_TELEGRAM_BOT_NAME=$telegram_bot_name\
   EXPO_PUBLIC_BACKEND_URL=$frontend_backend_url \
   PORT=80
-ENTRYPOINT ["npx", "serve"]
+ENTRYPOINT ["npx", "serve", "-s"]
 
 FROM node:18.12-slim AS backend
 
