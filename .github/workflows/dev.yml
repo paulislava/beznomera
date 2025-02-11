@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-backend:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
           docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
 
   build-frontend:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -43,7 +43,7 @@ jobs:
           docker run -it -d -p 4000:80 beznomera:frontend
 
   clean:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [build-frontend, build-backend]
     steps:
       - name: Checkout code
