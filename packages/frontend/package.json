@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --port 80",
+    "start": "expo start --port ${FRONTEND_PORT}",
     "android": "expo start --android",
     "build": "EXPO_PUBLIC_BACKEND_URL=/api expo export -p web",
     "ios": "expo start --ios",
