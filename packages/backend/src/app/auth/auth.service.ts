@@ -160,6 +160,8 @@ export class AuthService {
     res.cookie(this.configService.auth.jwtCookie, token, {
       expires,
       httpOnly: true,
+      secure: true,
+      sameSite: 'none',
       path: '/',
     });
   }
