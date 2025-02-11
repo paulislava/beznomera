@@ -13,7 +13,10 @@ jobs:
         run: |
           echo "Building backend Docker image..."
           docker build --target backend --rm -t beznomera:backend https://github.com/paulislava/beznomera.git
-          docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
+          docker stop beznoemra:backend || true
+          docker rm -f beznomera:backend || true
+
+          docker run --name beznomera:backend -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera:backend) || true
 
   build-frontend:
@@ -23,7 +26,10 @@ jobs:
         run: |
           echo "Building frontend Docker image..."
           frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
-          docker run -it -d -p 4000:80 beznomera:frontend
+          docker stop beznoemra:frontend || true
+          docker rm -f beznomera:frontend || true
+
+          docker run --name beznomera:frontend -it -d -p 4000:80 beznomera:frontend
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera:frontend) || true
 
   clean:
