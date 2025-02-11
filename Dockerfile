@@ -20,7 +20,7 @@ RUN cd /app/packages/shared && npm prune --production && cd /app/packages/backen
 RUN npm ci
 
 ENV NODE_ENV=production
-RUN npm run build
+RUN npm run build:backend
 RUN npm prune --production
 
 FROM node:18.12-slim AS backend
