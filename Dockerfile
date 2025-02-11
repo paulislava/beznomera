@@ -18,8 +18,6 @@ COPY packages/backend /app/packages/backend
 
 RUN cd /app/packages/shared && npm prune --production && cd /app/packages/backend
 
-RUN npm ci
-
 ENV NODE_ENV=production
 RUN npm run build:backend
 RUN npm prune --production
