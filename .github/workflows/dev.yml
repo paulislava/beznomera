@@ -40,5 +40,5 @@ jobs:
       - name: Build frontend Docker image
         run: |
           echo "Building frontend Docker image..."
-          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --no-cache --rm -f frontend.Dockerfile -t beznomera:frontend
+          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend .
           docker run -it -d -p 4000:80 beznomera:frontend
