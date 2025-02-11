@@ -21,7 +21,7 @@ jobs:
       - name: Build backend Docker image
         run: |
           echo "Building backend Docker image..."
-          docker build --target backend --rm -t beznomera:backend .
+          docker build --target backend --rm --no-cache -t beznomera:backend .
           docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
 
 
@@ -40,5 +40,5 @@ jobs:
       - name: Build frontend Docker image
         run: |
           echo "Building frontend Docker image..."
-          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend .
+          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile --no-cache -t beznomera:frontend .
           docker run -it -d -p 4000:80 beznomera:frontend
