@@ -27,3 +27,6 @@ sudo frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --no
 # Запуск контейнера фронтенда
 sudo docker run -it -d -p 4000:80 beznomera:frontend
 
+# Запуск postgres
+
+docker run -d --name postgres -p 5432:5432 -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=somepassword postgres:16.1
