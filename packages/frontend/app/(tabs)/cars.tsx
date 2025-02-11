@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import styled from 'styled-components/native';
 import useNeedAuth from '@/hooks/useNeedAuth';
 import Head from 'expo-router/head';
+import { carService } from '@/services';
+import { ShortCarInfo } from '@shared/car/car.types';
 
 const StyledTitle = styled(Text)`
   font-size: 20px;
@@ -15,14 +17,19 @@ const StyledTitle = styled(Text)`
 function TabOneScreen() {
   useNeedAuth();
 
+  const [cars, setCars] = useState<ShortCarInfo[]>();
+
+  useEffect(() => {
+    carService.list().then(setCars);
+  }, []);
+
   return (
     <View style={styles.container}>
       <Head>
-        <title>Чаты</title>
+        <title>Мои авто</title>
       </Head>
-      <StyledTitle>Tab One</StyledTitle>
-      <View style={styles.separator} lightColor='#eee' darkColor='rgba(255,255,255,0.1)' />
-      <EditScreenInfo path='app/(tabs)/index.tsx' />
+      
+      {cars?.map(car => <div>{JSON.stringify(car)}</div>)}
     </View>
   );
 }

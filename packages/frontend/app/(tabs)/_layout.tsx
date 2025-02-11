@@ -20,9 +20,9 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name='index'
+        name='cars'
         options={{
-          title: 'Tab One',
+          title: 'Мои авто',
           tabBarIcon: ({ color }) => <TabBarIcon name='code' color={color} />,
           headerRight: () => (
             <Link href='/modal' asChild>

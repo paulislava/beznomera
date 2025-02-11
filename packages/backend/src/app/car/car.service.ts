@@ -2,9 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
 import { Repository } from 'typeorm';
-import { CarInfo } from '@paulislava/shared/car/car.types';
+import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
+import { RequestUser } from '../users/user.types';
 
 @Injectable()
 export class CarService {
@@ -43,5 +44,13 @@ export class CarService {
     });
 
     await this.telegramService.sendMessage(`${no}: позвали водителя`, owner);
+  }
+
+  async list({ userId }: RequestUser): Promise<ShortCarInfo[]> {
+    const cars = await this.carRepository.findBy({
+      owner: { id: userId },
+    });
+
+    return cars;
   }
 }
