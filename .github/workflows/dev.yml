@@ -9,40 +9,25 @@ jobs:
   build-backend:
     runs-on: self-hosted
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # - name: Set up QEMU
-      #   uses: docker/setup-qemu-action@v2
-
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v2
-
       - name: Build backend Docker image
         run: |
           echo "Building backend Docker image..."
-          docker build --target backend --rm -t beznomera:backend .
+          docker build --target backend --rm -t beznomera:backend https://github.com/paulislava/beznomera.git
           docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
 
   build-frontend:
     runs-on: self-hosted
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Build frontend Docker image
         run: |
           echo "Building frontend Docker image..."
-          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend .
+          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
           docker run -it -d -p 4000:80 beznomera:frontend
 
   clean:
     runs-on: self-hosted
     needs: [build-frontend, build-backend]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Clean unused containers and volumes
         run: |
           echo "Deleting unused containers, volumes..."
