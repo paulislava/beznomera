@@ -8,21 +8,10 @@ COPY packages/shared/*.json /app/packages/shared/
 COPY packages/frontend/*.json /app/packages/frontend/
 RUN npm ci && \
   npm ci --prefix=packages/shared && \
-  npm ci --prefix=packages/frontend && \
   wait
 COPY packages/shared /app/packages/shared
-COPY packages/frontend /app/packages/frontend
-
-ARG frontend_backend_url=/api
-ARG telegram_bot_name=beznomera_bot
-
-ENV FRONTEND_PORT=80 \
-  EXPO_PUBLIC_BACKEND_URL=/api \
-  EXPO_PUBLIC_TELEGRAM_BOT_NAME=$telegram_bot_name 
-RUN npm run build:frontend
 # RUN npm run lint
 RUN (cd /app/packages/shared; npm prune --production)
-RUN (cd /app/packages/frontend; npm prune --production)
 
 FROM node:18.12-slim AS build-backend
 COPY .npmrc /root/.npmrc
