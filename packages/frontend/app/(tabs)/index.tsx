@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {  } from 'react';
 import { StyleSheet } from 'react-native';
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import styled from 'styled-components/native';
 import useNeedAuth from '@/hooks/useNeedAuth';
 import Head from 'expo-router/head';
 import { carService } from '@/services';
-import { ShortCarInfo } from '@shared/car/car.types';
+import { useAPI } from '@/utils/api';
 
 const StyledTitle = styled(Text)`
   font-size: 20px;
@@ -17,11 +16,7 @@ const StyledTitle = styled(Text)`
 function TabOneScreen() {
   useNeedAuth();
 
-  const [cars, setCars] = useState<ShortCarInfo[]>();
-
-  useEffect(() => {
-    carService.list().then(setCars);
-  }, []);
+  const cars = useAPI(carService.list);
 
   return (
     <View style={styles.container}>
