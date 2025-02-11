@@ -1,0 +1,56 @@
+name: Dev CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build backend Docker image
+        run: |
+          echo "Building backend Docker image..."
+          docker build --target backend --rm -t beznomera:backend .
+          docker run -it  --name beznomera:backend --add-host database:host-gateway -p 7000:3000 -v /home/admin/beznomera/config.yaml:/config.yaml beznomera:backend
+
+
+  build-frontend: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build frontend Docker image
+        run: |
+          echo "Building frontend Docker image..."
+          docker build --target frontend --rm -t beznomera:frontend .
+          docker run -it --name beznomera:frontend --add-host database:host-gateway -p 7001:80 beznomera:frontend
+
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Clean unused containers and volumes
+        run: |
+          echo "Deleting unused containers, volumes..."
+          docker container prune -f
+          docker volume prune -f
