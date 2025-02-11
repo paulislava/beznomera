@@ -24,8 +24,7 @@ jobs:
           docker build --target backend --rm -t beznomera:backend .
           docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
 
-
-  build-frontend: 
+  build-frontend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -42,3 +41,16 @@ jobs:
           echo "Building frontend Docker image..."
           frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend .
           docker run -it -d -p 4000:80 beznomera:frontend
+
+  clean:
+    runs-on: ubuntu-latest
+    needs: [build-frontend, build-backend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Clean unused containers and volumes
+        run: |
+          echo "Deleting unused containers, volumes..."
+          docker container prune -f
+          docker volume prune -f
