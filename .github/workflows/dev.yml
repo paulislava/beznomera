@@ -42,15 +42,3 @@ jobs:
           echo "Building frontend Docker image..."
           docker build --target frontend --rm -t beznomera:frontend .
           docker run -it --name beznomera:frontend --add-host database:host-gateway -p 7001:80 beznomera:frontend
-
-  clean:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Clean unused containers and volumes
-        run: |
-          echo "Deleting unused containers, volumes..."
-          docker container prune -f
-          docker volume prune -f
