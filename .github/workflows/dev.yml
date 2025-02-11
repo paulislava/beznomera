@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "Building backend Docker image..."
           docker build --target backend --rm -t beznomera:backend .
-          docker run -it  --name beznomera:backend --add-host database:host-gateway -p 7000:3000 -v /home/admin/beznomera/config.yaml:/config.yaml beznomera:backend
+          docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
 
 
   build-frontend: 
@@ -40,5 +40,5 @@ jobs:
       - name: Build frontend Docker image
         run: |
           echo "Building frontend Docker image..."
-          docker build --target frontend --rm -t beznomera:frontend .
-          docker run -it --name beznomera:frontend --add-host database:host-gateway -p 7001:80 beznomera:frontend
+          frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --no-cache --rm -f frontend.Dockerfile -t beznomera:frontend
+          docker run -it -d -p 4000:80 beznomera:frontend

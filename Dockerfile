@@ -49,25 +49,6 @@ ENV NODE_ENV=production
 RUN npm run build
 RUN npm prune --production
 
-FROM node:18.12-slim AS frontend
-
-EXPOSE 80
-
-ARG frontend_backend_url=/api
-ARG telegram_bot_name
-
-COPY --from=build-frontend /app/packages/frontend/node_modules /app/node_modules
-COPY --from=build-frontend /app/packages/shared /app/node_modules/@paulislava/shared
-COPY --from=build-frontend /app/packages/frontend/dist /app
-
-WORKDIR /app
-
-ENV NODE_ENV=production \
-  EXPO_PUBLIC_TELEGRAM_BOT_NAME=$telegram_bot_name\
-  EXPO_PUBLIC_BACKEND_URL=$frontend_backend_url \
-  PORT=80
-ENTRYPOINT ["npx", "serve", "-s"]
-
 FROM node:18.12-slim AS backend
 
 EXPOSE 3000
