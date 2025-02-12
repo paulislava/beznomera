@@ -124,7 +124,7 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
           }
         }
       };
-  }, {});
+    }, {});
 
   return { ...rawMethods, ...readyMethods } as T;
 }

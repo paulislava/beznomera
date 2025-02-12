@@ -6,6 +6,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from '@/components/useColorScheme';
 import { SITE_TITLE } from '@/constants/site';
+import styled from 'styled-components';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,18 +47,29 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+const Container = styled.div`
+  background-size: 100vh 100%;
+  flex: 1 1 0%;
+  display: flex;
+`;
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ title: SITE_TITLE }}>
-        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-        <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
-        <Stack.Screen name='login' options={{ headerShown: false, title: 'Вход' }} />
+    <Container>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{ title: SITE_TITLE }}>
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
+          <Stack.Screen name='login' options={{ headerShown: false, title: 'Вход' }} />
 
-        <Stack.Screen name='g/[code]' options={{ headerShown: false, title: 'Позвать водителя' }} />
-      </Stack>
-    </ThemeProvider>
+          <Stack.Screen
+            name='g/[code]'
+            options={{ headerShown: false, title: 'Позвать водителя' }}
+          />
+        </Stack>
+      </ThemeProvider>
+    </Container>
   );
 }
