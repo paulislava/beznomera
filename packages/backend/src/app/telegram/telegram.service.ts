@@ -5,10 +5,10 @@ import { User } from '../entities/user/user.entity';
 
 @Injectable()
 export class TelegramService {
-  // constructor(@InjectBot() private readonly bot: Telegraf) {}
-  private readonly bot: Telegraf;
+  constructor(@InjectBot() private readonly bot: Telegraf) {}
+  // private readonly bot: Telegraf;
 
-  constructor() {}
+  // constructor() {}
 
   async sendMessage(message: string, recipient: User) {
     await this.bot.telegram.sendMessage(recipient.telegramID, message);
