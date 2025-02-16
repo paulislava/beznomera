@@ -11,12 +11,17 @@ import styled from 'styled-components/native';
 
 const CarModel = styled(TextL)`
   font-weight: 100;
+  flex: 1;
+  text-align: right;
 `;
 
-const CarNumber = styled(TextL)``;
+const CarNumber = styled(TextL)`
+  flex: 1;
+`;
 
 const InfoRow = styled(StyledViewContainer)`
   flex-flow: row;
+  width: 100%;
 `;
 
 const BrandLogo = styled(Image)`
