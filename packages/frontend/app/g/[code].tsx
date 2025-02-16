@@ -63,14 +63,27 @@ const CallUserPage = () => {
   }, [code]);
 
   const callHandler = useCallback(() => {
-    carService
-      .call(code)
-      .then(() => {
-        setCalled(true);
-      })
-      .catch(error => {
-        alert(error);
-      });
+    const call = (location?: GeolocationPosition) =>
+      carService
+        .call(
+          location
+            ? { latitude: location.coords.latitude, longitude: location.coords.longitude }
+            : null,
+
+          code
+        )
+        .then(() => {
+          setCalled(true);
+        })
+        .catch(error => {
+          alert(error);
+        });
+
+    if (navigator?.geolocation) {
+      navigator.geolocation.getCurrentPosition(call, () => call());
+    } else {
+      call();
+    }
   }, []);
 
   return (

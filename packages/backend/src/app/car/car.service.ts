@@ -6,6 +6,7 @@ import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
 import { RequestUser } from '../users/user.types';
+import { CarCallBody } from '@paulislava/shared/car/car.api';
 
 @Injectable()
 export class CarService {
@@ -48,13 +49,22 @@ export class CarService {
     };
   }
 
-  async call(code: string): Promise<void> {
+  async call(code: string, body?: CarCallBody): Promise<void> {
     const { no, owner } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner'],
     });
 
-    await this.telegramService.sendMessage(`${no}: позвали водителя`, owner);
+    const message = await this.telegramService.sendMessage(
+      `${no}: позвали водителя`,
+      owner,
+    );
+
+    if (body) {
+      await this.telegramService.sendLocation(body, owner, {
+        reply_to_message_id: message.message_id,
+      });
+    }
   }
 
   async list({ userId }: RequestUser): Promise<ShortCarInfo[]> {
