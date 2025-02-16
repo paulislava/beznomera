@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 
 import { User } from '../user/user.entity';
+import { randomUUID } from 'crypto';
+import { Brand } from './brand.entity';
 
 @Entity('cars')
 export class Car extends BaseEntity {
@@ -20,8 +22,11 @@ export class Car extends BaseEntity {
   @ManyToOne(() => User)
   owner: User;
 
+  @ManyToOne(() => Brand)
+  brand: Brand | null;
+
   @Column({ nullable: true })
-  brand: string | null;
+  brandRaw: string | null;
 
   @Column({ nullable: true })
   model: string | null;
@@ -35,7 +40,6 @@ export class Car extends BaseEntity {
   @Column({ nullable: true })
   color: string | null;
 
-  @Generated('uuid')
-  @Column()
+  @Column({ default: randomUUID() })
   code: string;
 }

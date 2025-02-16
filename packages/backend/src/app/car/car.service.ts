@@ -16,15 +16,16 @@ export class CarService {
   ) {}
 
   async getInfo(code: string): Promise<CarInfo> {
-    const { no, model, brand, year, version, color, owner } =
+    const { no, model, brand, brandRaw, year, version, color, owner } =
       await this.carRepository.findOneOrFail({
         where: { code },
-        relations: ['owner'],
+        relations: ['owner', 'brand'],
       });
 
     return {
       no,
       brand,
+      brandRaw,
       model,
       year,
       version,

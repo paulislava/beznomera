@@ -18,7 +18,7 @@ function TabOneScreen() {
       </Head>
 
       {cars?.map(car => (
-        <div>{JSON.stringify(car)}</div>
+        <div key={car.no}>{JSON.stringify(car)}</div>
       ))}
     </View>
   );

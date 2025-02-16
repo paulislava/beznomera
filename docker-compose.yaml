@@ -41,6 +41,7 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
       - BACKEND_URL=${BACKEND_URL}
       - APP_PORT=${BACKEND_PORT}
+      - DISABLE_TELEGRAM=${DISABLE_TELEGRAM}
       - ROUTE_PREFIX=${BACKEND_PREFIX}
     volumes:
       - .:/app

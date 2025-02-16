@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from '@/components/useColorScheme';
 import { SITE_TITLE } from '@/constants/site';
 import styled from 'styled-components';
+import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,6 +52,11 @@ const Container = styled.div`
   background-size: 100vh 100%;
   flex: 1 1 0%;
   display: flex;
+  color: white;
+`;
+
+const StyledSvg = styled(Svg)`
+  visibility: hidden;
 `;
 
 function RootLayoutNav() {
@@ -58,6 +64,22 @@ function RootLayoutNav() {
 
   return (
     <Container>
+      <StyledSvg width={0} height={0}>
+        <Defs>
+          <LinearGradient
+            id='paint0_linear_2005_86'
+            x1='180'
+            y1='0'
+            x2='180'
+            y2='640'
+            gradientUnits='userSpaceOnUse'
+          >
+            <Stop stopColor='#090633' />
+            <Stop offset='0.451264' stopColor='#05031C' />
+            <Stop offset='1' />
+          </LinearGradient>
+        </Defs>
+      </StyledSvg>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{ title: SITE_TITLE }}>
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />

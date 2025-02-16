@@ -5,5 +5,6 @@ declare namespace NodeJS {
     BACKEND_URL: string;
     APP_PORT: number;
     ROUTE_PREFIX: string | undefined;
+    DISABLE_TELEGRAM?: string;
   }
 }

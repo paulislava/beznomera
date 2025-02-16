@@ -102,7 +102,7 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
 ): T {
   const service = new ApiService<T>(api);
 
-  const rawMethods = methods && methods(service);
+  const rawMethods = methods?.(service);
 
   const methodsKeys = Object.keys(rawMethods ?? {});
 

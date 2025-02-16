@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import CAR_API, { CODE_PARAM, CarApi } from '@paulislava/shared/car/car.api';
 import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
@@ -11,7 +11,7 @@ export class CarController implements CarApi {
   constructor(private readonly carService: CarService) {}
 
   @Get(CAR_API.backendRoutes.info)
-  info(@UUIDParam(CODE_PARAM) code: string): Promise<CarInfo> {
+  info(@Param(CODE_PARAM) code: string): Promise<CarInfo> {
     return this.carService.getInfo(code);
   }
 
