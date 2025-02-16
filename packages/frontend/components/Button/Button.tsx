@@ -22,7 +22,7 @@ const StyledText = styled(Text)`
   font-size: 17px;
 
   padding: 15px 25px;
-  font-weight: 300;
+  font-weight: 100;
 `;
 
 const Button: FC<ButtonProps> = ({ children, externalHref, onClick }) => {

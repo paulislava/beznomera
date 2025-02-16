@@ -62,6 +62,10 @@ export function Text(props: TextProps) {
   return <DefaultText style={[{ color }, style]} {...otherProps} />;
 }
 
+export const TextL = styled(Text)`
+  font-size: 18px;
+`;
+
 const SvgContainer = styled(Svg)`
   position: absolute;
   width: 100%;

@@ -16,11 +16,20 @@ export class CarService {
   ) {}
 
   async getInfo(code: string): Promise<CarInfo> {
-    const { no, model, brand, brandRaw, year, version, color, owner } =
-      await this.carRepository.findOneOrFail({
-        where: { code },
-        relations: ['owner', 'brand'],
-      });
+    const {
+      no,
+      model,
+      brand,
+      brandRaw,
+      year,
+      version,
+      color,
+      owner,
+      rawColor,
+    } = await this.carRepository.findOneOrFail({
+      where: { code },
+      relations: ['owner', 'brand', 'color'],
+    });
 
     return {
       no,
@@ -30,6 +39,7 @@ export class CarService {
       year,
       version,
       color,
+      rawColor,
       owner: {
         firstName: owner.firstName,
         lastName: owner.lastName,

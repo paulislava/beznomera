@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import { CarImage } from '@/components/CarImage/CarImage';
-import { StyledViewContainer, Text, View } from '@/components/Themed';
+import { StyledViewContainer, Text, TextL, View } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
@@ -9,14 +9,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import styled from 'styled-components/native';
 
-const CarModel = styled(Text)`
-  font-size: 18px;
+const CarModel = styled(TextL)`
   font-weight: 100;
 `;
 
-const CarNumber = styled(Text)`
-  font-size: 18px;
-`;
+const CarNumber = styled(TextL)``;
 
 const InfoRow = styled(StyledViewContainer)`
   flex-flow: row;
@@ -28,10 +25,14 @@ const BrandLogo = styled(Image)`
 `;
 
 const StyledCarImage = styled(CarImage)`
-  margin: 20px 0;
+  margin: 40px 0;
   z-index: 2;
   max-width: 400px;
   height: auto;
+`;
+
+const Nickname = styled(TextL)`
+  margin-bottom: 20px;
 `;
 
 const CallUserPage = () => {
@@ -68,12 +69,20 @@ const CallUserPage = () => {
   return (
     <View fullHeight center>
       <Head>
-        <title>{info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто'}</title>
+        <title>{info ? `${info.no}: информация об авто` : 'Информация об авто'}</title>
       </Head>
       {requested && !info && <Text>Ошибка: ссылка недействительна</Text>}
 
       {info && (
         <>
+          {info.owner.nickname ||
+            info.owner.firstName ||
+            (info.owner.lastName && (
+              <Nickname>
+                {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
+              </Nickname>
+            ))}
+
           <InfoRow $center>
             {(info.brand || info.brandRaw) && (
               <CarModel>
@@ -89,8 +98,7 @@ const CallUserPage = () => {
             )}
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
-          <StyledCarImage color={{ r: 255, g: 0, b: 0 }} />
-          <Text>{JSON.stringify(info)}</Text>
+          <StyledCarImage color={info.color?.value} />
           <Button onClick={callHandler}>{called ? 'Запрос отправлен!' : 'Позвать водителя'}</Button>
         </>
       )}

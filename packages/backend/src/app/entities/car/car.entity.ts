@@ -1,18 +1,13 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  Generated,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { User } from '../user/user.entity';
 import { randomUUID } from 'crypto';
 import { Brand } from './brand.entity';
+import { Color } from './color.entity';
+import { CarInfo, RgbColor } from '@paulislava/shared/car/car.types';
 
 @Entity('cars')
-export class Car extends BaseEntity {
+export class Car extends BaseEntity implements CarInfo {
   @PrimaryColumn()
   no: string;
 
@@ -37,8 +32,11 @@ export class Car extends BaseEntity {
   @Column({ nullable: true })
   year: number | null;
 
-  @Column({ nullable: true })
-  color: string | null;
+  @ManyToOne(() => Color)
+  color: Maybe<Color>;
+
+  @Column({ nullable: true, type: 'jsonb' })
+  rawColor: RgbColor;
 
   @Column({ default: randomUUID() })
   code: string;

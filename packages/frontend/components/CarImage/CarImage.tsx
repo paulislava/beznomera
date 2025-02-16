@@ -1,19 +1,16 @@
+import { RgbColor } from '@shared/car/car.types';
 import { FC } from 'react';
 import { ViewStyle } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
-type RgbColor = {
-  r: number;
-  g: number;
-  b: number;
-};
-
 type CarImageProps = {
-  color: RgbColor;
+  color?: RgbColor;
   style?: ViewStyle;
 };
 
-export const CarImage: FC<CarImageProps> = ({ color: { r, g, b }, style }) => {
+const redColor: RgbColor = { r: 255, g: 0, b: 0 };
+
+export const CarImage: FC<CarImageProps> = ({ color: { r, g, b } = redColor, style }) => {
   const newColor = (oRed: number, oGreen: number, oBlue: number) =>
     `rgb(${r - 255 + oRed}, ${g + oGreen}, ${b + oBlue})`;
 
@@ -32,7 +29,6 @@ export const CarImage: FC<CarImageProps> = ({ color: { r, g, b }, style }) => {
   const c13 = newColor(255, 3, 3);
   const c14 = newColor(186, 12, 12);
   const lc1 = newColor(186, 0, 0);
-
 
   return (
     <Svg width='991' height='295' viewBox='0 0 991 295' fill='none' style={style}>

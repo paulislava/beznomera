@@ -5,13 +5,26 @@ export type BrandInfo = {
   slug: string;
 };
 
+export type RgbColor = {
+  r: number;
+  g: number;
+  b: number;
+};
+
+export type ColorInfo = {
+  id: number;
+  value: RgbColor;
+  title: string;
+};
+
 export type ShortCarInfo = {
   no: string;
   brandRaw: string | null;
   brand: BrandInfo | null;
   model: string | null;
   version: string | null;
-  color: string | null;
+  color: ColorInfo | null;
+  rawColor: RgbColor | null;
   year: number | null;
 };
 

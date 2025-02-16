@@ -13,8 +13,8 @@ export interface UserTransaction {
 }
 
 export interface UserProfile {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   avatarUrl?: string;
-  nickname: string;
+  nickname?: string;
 }
