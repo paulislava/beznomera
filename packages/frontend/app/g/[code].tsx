@@ -25,8 +25,9 @@ const InfoRow = styled(StyledViewContainer)`
 `;
 
 const BrandLogo = styled(Image)`
-  height: 100%;
   margin: 0 10px;
+  width: 100px;
+  height: 100%;
 `;
 
 const StyledCarImage = styled(CarImage)`
@@ -93,11 +94,8 @@ const CallUserPage = () => {
                 {info.model ? ` ${info.model}` : ''}
               </CarModel>
             )}
-            {info.brand?.slug && (
-              <BrandLogo
-                style={{ resizeMode: 'contain' }}
-                source={require(`@/assets/images/brands/audi.svg`)}
-              />
+            {info.brand?.logoUrl && (
+              <BrandLogo style={{ resizeMode: 'contain' }} source={{ uri: info.brand.logoUrl }} />
             )}
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>

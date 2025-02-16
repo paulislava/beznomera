@@ -11,4 +11,7 @@ export class Brand extends BaseEntity implements BrandInfo {
 
   @Column()
   slug: string;
+
+  @Column({ nullable: true })
+  logoUrl: string | null;
 }

@@ -3,6 +3,7 @@ import { UserProfile } from '../user/user.types';
 export type BrandInfo = {
   title: string;
   slug: string;
+  logoUrl: string | null;
 };
 
 export type RgbColor = {
