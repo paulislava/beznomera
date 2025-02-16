@@ -7,6 +7,10 @@ import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
 import { RequestUser } from '../users/user.types';
 import { CarCallBody } from '@paulislava/shared/car/car.api';
+import { Agent } from 'useragent';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore cannot find module?
+import { LookupResult } from 'ip-location-api';
 
 @Injectable()
 export class CarService {
@@ -49,16 +53,24 @@ export class CarService {
     };
   }
 
-  async call(code: string, { coords }: CarCallBody): Promise<void> {
+  async call(
+    code: string,
+    { coords }: CarCallBody,
+    userAgent: Agent,
+    ipInfo: Maybe<LookupResult>,
+  ): Promise<void> {
     const { no, owner } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner'],
     });
 
-    const message = await this.telegramService.sendMessage(
-      `${no}: позвали водителя`,
-      owner,
-    );
+    let text = `${no}: позвали водителя.\nОтправлено из: ${userAgent.family}, ${userAgent.os.family}`;
+
+    if (ipInfo.city) {
+      text += `\n${ipInfo.city}, ${ipInfo.region1_name}${ipInfo.region2_name && `, ${ipInfo.region2_name}`}, ${ipInfo.country_name}`;
+    }
+
+    const message = await this.telegramService.sendMessage(text, owner);
 
     if (coords) {
       await this.telegramService.sendLocation(coords, owner, {

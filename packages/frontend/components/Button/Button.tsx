@@ -7,6 +7,7 @@ import styled from 'styled-components/native';
 interface ButtonProps {
   children?: React.ReactNode;
   externalHref?: string;
+  disabled?: boolean;
   onClick?(): void;
 }
 
@@ -25,7 +26,7 @@ const StyledText = styled(Text)`
   font-weight: 100;
 `;
 
-const Button: FC<ButtonProps> = ({ children, externalHref, onClick }) => {
+const Button: FC<ButtonProps> = ({ children, externalHref, onClick, disabled }) => {
   const handleClick = useCallback(() => {
     onClick?.();
 
@@ -38,7 +39,7 @@ const Button: FC<ButtonProps> = ({ children, externalHref, onClick }) => {
   }, [externalHref, onClick]);
 
   return (
-    <StyledPressable onPress={handleClick}>
+    <StyledPressable disabled={disabled} onPress={handleClick}>
       <StyledText>{children}</StyledText>
     </StyledPressable>
   );

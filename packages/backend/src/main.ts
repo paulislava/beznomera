@@ -17,6 +17,10 @@ import { AppModule } from './app.module';
 import { ASSETS_FILE_PATH, ASSETS_URI_PATH } from './constants';
 import { prefixPath } from './common/utils/prefixPath';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore cannot find module?
+import { reload } from 'ip-location-api';
+
 const rawBodyBuffer = (
   req: Request,
   _res: ServerResponse,
@@ -59,6 +63,8 @@ async function bootstrap() {
   const appPort = process.env.APP_PORT ?? 3000;
   console.log(`Listening on port ${appPort}`);
   await app.listen(appPort);
+
+  reload();
 }
 
 bootstrap().catch((e: Error) => console.error(e));

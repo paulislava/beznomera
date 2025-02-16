@@ -13,7 +13,9 @@ export class TelegramService {
   // constructor() {}
 
   async sendMessage(message: string, recipient: User) {
-    return this.bot.telegram.sendMessage(recipient.telegramID, message);
+    return this.bot.telegram.sendMessage(recipient.telegramID, message, {
+      parse_mode: 'HTML',
+    });
   }
 
   async sendLocation(

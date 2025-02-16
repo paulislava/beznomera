@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Ip,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import CAR_API, {
   CODE_PARAM,
   CarApi,
@@ -11,6 +20,10 @@ import { CurrentUser } from '../users/user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IsNumber, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import userAgentParser from 'useragent';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore cannot find module?
+import { lookup } from 'ip-location-api';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -37,11 +50,15 @@ export class CarController implements CarApi {
   }
 
   @Post(CAR_API.backendRoutes.call)
-  call(
+  async call(
     @Body() body: CarCallDto,
     @Param(CODE_PARAM) code: string,
+    @Req() req: Request,
+    @Ip() ip: string,
   ): Promise<void> {
-    return this.carService.call(code, body);
+    const agent = userAgentParser.parse(req.headers['user-agent']);
+    const ipInfo = await lookup(ip);
+    return this.carService.call(code, body, agent, ipInfo);
   }
 
   @Get(CAR_API.backendRoutes.list)

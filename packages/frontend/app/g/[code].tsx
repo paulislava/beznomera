@@ -116,7 +116,9 @@ const CallUserPage = () => {
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
           <StyledCarImage color={info.color?.value ?? info.rawColor} />
-          <Button onClick={callHandler}>{called ? 'Запрос отправлен!' : 'Позвать водителя'}</Button>
+          <Button onClick={callHandler} disabled={called}>
+            {called ? 'Запрос отправлен!' : 'Позвать водителя'}
+          </Button>
         </>
       )}
     </View>
