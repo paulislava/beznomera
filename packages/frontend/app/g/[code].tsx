@@ -26,7 +26,6 @@ const BrandLogo = styled(Image)`
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
-  z-index: 2;
   max-width: 400px;
   height: auto;
 `;
@@ -75,13 +74,11 @@ const CallUserPage = () => {
 
       {info && (
         <>
-          {info.owner.nickname ||
-            info.owner.firstName ||
-            (info.owner.lastName && (
-              <Nickname>
-                {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
-              </Nickname>
-            ))}
+          {!!(info.owner.nickname || info.owner.firstName || info.owner.lastName) && (
+            <Nickname>
+              {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
+            </Nickname>
+          )}
 
           <InfoRow $center>
             {(info.brand || info.brandRaw) && (
