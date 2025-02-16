@@ -40,5 +40,5 @@ jobs:
         run: |
           echo "Deleting unused containers, volumes..."
           docker container prune -f
-          docker images prune -f
+          docker image prune -f
           docker volume prune -f
