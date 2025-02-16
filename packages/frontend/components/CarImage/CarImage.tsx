@@ -4,7 +4,7 @@ import { ViewStyle } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
 type CarImageProps = {
-  color?: RgbColor;
+  color?: Maybe<RgbColor>;
   style?: ViewStyle;
 };
 

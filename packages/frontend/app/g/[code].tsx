@@ -17,6 +17,7 @@ const CarModel = styled(TextL)`
 
 const CarNumber = styled(TextL)`
   flex: 1;
+  font-weight: 100;
 `;
 
 const InfoRow = styled(StyledViewContainer)`
