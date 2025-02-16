@@ -2,11 +2,11 @@ import { APIRoutes, apiInfo } from '../api-routes';
 import { CarInfo, ShortCarInfo } from './car.types';
 
 export type LocationInfo = { latitude: number; longitude: number };
-export type CarCallBody = LocationInfo;
+export type CarCallBody = { coords?: LocationInfo };
 
 export interface CarApi {
   info(code: string, ...args: any[]): Promise<CarInfo>;
-  call(body: CarCallBody | undefined, code: string, ...args: any[]): Promise<void>;
+  call(body: CarCallBody, code: string, ...args: any[]): Promise<void>;
   list(...args: any[]): Promise<ShortCarInfo[]>;
 }
 

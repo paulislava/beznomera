@@ -67,8 +67,10 @@ const CallUserPage = () => {
       carService
         .call(
           location
-            ? { latitude: location.coords.latitude, longitude: location.coords.longitude }
-            : null,
+            ? {
+                coords: { latitude: location.coords.latitude, longitude: location.coords.longitude }
+              }
+            : {},
 
           code
         )

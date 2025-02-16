@@ -3,19 +3,28 @@ import CAR_API, {
   CODE_PARAM,
   CarApi,
   CarCallBody,
+  LocationInfo,
 } from '@paulislava/shared/car/car.api';
 import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsOptional, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CarCallDto implements CarCallBody {
+class LocationDto implements LocationInfo {
   @IsNumber()
   latitude: number;
 
   @IsNumber()
   longitude: number;
+}
+
+export class CarCallDto implements CarCallBody {
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocationDto)
+  coords?: LocationInfo;
 }
 
 @Controller(CAR_API.path)
@@ -29,7 +38,7 @@ export class CarController implements CarApi {
 
   @Post(CAR_API.backendRoutes.call)
   call(
-    @Body() body: CarCallDto | undefined,
+    @Body() body: CarCallDto,
     @Param(CODE_PARAM) code: string,
   ): Promise<void> {
     return this.carService.call(code, body);

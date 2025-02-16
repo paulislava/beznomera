@@ -49,7 +49,7 @@ export class CarService {
     };
   }
 
-  async call(code: string, body?: CarCallBody): Promise<void> {
+  async call(code: string, { coords }: CarCallBody): Promise<void> {
     const { no, owner } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner'],
@@ -60,8 +60,8 @@ export class CarService {
       owner,
     );
 
-    if (body) {
-      await this.telegramService.sendLocation(body, owner, {
+    if (coords) {
+      await this.telegramService.sendLocation(coords, owner, {
         reply_to_message_id: message.message_id,
       });
     }
