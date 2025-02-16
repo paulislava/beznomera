@@ -71,7 +71,7 @@ const CallUserPage = () => {
         <title>{info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто'}</title>
       </Head>
       {requested && !info && <Text>Ошибка: ссылка недействительна</Text>}
-      <div>Code: {code}</div>
+
       {info && (
         <>
           <InfoRow $center>
@@ -89,7 +89,7 @@ const CallUserPage = () => {
             )}
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
-          <StyledCarImage color={{ r: 0, g: 0, b: 10 }} />
+          <StyledCarImage color={{ r: 255, g: 0, b: 0 }} />
           <Text>{JSON.stringify(info)}</Text>
           <Button onClick={callHandler}>{called ? 'Запрос отправлен!' : 'Позвать водителя'}</Button>
         </>
