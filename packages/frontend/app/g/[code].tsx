@@ -25,7 +25,8 @@ const BrandLogo = styled(Image)`
 `;
 
 const StyledCarImage = styled(CarImage)`
-  margin: 40px 0;
+  margin: 40px auto;
+  width: calc(100% - 40px);
   max-width: 400px;
   height: auto;
 `;

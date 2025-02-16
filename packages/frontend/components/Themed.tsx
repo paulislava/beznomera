@@ -25,6 +25,7 @@ export const StyledViewContainer = styled(DefaultView)<{
   $backgroundColor?: ColorValue;
 }>`
   position: relative;
+  padding: 0 10px;
 
   ${({ $fullHeight }) =>
     $fullHeight &&
