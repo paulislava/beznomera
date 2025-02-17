@@ -1,5 +1,6 @@
 import env from '@/utils/env';
 import { APIInfo } from '@paulislava/shared/api-routes';
+import { useFocusEffect } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 export const BACKEND_URL = env('BACKEND_URL', '/api');
@@ -132,9 +133,9 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
 export function useAPI<T>(func: () => Promise<T>) {
   const [value, setValue] = useState<T>();
 
-  useEffect(() => {
+  useFocusEffect(() => {
     func().then(setValue);
-  }, [func]);
+  });
 
   return value;
 }
