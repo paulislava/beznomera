@@ -11,6 +11,7 @@ import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
+import { showResponseMessage } from '@/utils/messages';
 
 const CarModel = styled(TextL)`
   font-weight: 100;
@@ -87,9 +88,7 @@ const CallUserPage = () => {
           handleEvent('call', { carId: info?.id, code });
           setCalled(true);
         })
-        .catch(error => {
-          alert(error);
-        });
+        .catch(showResponseMessage);
 
     // recaptcha.current?.open();
 

@@ -9,7 +9,6 @@ export interface AuthApi {
   checkAuthorized(...args: any): Promise<void>;
 }
 
-
 const AUTH_ROUTES: APIRoutes<AuthApi> = {
   authStart: 'start',
   authFinish: 'finish',

@@ -11,6 +11,8 @@ import { Agent } from 'useragent';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore cannot find module?
 import { lookup } from 'ip-location-api';
+import { CALL_TIMEOUT_S } from '~/constants';
+import { CallNeedTimeoutException } from './car.exceptions';
 
 @Injectable()
 export class CarService {
@@ -65,6 +67,18 @@ export class CarService {
       where: { code },
       relations: ['owner'],
     });
+
+    const lastCall = await this.callRepository.findOne({
+      where: { car: { id }, ip },
+      order: { date: 'DESC' },
+    });
+
+    if (
+      lastCall &&
+      (new Date().getTime() - lastCall.date.getTime()) / 1000 < CALL_TIMEOUT_S
+    ) {
+      throw new CallNeedTimeoutException(id);
+    }
 
     let text = `${no}: позвали водителя.\nОтправлено из: ${userAgent.family}, ${userAgent.os.family}`;
 

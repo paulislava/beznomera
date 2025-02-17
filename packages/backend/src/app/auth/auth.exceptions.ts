@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { ResponseWithCode } from '@paulislava/shared/responses';
-import { AuthErrorCodes } from '@paulislava/shared/auth/auth.constants';
+import { ResponseCode } from '@paulislava/shared/errors';
 
 import { AuthMode } from './auth.types';
 
@@ -11,9 +11,12 @@ export class AuthServiceException extends HttpException {
 }
 
 export class UserNotFound extends AuthServiceException {
-  constructor(readonly authMode: AuthMode, readonly identifier: string) {
+  constructor(
+    readonly authMode: AuthMode,
+    readonly identifier: string,
+  ) {
     super({
-      code: AuthErrorCodes.USER_OR_DRAFT_NOT_FOUND,
+      code: ResponseCode.USER_OR_DRAFT_NOT_FOUND,
       message: `User was not found in users and users' drafts for auth mode '${authMode}' and identifier '${identifier}'`,
     });
   }
@@ -22,7 +25,7 @@ export class UserNotFound extends AuthServiceException {
 export class WrongAuthCode extends AuthServiceException {
   constructor() {
     super({
-      code: AuthErrorCodes.WRONG_AUTH_CODE,
+      code: ResponseCode.WRONG_AUTH_CODE,
       message: 'Wrong auth code was provided',
     });
   }

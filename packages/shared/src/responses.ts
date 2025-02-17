@@ -1,4 +1,6 @@
+import { ResponseCode } from './errors';
+
 export interface ResponseWithCode {
-  code: string;
-  message: string;
+  code: ResponseCode;
+  message?: string;
 }

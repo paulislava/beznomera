@@ -1,5 +1,8 @@
+import { getMessage } from '@/app/locale';
 import env from '@/utils/env';
 import { APIInfo } from '@paulislava/shared/api-routes';
+import { ResponseCode } from '@shared/errors';
+import { ResponseWithCode } from '@shared/responses';
 import { useFocusEffect } from 'expo-router';
 import { useEffect, useState } from 'react';
 
@@ -46,8 +49,14 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
       }
     );
 
+    const contentType = res.headers.get('Content-type');
+
     if (res.status < 200 || res.status >= 300) {
-      throw new Error(`${res.status}: ${res.statusText}`);
+      const response: Maybe<ResponseWithCode> = contentType?.includes('application/json')
+        ? await res.json()
+        : null;
+
+      throw response ?? ({ code: ResponseCode.Error, message: res.statusText } as ResponseWithCode);
     }
 
     return res;
