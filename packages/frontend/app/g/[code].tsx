@@ -86,9 +86,9 @@ const CallUserPage = () => {
           alert(error);
         });
 
-    recaptcha.current?.open();
+    // recaptcha.current?.open();
 
-    return;
+    // return;
 
     if (navigator?.geolocation) {
       navigator.geolocation.getCurrentPosition(call, () => call());
