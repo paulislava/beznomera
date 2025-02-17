@@ -10,7 +10,7 @@ import { CarCallBody } from '@paulislava/shared/car/car.api';
 import { Agent } from 'useragent';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore cannot find module?
-import { LookupResult } from 'ip-location-api';
+import { lookup } from 'ip-location-api';
 
 @Injectable()
 export class CarService {
@@ -59,7 +59,7 @@ export class CarService {
     code: string,
     { coords }: CarCallBody,
     userAgent: Agent,
-    ipInfo: Maybe<LookupResult>,
+    ip: string,
   ): Promise<void> {
     const { id, no, owner } = await this.carRepository.findOneOrFail({
       where: { code },
@@ -68,11 +68,12 @@ export class CarService {
 
     let text = `${no}: позвали водителя.\nОтправлено из: ${userAgent.family}, ${userAgent.os.family}`;
 
+    const ipInfo = await lookup(ip);
     if (ipInfo?.city) {
       text += `\n${ipInfo.city}, ${ipInfo.region1_name}${ipInfo.region2_name && `, ${ipInfo.region2_name}`}, ${ipInfo.country_name}`;
     }
 
-    await this.callRepository.save({ car: { id } });
+    await this.callRepository.save({ car: { id }, ip });
 
     const message = await this.telegramService.sendMessage(text, owner);
 

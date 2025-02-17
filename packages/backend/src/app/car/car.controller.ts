@@ -21,9 +21,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IsNumber, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore cannot find module?
-import { lookup } from 'ip-location-api';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -57,8 +54,8 @@ export class CarController implements CarApi {
     @Ip() ip: string,
   ): Promise<void> {
     const agent = userAgentParser.parse(req.headers['user-agent']);
-    const ipInfo = await lookup(ip);
-    return this.carService.call(code, body, agent, ipInfo);
+
+    return this.carService.call(code, body, agent, ip);
   }
 
   @Get(CAR_API.backendRoutes.list)

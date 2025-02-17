@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -17,4 +18,7 @@ export class Call extends BaseEntity {
 
   @CreateDateColumn()
   date: Date;
+
+  @Column()
+  ip: string;
 }
