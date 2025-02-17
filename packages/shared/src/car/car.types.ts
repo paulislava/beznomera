@@ -19,6 +19,7 @@ export type ColorInfo = {
 };
 
 export type ShortCarInfo = {
+  id: number;
   no: string;
   brandRaw: string | null;
   brand: BrandInfo | null;

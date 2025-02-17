@@ -22,6 +22,7 @@ export class CarService {
 
   async getInfo(code: string): Promise<CarInfo> {
     const {
+      id,
       no,
       model,
       brand,
@@ -37,6 +38,7 @@ export class CarService {
     });
 
     return {
+      id,
       no,
       brand,
       brandRaw,
@@ -66,7 +68,7 @@ export class CarService {
 
     let text = `${no}: позвали водителя.\nОтправлено из: ${userAgent.family}, ${userAgent.os.family}`;
 
-    if (ipInfo.city) {
+    if (ipInfo?.city) {
       text += `\n${ipInfo.city}, ${ipInfo.region1_name}${ipInfo.region2_name && `, ${ipInfo.region2_name}`}, ${ipInfo.country_name}`;
     }
 

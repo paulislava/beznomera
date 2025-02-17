@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 import { User } from '../user/user.entity';
 import { randomUUID } from 'crypto';
@@ -8,7 +16,10 @@ import { CarInfo, RgbColor } from '@paulislava/shared/car/car.types';
 
 @Entity('cars')
 export class Car extends BaseEntity implements CarInfo {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
   no: string;
 
   @Column({ nullable: true })
@@ -40,4 +51,10 @@ export class Car extends BaseEntity implements CarInfo {
 
   @Column({ default: randomUUID() })
   code: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

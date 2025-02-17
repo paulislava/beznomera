@@ -9,6 +9,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Image } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
+import { handleEvent } from '@/utils/log';
 
 const CarModel = styled(TextL)`
   font-weight: 100;
@@ -80,6 +81,7 @@ const CallUserPage = () => {
           code
         )
         .then(() => {
+          handleEvent('call', { carId: info?.id });
           setCalled(true);
         })
         .catch(error => {
@@ -95,7 +97,7 @@ const CallUserPage = () => {
     } else {
       call();
     }
-  }, []);
+  }, [info]);
 
   return (
     <View fullHeight center>
