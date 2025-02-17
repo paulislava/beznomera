@@ -5,8 +5,8 @@ import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, Platform } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Image, ImageSourcePropType, ImageStyle, Platform, StyleProp } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
@@ -46,6 +46,8 @@ const Nickname = styled(TextL)`
 `;
 
 const consoleFunc = (...args: any) => console.log(args);
+
+const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
 const CallUserPage = () => {
   const recaptcha = useRef<RecaptchaRef>(null);
@@ -100,6 +102,11 @@ const CallUserPage = () => {
     }
   }, [info]);
 
+  const brandLogoSource: ImageSourcePropType = useMemo(
+    () => ({ uri: info?.brand?.logoUrl ?? undefined }),
+    [info]
+  );
+
   return (
     <View fullHeight center>
       {!isWeb && (
@@ -129,12 +136,10 @@ const CallUserPage = () => {
             {(info.brand || info.brandRaw) && (
               <CarModel>
                 {info.brand?.title || info.brandRaw}
-                {info.model ? ` ${info.model}` : ''}
+                {info.model}
               </CarModel>
             )}
-            {info.brand?.logoUrl && (
-              <BrandLogo style={{ resizeMode: 'contain' }} source={{ uri: info.brand.logoUrl }} />
-            )}
+            {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
           <StyledCarImage color={info.color?.value ?? info.rawColor} />

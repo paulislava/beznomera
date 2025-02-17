@@ -5,6 +5,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ConfigService } from '../config/config.service';
           entities: [join(__dirname, '../', 'entities', '**')],
           migrationsRun: true,
           migrations: [join(__dirname, '../', 'migrations', '**')],
+          namingStrategy: new SnakeNamingStrategy(),
         };
       },
     }),

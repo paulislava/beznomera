@@ -61,7 +61,7 @@ export class CarService {
     userAgent: Agent,
     ipInfo: Maybe<LookupResult>,
   ): Promise<void> {
-    const { no, owner } = await this.carRepository.findOneOrFail({
+    const { id, no, owner } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner'],
     });
@@ -71,6 +71,8 @@ export class CarService {
     if (ipInfo?.city) {
       text += `\n${ipInfo.city}, ${ipInfo.region1_name}${ipInfo.region2_name && `, ${ipInfo.region2_name}`}, ${ipInfo.country_name}`;
     }
+
+    await this.callRepository.save({ car: { id } });
 
     const message = await this.telegramService.sendMessage(text, owner);
 
