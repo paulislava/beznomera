@@ -6,10 +6,11 @@ import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Image } from 'react-native';
+import { Image, Platform } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
+import { isWeb } from '@/utils/env';
 
 const CarModel = styled(TextL)`
   font-weight: 100;
@@ -101,14 +102,16 @@ const CallUserPage = () => {
 
   return (
     <View fullHeight center>
-      <Recaptcha
-        ref={recaptcha}
-        siteKey='6LfQpdkqAAAAAO3SXZIRkr4yso-Gm2DJFfetUjc0'
-        baseUrl='https://beznomera.net'
-        onVerify={consoleFunc}
-        onExpire={consoleFunc}
-        size='invisible'
-      />
+      {!isWeb && (
+        <Recaptcha
+          ref={recaptcha}
+          siteKey='6LfQpdkqAAAAAO3SXZIRkr4yso-Gm2DJFfetUjc0'
+          baseUrl='https://beznomera.net'
+          onVerify={consoleFunc}
+          onExpire={consoleFunc}
+          size='invisible'
+        />
+      )}
       <Head>
         <title>{info ? `${info.no}: информация об авто` : 'Информация об авто'}</title>
       </Head>
