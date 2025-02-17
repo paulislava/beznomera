@@ -85,15 +85,10 @@ function RootLayoutNav() {
           </Defs>
         </StyledSvg>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{ title: SITE_TITLE }}>
-            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-            <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
-            <Stack.Screen name='login' options={{ headerShown: false, title: 'Вход' }} />
-
-            <Stack.Screen
-              name='g/[code]'
-              options={{ headerShown: false, title: 'Позвать водителя' }}
-            />
+          <Stack screenOptions={{ title: SITE_TITLE, headerShown: false }}>
+            <Stack.Screen name='(tabs)' />
+            <Stack.Screen name='modal' options={{ presentation: 'modal', headerShown: true }} />
+            <Stack.Screen name='login' />
           </Stack>
         </ThemeProvider>
       </Container>

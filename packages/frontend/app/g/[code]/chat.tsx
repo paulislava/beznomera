@@ -1,4 +1,3 @@
-import Button from '@/components/Button/Button';
 import { CarImage } from '@/components/CarImage/CarImage';
 import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
 import { carService } from '@/services';
@@ -125,7 +124,7 @@ const CallUserPage = () => {
         />
       )}
       <Head>
-        <title>{info ? `${info.no}: информация об авто` : 'Информация об авто'}</title>
+        <title>{info ? `${info.no}: чат с водителем` : 'Чат с водителем'}</title>
       </Head>
       {requested && !info && <Text>Ошибка: ссылка недействительна</Text>}
 
@@ -147,13 +146,6 @@ const CallUserPage = () => {
             {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
-          <StyledCarImage color={info.color?.value ?? info.rawColor} />
-          <ButtonsContainer>
-            <Button onClick={callHandler} disabled={called}>
-              {called ? 'Запрос отправлен!' : 'Позвать водителя'}
-            </Button>
-            <Button view='secondary'>Отправить сообщение</Button>
-          </ButtonsContainer>
         </>
       )}
     </PageView>
