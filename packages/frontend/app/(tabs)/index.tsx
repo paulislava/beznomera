@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { View } from '@/components/Themed';
+import { PageView } from '@/components/Themed';
 import useNeedAuth from '@/hooks/useNeedAuth';
 import Head from 'expo-router/head';
 import { carService } from '@/services';
@@ -12,7 +12,7 @@ function TabOneScreen() {
   const cars = useAPI(carService.list);
 
   return (
-    <View style={styles.container}>
+    <PageView style={styles.container}>
       <Head>
         <title>Мои авто</title>
       </Head>
@@ -20,7 +20,7 @@ function TabOneScreen() {
       {cars?.map(car => (
         <div key={car.no}>{JSON.stringify(car)}</div>
       ))}
-    </View>
+    </PageView>
   );
 }
 

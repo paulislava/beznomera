@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import TelegramLoginButton, { TelegramUser } from 'telegram-login-button';
 
-import { Text, View } from '../components/Themed';
+import { Text, PageView } from '../components/Themed';
 import { authService } from '@/services';
 import withRouter, { WithRouterProps } from '@/utils/withRouter';
 import env, { isWeb } from '@/utils/env';
@@ -24,7 +24,7 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
   }, []);
 
   return (
-    <View fullHeight center>
+    <PageView fullHeight center>
       <Head>
         <title>Вход</title>
       </Head>
@@ -38,7 +38,7 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
           </Button>
         )}
       </Text>
-    </View>
+    </PageView>
   );
 }
 

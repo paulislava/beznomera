@@ -2,31 +2,72 @@ import React, { FC, useCallback } from 'react';
 import { Text, Pressable, Platform } from 'react-native';
 
 import * as WebBrowser from 'expo-web-browser';
-import styled from 'styled-components/native';
+import styled, { css } from 'styled-components/native';
+
+type ButtonView = 'primary' | 'secondary';
 
 interface ButtonProps {
   children?: React.ReactNode;
   externalHref?: string;
   disabled?: boolean;
+  view?: ButtonView;
   onClick?(): void;
 }
+type ViewConfig = {
+  background: string;
+  color: string;
+};
 
-const StyledPressable = styled(Pressable)`
+const viewConfigs: Record<ButtonView, ViewConfig> = {
+  primary: {
+    background: '#00388b',
+    color: '#fff'
+  },
+  secondary: {
+    background: '#e5e5e5',
+    color: '#000'
+  }
+};
+
+const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
+
+const StyledPressable = styled(Pressable)<{ $view: ButtonView }>`
   border-radius: 35px;
-  background: #00388b;
-  color: white;
+  ${({ $view }) => {
+    const config = getViewConfig($view);
+
+    return css`
+      background: ${config.background};
+      color: ${config.color};
+    `;
+  }}
+
   height: max-content;
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      background: gray;
+    `}
 `;
 
 const StyledText = styled(Text)`
-  color: white;
+  color: inherit;
   font-size: 17px;
+
+  text-align: center;
 
   padding: 15px 25px;
   font-weight: 100;
 `;
 
-const Button: FC<ButtonProps> = ({ children, externalHref, onClick, disabled }) => {
+const Button: FC<ButtonProps> = ({
+  children,
+  externalHref,
+  onClick,
+  disabled,
+  view = 'primary'
+}) => {
   const handleClick = useCallback(() => {
     onClick?.();
 
@@ -39,7 +80,7 @@ const Button: FC<ButtonProps> = ({ children, externalHref, onClick, disabled }) 
   }, [externalHref, onClick]);
 
   return (
-    <StyledPressable disabled={disabled} onPress={handleClick}>
+    <StyledPressable $view={view} disabled={disabled} onPress={handleClick}>
       <StyledText>{children}</StyledText>
     </StyledPressable>
   );

@@ -73,7 +73,7 @@ const SvgContainer = styled(Svg)`
   height: 100%;
 `;
 
-export function View(props: ViewProps) {
+export function PageView(props: ViewProps) {
   const { style, lightColor, darkColor, fullHeight, center, children, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor });
 

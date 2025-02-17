@@ -1,17 +1,17 @@
 import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { Text, PageView } from '@/components/Themed';
 import useNeedAuth from '@/hooks/useNeedAuth';
 
 export default function TabTwoScreen() {
   useNeedAuth();
 
   return (
-    <View style={styles.container}>
+    <PageView style={styles.container}>
       <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor='#eee' darkColor='rgba(255,255,255,0.1)' />
+      <PageView style={styles.separator} lightColor='#eee' darkColor='rgba(255,255,255,0.1)' />
       <EditScreenInfo path='app/(tabs)/two.tsx' />
-    </View>
+    </PageView>
   );
 }
 

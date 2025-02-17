@@ -1,12 +1,12 @@
 import Button from '@/components/Button/Button';
 import { CarImage } from '@/components/CarImage/CarImage';
-import { StyledViewContainer, Text, TextL, View } from '@/components/Themed';
+import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, ImageSourcePropType, ImageStyle, Platform, StyleProp } from 'react-native';
+import { Image, ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
@@ -44,6 +44,12 @@ const StyledCarImage = styled(CarImage)`
 
 const Nickname = styled(TextL)`
   margin-bottom: 20px;
+`;
+
+const ButtonsContainer = styled(View)`
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
 `;
 
 const consoleFunc = (...args: any) => console.log(args);
@@ -107,7 +113,7 @@ const CallUserPage = () => {
   );
 
   return (
-    <View fullHeight center>
+    <PageView fullHeight center>
       {!isWeb && (
         <Recaptcha
           ref={recaptcha}
@@ -142,12 +148,15 @@ const CallUserPage = () => {
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
           <StyledCarImage color={info.color?.value ?? info.rawColor} />
-          <Button onClick={callHandler} disabled={called}>
-            {called ? 'Запрос отправлен!' : 'Позвать водителя'}
-          </Button>
+          <ButtonsContainer>
+            <Button onClick={callHandler} disabled={called}>
+              {called ? 'Запрос отправлен!' : 'Позвать водителя'}
+            </Button>
+            <Button view='secondary'>Отправить сообщение</Button>
+          </ButtonsContainer>
         </>
       )}
-    </View>
+    </PageView>
   );
 };
 
