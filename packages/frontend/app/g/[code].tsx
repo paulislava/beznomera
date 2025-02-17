@@ -81,7 +81,7 @@ const CallUserPage = () => {
           code
         )
         .then(() => {
-          handleEvent('call', { carId: info?.id });
+          handleEvent('call', { carId: info?.id, code });
           setCalled(true);
         })
         .catch(error => {
