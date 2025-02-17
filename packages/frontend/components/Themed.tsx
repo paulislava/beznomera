@@ -79,7 +79,7 @@ export function View(props: ViewProps) {
 
   return (
     <>
-      <SvgContainer viewBox='0 0 100% 100%' fill='none'>
+      <SvgContainer fill='none'>
         <Rect width='100%' height='100%' fill='url(#paint0_linear_2005_86)' />
       </SvgContainer>{' '}
       <StyledViewContainer
