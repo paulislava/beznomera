@@ -8,8 +8,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { SITE_TITLE } from '@/constants/site';
 import styled from 'styled-components';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
-
-import { YandexMetrika } from '@/components/metrika/YandexMetrika';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -61,11 +60,29 @@ const StyledSvg = styled(Svg)`
   visibility: hidden;
 `;
 
+const helmetContext = {};
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <>
+    <HelmetProvider context={helmetContext}>
+      <Helmet>
+        <script async defer type='text/javascript'>{`(function (m, e, t, r, i, k, a) {
+      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+      m[i].l = 1 * new Date();
+      for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+      k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+    })
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+    ym(99937060, "init", {
+      clickmap: true,
+      trackLinks: true,
+      accurateTrackBounce: true,
+      webvisor: true
+    });`}</script>
+      </Helmet>
       <Container>
         <StyledSvg width={0} height={0}>
           <Defs>
@@ -96,6 +113,6 @@ function RootLayoutNav() {
           </Stack>
         </ThemeProvider>
       </Container>
-    </>
+    </HelmetProvider>
   );
 }
