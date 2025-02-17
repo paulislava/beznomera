@@ -135,7 +135,7 @@ const CallUserPage = () => {
             {(info.brand || info.brandRaw) && (
               <CarModel>
                 {info.brand?.title || info.brandRaw}
-                {info.model}
+                {info.model && ` ${info.model}`}
               </CarModel>
             )}
             {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
