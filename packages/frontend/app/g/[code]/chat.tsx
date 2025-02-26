@@ -1,4 +1,3 @@
-import { CarImage } from '@/components/CarImage/CarImage';
 import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
@@ -11,6 +10,8 @@ import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
+import Button from '@/components/Button/Button';
+import { TextInput } from 'react-native-paper';
 
 const CarModel = styled(TextL)`
   font-weight: 100;
@@ -34,34 +35,31 @@ const BrandLogo = styled(Image)`
   height: 100%;
 `;
 
-const StyledCarImage = styled(CarImage)`
-  margin: 40px auto;
-  width: calc(100% - 40px);
-  max-width: 400px;
-  height: auto;
-`;
-
 const Nickname = styled(TextL)`
   margin-bottom: 20px;
 `;
 
-const ButtonsContainer = styled(View)`
-  display: flex;
-  flex-flow: column;
-  gap: 10px;
+const InputContainer = styled(View)`
+  margin: 20px 0;
+  margin-right: -16px;
+  width: 100%;
+  max-width: 600px;
+  height: 30vh;
 `;
 
 const consoleFunc = (...args: any) => console.log(args);
 
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
-const CallUserPage = () => {
+const ChatDriverPage = () => {
   const recaptcha = useRef<RecaptchaRef>(null);
 
   const { code } = useLocalSearchParams<{ code: string }>();
   const [requested, setRequested] = useState(false);
   const [info, setInfo] = useState<CarInfo | null>(null);
   const [called, setCalled] = useState(false);
+  const [text, setText] = useState<string>();
+  const [submitting, setSubmitting] = useState(false);
 
   // useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
 
@@ -77,39 +75,56 @@ const CallUserPage = () => {
       });
   }, [code]);
 
-  const callHandler = useCallback(() => {
-    const call = (location?: GeolocationPosition) =>
+  const sendHandler = useCallback(() => {
+    if (!text) {
+      alert('No text!');
+      return;
+    }
+
+    const send = (location?: GeolocationPosition) => {
+      setSubmitting(true);
+
       carService
-        .call(
-          location
-            ? {
-                coords: { latitude: location.coords.latitude, longitude: location.coords.longitude }
-              }
-            : {},
+        .sendMessage(
+          {
+            coords: location && {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude
+            },
+            text
+          },
 
           code
         )
         .then(() => {
-          handleEvent('call', { carId: info?.id, code });
+          handleEvent('send_message', { carId: info?.id, code });
           setCalled(true);
+          setText('');
         })
-        .catch(showResponseMessage);
+        .catch(showResponseMessage)
+        .finally(() => setSubmitting(false));
+    };
 
     // recaptcha.current?.open();
 
     // return;
 
     if (navigator?.geolocation) {
-      navigator.geolocation.getCurrentPosition(call, () => call());
+      navigator.geolocation.getCurrentPosition(send, () => send());
     } else {
-      call();
+      send();
     }
-  }, [info]);
+  }, [info, text]);
 
   const brandLogoSource: ImageSourcePropType = useMemo(
     () => ({ uri: info?.brand?.logoUrl ?? undefined }),
     [info]
   );
+
+  const onChangeText = useCallback((content: string) => {
+    setText(content);
+    setCalled(false);
+  }, []);
 
   return (
     <PageView fullHeight center>
@@ -146,10 +161,28 @@ const CallUserPage = () => {
             {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
             {info.no && <CarNumber>{info.no}</CarNumber>}
           </InfoRow>
+          <InputContainer>
+            <TextInput
+              mode='flat'
+              value={text}
+              outlineColor='white'
+              onChangeText={onChangeText}
+              multiline
+              label='Сообщение'
+              textColor='#fff'
+              activeUnderlineColor='#dbb3b3'
+              style={{ backgroundColor: 'transparent', minHeight: '100%' }}
+              underlineStyle={{ marginLeft: 16 }}
+              contentStyle={{ paddingTop: 0, marginTop: 26 }}
+            />
+          </InputContainer>
+          <Button onClick={sendHandler} disabled={submitting || called || !text}>
+            {called ? 'Отправлено!' : submitting ? 'Отправка...' : 'Отправить'}
+          </Button>
         </>
       )}
     </PageView>
   );
 };
 
-export default CallUserPage;
+export default ChatDriverPage;

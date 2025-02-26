@@ -65,6 +65,10 @@ export class AuthConfig {
 
   @IsDefined()
   @IsString()
+  readonly anonymousIdCookie: string;
+
+  @IsDefined()
+  @IsString()
   readonly jwtSecret: string;
 
   @IsDefined()

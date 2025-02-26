@@ -15,6 +15,7 @@ auth:
   codeLength: 4
   jwtSecret: MY_SECRET
   jwtCookie: auth
+  anonymousIdCookie: anonymous_id
   passwordSalt: test
   passwordSaltRounds: 10
 

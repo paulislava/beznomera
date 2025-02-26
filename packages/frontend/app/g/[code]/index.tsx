@@ -3,7 +3,7 @@ import { CarImage } from '@/components/CarImage/CarImage';
 import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, useGlobalSearchParams, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
@@ -59,10 +59,11 @@ const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 const CallUserPage = () => {
   const recaptcha = useRef<RecaptchaRef>(null);
 
-  const { code } = useLocalSearchParams<{ code: string }>();
+  const { code } = useGlobalSearchParams<{ code: string }>();
   const [requested, setRequested] = useState(false);
   const [info, setInfo] = useState<CarInfo | null>(null);
   const [called, setCalled] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
 
@@ -79,6 +80,8 @@ const CallUserPage = () => {
   }, [code]);
 
   const callHandler = useCallback(() => {
+    setSubmitting(true);
+
     const call = (location?: GeolocationPosition) =>
       carService
         .call(
@@ -94,7 +97,8 @@ const CallUserPage = () => {
           handleEvent('call', { carId: info?.id, code });
           setCalled(true);
         })
-        .catch(showResponseMessage);
+        .catch(showResponseMessage)
+        .finally(() => setSubmitting(false));
 
     // recaptcha.current?.open();
 
@@ -149,8 +153,12 @@ const CallUserPage = () => {
           </InfoRow>
           <StyledCarImage color={info.color?.value ?? info.rawColor} />
           <ButtonsContainer>
-            <Button onClick={callHandler} disabled={called}>
-              {called ? 'Запрос отправлен!' : 'Позвать водителя'}
+            <Button onClick={callHandler} disabled={submitting || called}>
+              {called
+                ? 'Запрос отправлен!'
+                : submitting
+                ? 'Отправка запроса...'
+                : 'Позвать водителя'}
             </Button>
             <Link href={`/g/${code}/chat`} asChild>
               <Button view='secondary'>Отправить сообщение</Button>
