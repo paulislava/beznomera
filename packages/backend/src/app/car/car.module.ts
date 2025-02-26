@@ -6,9 +6,25 @@ import { CarService } from './car.service';
 import { Call } from '../entities/call.entity';
 import { TelegramModule } from '../telegram/telegram.module';
 import { TelegramService } from '../telegram/telegram.service';
+import { AnonymousUser } from '../entities/user/anonymous-user.entity';
+import { User } from '../entities/user/user.entity';
+import { Chat } from '../entities/chat/chat.entity';
+import { ChatMessage } from '../entities/chat/message.entity';
+import { ConfigModule } from '../config/config.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Car, Call]), TelegramModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Car,
+      Call,
+      AnonymousUser,
+      User,
+      Chat,
+      ChatMessage,
+    ]),
+    TelegramModule,
+    ConfigModule,
+  ],
   controllers: [CarController],
   providers: [CarService, TelegramService],
 })

@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, forwardRef, useCallback } from 'react';
 import { Text, Pressable, Platform } from 'react-native';
 
 import * as WebBrowser from 'expo-web-browser';
@@ -61,29 +61,25 @@ const StyledText = styled(Text)`
   font-weight: 100;
 `;
 
-const Button: FC<ButtonProps> = ({
-  children,
-  externalHref,
-  onClick,
-  disabled,
-  view = 'primary'
-}) => {
-  const handleClick = useCallback(() => {
-    onClick?.();
+const Button = forwardRef<any, ButtonProps>(
+  ({ children, externalHref, onClick, disabled, view = 'primary' }, ref) => {
+    const handleClick = useCallback(() => {
+      onClick?.();
 
-    if (externalHref) {
-      if (Platform.OS !== 'web') {
-        // Open the link in an in-app browser.
-        WebBrowser.openBrowserAsync(externalHref);
+      if (externalHref) {
+        if (Platform.OS !== 'web') {
+          // Open the link in an in-app browser.
+          WebBrowser.openBrowserAsync(externalHref);
+        }
       }
-    }
-  }, [externalHref, onClick]);
+    }, [externalHref, onClick]);
 
-  return (
-    <StyledPressable $view={view} disabled={disabled} onPress={handleClick}>
-      <StyledText>{children}</StyledText>
-    </StyledPressable>
-  );
-};
+    return (
+      <StyledPressable ref={ref} $view={view} disabled={disabled} onPress={handleClick}>
+        <StyledText>{children}</StyledText>
+      </StyledPressable>
+    );
+  }
+);
 
 export default Button;

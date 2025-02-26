@@ -6,12 +6,14 @@ import {
   Param,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import CAR_API, {
   CODE_PARAM,
   CarApi,
   CarCallBody,
+  CarMessageBody,
   LocationInfo,
 } from '@paulislava/shared/car/car.api';
 import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
@@ -21,6 +23,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IsNumber, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
+import { Response, Request } from 'express';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -62,5 +65,23 @@ export class CarController implements CarApi {
   @UseGuards(JwtAuthGuard)
   list(@CurrentUser() user): Promise<ShortCarInfo[]> {
     return this.carService.list(user);
+  }
+
+  @Post(CAR_API.backendRoutes.sendMessage)
+  async sendMessage(
+    @Body() body: CarMessageBody,
+    @Param(CODE_PARAM) code: string,
+    @Req() req: Request,
+    @Ip() ip: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    return this.carService.sendMessage(
+      code,
+      body,
+      req.headers['user-agent'],
+      ip,
+      res,
+      req,
+    );
   }
 }

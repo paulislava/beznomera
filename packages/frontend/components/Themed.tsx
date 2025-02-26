@@ -26,6 +26,7 @@ export const StyledViewContainer = styled(DefaultView)<{
 }>`
   position: relative;
   padding: 0 10px;
+  z-index: 1;
 
   ${({ $fullHeight }) =>
     $fullHeight &&
@@ -71,6 +72,7 @@ const SvgContainer = styled(Svg)`
   position: absolute;
   width: 100%;
   height: 100%;
+  z-index: -1;
 `;
 
 export function PageView(props: ViewProps) {
@@ -81,7 +83,7 @@ export function PageView(props: ViewProps) {
     <>
       <SvgContainer fill='none'>
         <Rect width='100%' height='100%' fill='url(#paint0_linear_2005_86)' />
-      </SvgContainer>{' '}
+      </SvgContainer>
       <StyledViewContainer
         $fullHeight={fullHeight}
         $center={center}
