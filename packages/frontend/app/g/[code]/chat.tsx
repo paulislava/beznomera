@@ -41,7 +41,6 @@ const Nickname = styled(TextL)`
 
 const InputContainer = styled(View)`
   margin: 20px 0;
-  margin-right: -16px;
   width: 100%;
   max-width: 600px;
   height: 30vh;
@@ -172,7 +171,7 @@ const ChatDriverPage = () => {
               textColor='#fff'
               activeUnderlineColor='#dbb3b3'
               style={{ backgroundColor: 'transparent', minHeight: '100%' }}
-              underlineStyle={{ marginLeft: 16 }}
+              underlineStyle={{ marginHorizontal: 16 }}
               contentStyle={{ paddingTop: 0, marginTop: 26 }}
             />
           </InputContainer>

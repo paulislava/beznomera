@@ -38,7 +38,5 @@ jobs:
     steps:
       - name: Clean unused containers and volumes
         run: |
-          echo "Deleting unused containers, volumes..."
-          docker container prune -f
-          docker image prune -f
-          docker volume prune -f
+          echo "Deleting unused containers, images, volumes..."
+          docker system prune -f
