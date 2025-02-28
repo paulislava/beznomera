@@ -3,7 +3,7 @@ import { CarImage } from '@/components/CarImage/CarImage';
 import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
-import { Link, useGlobalSearchParams, useLocalSearchParams } from 'expo-router';
+import { Link, useGlobalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
@@ -13,24 +13,21 @@ import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
 
-const CarModel = styled(View)`
+const CarModel = styled(TextL)`
+  font-weight: 100;
   flex: 1;
 `;
 
-const CarModelContent = styled(TextL)`
-  font-weight: 100;
-  text-align: center;
-  margin-left: auto;
-  width: max-content;
-  max-width: 100%;
+const CarModelBrand = styled(CarModel)`
+  text-align: right;
 `;
 
 const CarNumber = styled(TextL)`
-  flex: 1;
-  font-weight: 100;
+  font-weight: 200;
+  margin-top: 20px;
 `;
 
-const InfoRow = styled(StyledViewContainer)`
+const ModelRow = styled(StyledViewContainer)`
   flex-flow: row;
   width: 100%;
 `;
@@ -42,7 +39,7 @@ const BrandLogo = styled(Image)`
 `;
 
 const StyledCarImage = styled(CarImage)`
-  margin: 40px auto;
+  margin: 20px auto 40px;
   width: calc(100% - 40px);
   max-width: 400px;
   height: auto;
@@ -147,18 +144,17 @@ const CallUserPage = () => {
             </Nickname>
           )}
 
-          <InfoRow $center>
-            {(info.brand || info.brandRaw) && (
-              <CarModel>
-                <CarModelContent>
-                  {info.brand?.title || info.brandRaw}
-                  {info.model && ` ${info.model}`}
-                </CarModelContent>
-              </CarModel>
-            )}
-            {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
-            {info.no && <CarNumber>{info.no}</CarNumber>}
-          </InfoRow>
+          {info.brand && (
+            <ModelRow $center>
+              <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
+              {info.brand.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
+              <CarModel>{info.model}</CarModel>
+            </ModelRow>
+          )}
+
+          {info.no && <CarNumber>{info.no}</CarNumber>}
+
+          {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           <StyledCarImage color={info.color?.value ?? info.rawColor} />
           <ButtonsContainer>
             {info.owner.tel && (
