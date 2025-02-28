@@ -13,10 +13,16 @@ import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
 
-const CarModel = styled(TextL)`
-  font-weight: 100;
+const CarModel = styled(View)`
   flex: 1;
-  text-align: right;
+`;
+
+const CarModelContent = styled(TextL)`
+  font-weight: 100;
+  text-align: center;
+  margin-left: auto;
+  width: max-content;
+  max-width: 100%;
 `;
 
 const CarNumber = styled(TextL)`
@@ -32,7 +38,7 @@ const InfoRow = styled(StyledViewContainer)`
 const BrandLogo = styled(Image)`
   margin: 0 10px;
   width: 100px;
-  height: 100%;
+  height: 21.5px;
 `;
 
 const StyledCarImage = styled(CarImage)`
@@ -144,8 +150,10 @@ const CallUserPage = () => {
           <InfoRow $center>
             {(info.brand || info.brandRaw) && (
               <CarModel>
-                {info.brand?.title || info.brandRaw}
-                {info.model && ` ${info.model}`}
+                <CarModelContent>
+                  {info.brand?.title || info.brandRaw}
+                  {info.model && ` ${info.model}`}
+                </CarModelContent>
               </CarModel>
             )}
             {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
