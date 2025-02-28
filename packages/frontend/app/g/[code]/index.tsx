@@ -18,7 +18,8 @@ import {
   BrandLogo,
   CarModel,
   CarNumber,
-  StyledCarImage
+  StyledCarImage,
+  CarExternalImage
 } from '@/components/CarDetails';
 
 const ButtonsContainer = styled(View)`
@@ -127,7 +128,11 @@ const CallUserPage = () => {
           {info.no && <CarNumber>{info.no}</CarNumber>}
 
           {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
-          <StyledCarImage color={info.color?.value ?? info.rawColor} />
+          {info.imageUrl ? (
+            <CarExternalImage resizeMode='contain' source={{ uri: info.imageUrl }} />
+          ) : (
+            <StyledCarImage color={info.color?.value ?? info.rawColor} />
+          )}
           <ButtonsContainer>
             {info.owner.tel && (
               <Button externalHref={`tel:${info.owner.tel}`} view='glass'>

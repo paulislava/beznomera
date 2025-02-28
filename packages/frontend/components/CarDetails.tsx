@@ -38,3 +38,10 @@ export const StyledCarImage = styled(CarImage)`
 export const Nickname = styled(TextL)`
   margin-bottom: 20px;
 `;
+
+export const CarExternalImage = styled(Image)`
+  margin: 40px auto;
+  width: calc(100% - 40px);
+  max-width: 400px;
+  height: 125px;
+`;

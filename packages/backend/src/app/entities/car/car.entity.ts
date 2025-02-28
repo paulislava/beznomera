@@ -52,6 +52,9 @@ export class Car extends BaseEntity implements CarInfo {
   @Column({ default: randomUUID() })
   code: string;
 
+  @Column({ nullable: true })
+  imageUrl: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
