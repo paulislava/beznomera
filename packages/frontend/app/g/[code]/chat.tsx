@@ -1,10 +1,10 @@
-import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
+import { Text, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
+import { ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
@@ -12,36 +12,18 @@ import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
 import Button from '@/components/Button/Button';
 import { TextInput } from 'react-native-paper';
-
-const CarModel = styled(TextL)`
-  font-weight: 100;
-  flex: 1;
-  text-align: right;
-`;
-
-const CarNumber = styled(TextL)`
-  flex: 1;
-  font-weight: 100;
-`;
-
-const InfoRow = styled(StyledViewContainer)`
-  flex-flow: row;
-  width: 100%;
-`;
-
-const BrandLogo = styled(Image)`
-  margin: 0 10px;
-  width: 100px;
-  height: 100%;
-`;
-
-const Nickname = styled(TextL)`
-  margin-bottom: 20px;
-`;
+import {
+  ModelRow,
+  CarModelBrand,
+  BrandLogo,
+  CarModel,
+  CarNumber,
+  Nickname
+} from '@/components/CarDetails';
 
 const InputContainer = styled(View)`
   margin: 20px 0;
-  margin-right: -16px;
+  margin-left: -16px;
   width: 100%;
   max-width: 600px;
   height: 30vh;
@@ -151,16 +133,15 @@ const ChatDriverPage = () => {
             </Nickname>
           )}
 
-          <InfoRow $center>
-            {(info.brand || info.brandRaw) && (
-              <CarModel>
-                {info.brand?.title || info.brandRaw}
-                {info.model && ` ${info.model}`}
-              </CarModel>
-            )}
-            {info.brand?.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
-            {info.no && <CarNumber>{info.no}</CarNumber>}
-          </InfoRow>
+          {info.brand && (
+            <ModelRow $center>
+              <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
+              {info.brand.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
+              <CarModel>{info.model}</CarModel>
+            </ModelRow>
+          )}
+
+          {info.no && <CarNumber>{info.no}</CarNumber>}
           <InputContainer>
             <TextInput
               mode='flat'

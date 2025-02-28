@@ -1,53 +1,25 @@
 import Button from '@/components/Button/Button';
-import { CarImage } from '@/components/CarImage/CarImage';
-import { StyledViewContainer, Text, TextL, PageView } from '@/components/Themed';
+import { Text, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
 import { Link, useGlobalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
+import { ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
-
-const CarModel = styled(TextL)`
-  font-weight: 100;
-  flex: 1;
-`;
-
-const CarModelBrand = styled(CarModel)`
-  text-align: right;
-`;
-
-const CarNumber = styled(TextL)`
-  font-weight: 200;
-  margin-top: 20px;
-`;
-
-const ModelRow = styled(StyledViewContainer)`
-  flex-flow: row;
-  width: 100%;
-`;
-
-const BrandLogo = styled(Image)`
-  margin: 0 10px;
-  width: 100px;
-  height: 21.5px;
-`;
-
-const StyledCarImage = styled(CarImage)`
-  margin: 20px auto 40px;
-  width: calc(100% - 40px);
-  max-width: 400px;
-  height: auto;
-`;
-
-const Nickname = styled(TextL)`
-  margin-bottom: 20px;
-`;
+import {
+  Nickname,
+  ModelRow,
+  CarModelBrand,
+  BrandLogo,
+  CarModel,
+  CarNumber,
+  StyledCarImage
+} from '@/components/CarDetails';
 
 const ButtonsContainer = styled(View)`
   display: flex;
