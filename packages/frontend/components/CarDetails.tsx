@@ -39,9 +39,9 @@ export const Nickname = styled(TextL)`
   margin-bottom: 20px;
 `;
 
-export const CarExternalImage = styled(Image)`
+export const CarExternalImage = styled(Image)<{ $aspectRatio: Maybe<number> }>`
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;
-  height: ${({ height }) => height ?? 125}px;
+  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 125};
 `;

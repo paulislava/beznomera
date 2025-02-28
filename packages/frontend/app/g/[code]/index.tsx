@@ -130,7 +130,7 @@ const CallUserPage = () => {
           {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           {info.imageUrl ? (
             <CarExternalImage
-              height={info.imageHeight ?? undefined}
+              $aspectRatio={info.imageRatio}
               resizeMode='contain'
               source={{ uri: info.imageUrl }}
             />

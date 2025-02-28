@@ -55,8 +55,8 @@ export class Car extends BaseEntity implements CarInfo {
   @Column({ nullable: true })
   imageUrl: string | null;
 
-  @Column({ nullable: true })
-  imageHeight: number | null;
+  @Column({ nullable: true, type: 'float' })
+  imageRatio: number | null;
 
   @CreateDateColumn()
   createdAt: Date;
