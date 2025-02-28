@@ -29,6 +29,7 @@ export type ShortCarInfo = {
   rawColor: RgbColor | null;
   year: number | null;
   imageUrl?: Maybe<string>;
+  imageHeight?: Maybe<number>;
 };
 
 export type CarInfo = ShortCarInfo & {

@@ -48,6 +48,7 @@ export class CarService {
       owner,
       rawColor,
       imageUrl,
+      imageHeight,
     } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner', 'brand', 'color'],
@@ -64,6 +65,7 @@ export class CarService {
       color,
       rawColor,
       imageUrl,
+      imageHeight,
       owner: {
         firstName: owner.firstName,
         lastName: owner.lastName,

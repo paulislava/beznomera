@@ -43,5 +43,5 @@ export const CarExternalImage = styled(Image)`
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;
-  height: 125px;
+  height: ${({ height }) => height ?? 125}px;
 `;

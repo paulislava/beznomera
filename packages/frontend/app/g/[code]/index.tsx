@@ -129,7 +129,11 @@ const CallUserPage = () => {
 
           {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           {info.imageUrl ? (
-            <CarExternalImage resizeMode='contain' source={{ uri: info.imageUrl }} />
+            <CarExternalImage
+              height={info.imageHeight ?? undefined}
+              resizeMode='contain'
+              source={{ uri: info.imageUrl }}
+            />
           ) : (
             <StyledCarImage color={info.color?.value ?? info.rawColor} />
           )}
