@@ -1,10 +1,12 @@
-import React, { FC, forwardRef, useCallback } from 'react';
-import { Text, Pressable, Platform } from 'react-native';
+import React, { forwardRef, useCallback } from 'react';
+import { Text, Pressable } from 'react-native';
 
-import * as WebBrowser from 'expo-web-browser';
 import styled, { css } from 'styled-components/native';
+import { ExternalLink } from '../ExternalLink';
+import { isWeb } from '@/utils/env';
+import { LinearGradient } from 'expo-linear-gradient';
 
-type ButtonView = 'primary' | 'secondary';
+type ButtonView = 'primary' | 'secondary' | 'glass';
 
 interface ButtonProps {
   children?: React.ReactNode;
@@ -26,6 +28,10 @@ const viewConfigs: Record<ButtonView, ViewConfig> = {
   secondary: {
     background: '#e5e5e5',
     color: '#000'
+  },
+  glass: {
+    background: `rgba(255, 255, 255, 0.1)`,
+    color: '#fff'
   }
 };
 
@@ -33,14 +39,25 @@ const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
 
 const StyledPressable = styled(Pressable)<{ $view: ButtonView }>`
   border-radius: 35px;
+  overflow: hidden;
+
   ${({ $view }) => {
     const config = getViewConfig($view);
 
     return css`
       background: ${config.background};
       color: ${config.color};
+
+      ${$view === 'glass' &&
+      css`
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      `}
     `;
   }}
+
+  width: 100%;
 
   height: max-content;
 
@@ -61,24 +78,38 @@ const StyledText = styled(Text)`
   font-weight: 100;
 `;
 
+const StyledGradient = styled(LinearGradient)`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  right: 0;
+`;
+
 const Button = forwardRef<any, ButtonProps>(
   ({ children, externalHref, onClick, disabled, view = 'primary' }, ref) => {
     const handleClick = useCallback(() => {
       onClick?.();
+    }, [onClick]);
 
-      if (externalHref) {
-        if (Platform.OS !== 'web') {
-          // Open the link in an in-app browser.
-          WebBrowser.openBrowserAsync(externalHref);
-        }
-      }
-    }, [externalHref, onClick]);
-
-    return (
+    const content = (
       <StyledPressable ref={ref} $view={view} disabled={disabled} onPress={handleClick}>
+        {isWeb && view === 'glass' && (
+          <StyledGradient
+            colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          />
+        )}
         <StyledText>{children}</StyledText>
       </StyledPressable>
     );
+
+    if (externalHref) {
+      return <ExternalLink href={externalHref}>{content}</ExternalLink>;
+    }
+
+    return content;
   }
 );
 

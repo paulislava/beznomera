@@ -17,4 +17,5 @@ export interface UserProfile {
   lastName?: string;
   avatarUrl?: string;
   nickname?: string;
+  tel?: string;
 }

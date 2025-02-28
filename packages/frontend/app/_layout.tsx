@@ -80,7 +80,7 @@ function RootLayoutNav() {
             >
               <Stop stopColor='#090633' />
               <Stop offset='0.451264' stopColor='#05031C' />
-              <Stop offset='1' />
+              <Stop offset='1' stopColor='#090821' />
             </LinearGradient>
           </Defs>
         </StyledSvg>

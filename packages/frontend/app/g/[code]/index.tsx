@@ -153,6 +153,11 @@ const CallUserPage = () => {
           </InfoRow>
           <StyledCarImage color={info.color?.value ?? info.rawColor} />
           <ButtonsContainer>
+            {info.owner.tel && (
+              <Button externalHref={`tel:${info.owner.tel}`} view='glass'>
+                Позвонить
+              </Button>
+            )}
             <Button onClick={callHandler} disabled={submitting || called}>
               {called
                 ? 'Запрос отправлен!'

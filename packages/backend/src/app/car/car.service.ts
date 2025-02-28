@@ -66,6 +66,7 @@ export class CarService {
         firstName: owner.firstName,
         lastName: owner.lastName,
         nickname: owner.nickname,
+        tel: owner.tel,
       },
     };
   }
