@@ -3,10 +3,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { AnonymousUser } from '../user/anonymous-user.entity';
 import { User } from '../user/user.entity';
+import { ChatMessage } from './message.entity';
 
 @Entity()
 export class Chat extends BaseEntity {
@@ -21,6 +23,9 @@ export class Chat extends BaseEntity {
 
   @ManyToOne(() => AnonymousUser)
   anonymousSender?: AnonymousUser;
+
+  @OneToMany(() => ChatMessage, (message) => message.chat)
+  messages: ChatMessage[];
 
   @CreateDateColumn()
   createdAt: Date;

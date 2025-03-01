@@ -1,4 +1,4 @@
-type FunctionalRoute = (...pathSegments: string[]) => string;
+type FunctionalRoute = (...pathSegments: (string | number)[]) => string;
 
 interface RouteProps {
   method: 'GET' | 'POST';

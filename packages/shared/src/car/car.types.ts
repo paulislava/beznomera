@@ -35,3 +35,9 @@ export type ShortCarInfo = {
 export type CarInfo = ShortCarInfo & {
   owner: UserProfile;
 };
+
+export type FullCarInfo = ShortCarInfo & {
+  messagesCount: number;
+  callsCount: number;
+  chatsCount: number;
+};

@@ -58,6 +58,7 @@ const StyledPressable = styled(Pressable)<{ $view: ButtonView }>`
   }}
 
   width: 100%;
+  max-width: 300px;
 
   height: max-content;
 

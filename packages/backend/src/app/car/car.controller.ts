@@ -4,6 +4,7 @@ import {
   Get,
   Ip,
   Param,
+  ParseIntPipe,
   Post,
   Req,
   Res,
@@ -14,9 +15,14 @@ import CAR_API, {
   CarApi,
   CarCallBody,
   CarMessageBody,
+  ID_PARAM,
   LocationInfo,
 } from '@paulislava/shared/car/car.api';
-import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
+import {
+  CarInfo,
+  FullCarInfo,
+  ShortCarInfo,
+} from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -83,5 +89,14 @@ export class CarController implements CarApi {
       res,
       req,
     );
+  }
+
+  @Get(CAR_API.backendRoutes.fullInfo)
+  @UseGuards(JwtAuthGuard)
+  fullInfo(
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @CurrentUser() user,
+  ): Promise<FullCarInfo> {
+    return this.carService.getFullInfo(id, user);
   }
 }

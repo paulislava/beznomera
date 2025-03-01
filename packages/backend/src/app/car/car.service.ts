@@ -2,7 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
-import { CarInfo, ShortCarInfo } from '@paulislava/shared/car/car.types';
+import {
+  CarInfo,
+  FullCarInfo,
+  ShortCarInfo,
+} from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
 import { RequestUser } from '../users/user.types';
@@ -12,7 +16,10 @@ import { Agent } from 'useragent';
 // @ts-ignore cannot find module?
 import { lookup } from 'ip-location-api';
 import { CALL_TIMEOUT_S } from '~/constants';
-import { CallNeedTimeoutException } from './car.exceptions';
+import {
+  CallNeedTimeoutException,
+  CarNotFoundException,
+} from './car.exceptions';
 import { Chat } from '../entities/chat/chat.entity';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { AnonymousUser } from '../entities/user/anonymous-user.entity';
@@ -222,5 +229,34 @@ export class CarService {
     }
 
     res.send();
+  }
+
+  async getFullInfo(id: number, user: RequestUser): Promise<FullCarInfo> {
+    const car = await this.carRepository.findOne({
+      where: { id, owner: { id: user.userId } },
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    const messagesCount = await this.messagesRepository.count({
+      where: { car: { id } },
+    });
+
+    const callsCount = await this.callRepository.count({
+      where: { car: { id } },
+    });
+
+    const chatsCount = await this.chatRepository.count({
+      where: { messages: { car: { id } } },
+    });
+
+    return {
+      ...car,
+      messagesCount,
+      callsCount,
+      chatsCount,
+    };
   }
 }

@@ -16,3 +16,12 @@ export class CallNeedTimeoutException extends CarServiceException {
     });
   }
 }
+
+export class CarNotFoundException extends CarServiceException {
+  constructor(carId: number) {
+    super({
+      code: ResponseCode.NOT_FOUND,
+      message: `Car (id: ${carId}) not found`,
+    });
+  }
+}

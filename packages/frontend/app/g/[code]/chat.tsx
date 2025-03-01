@@ -11,7 +11,7 @@ import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
 import Button from '@/components/Button/Button';
-import { TextInput } from 'react-native-paper';
+import TextInput from '@/ui/TextInput/TextInput';
 import {
   ModelRow,
   CarModelBrand,
@@ -20,7 +20,7 @@ import {
   CarNumber,
   Nickname
 } from '@/components/CarDetails';
-
+import { PRODUCTION_URL } from '@/constants/site';
 const InputContainer = styled(View)`
   margin: 20px 0;
   margin-left: -16px;
@@ -114,7 +114,7 @@ const ChatDriverPage = () => {
         <Recaptcha
           ref={recaptcha}
           siteKey='6LfQpdkqAAAAAO3SXZIRkr4yso-Gm2DJFfetUjc0'
-          baseUrl='https://beznomera.net'
+          baseUrl={PRODUCTION_URL}
           onVerify={consoleFunc}
           onExpire={consoleFunc}
           size='invisible'
@@ -143,19 +143,7 @@ const ChatDriverPage = () => {
 
           {info.no && <CarNumber>{info.no}</CarNumber>}
           <InputContainer>
-            <TextInput
-              mode='flat'
-              value={text}
-              outlineColor='white'
-              onChangeText={onChangeText}
-              multiline
-              label='Сообщение'
-              textColor='#fff'
-              activeUnderlineColor='#dbb3b3'
-              style={{ backgroundColor: 'transparent', minHeight: '100%' }}
-              underlineStyle={{ marginLeft: 16 }}
-              contentStyle={{ paddingTop: 0, marginTop: 26 }}
-            />
+            <TextInput value={text} onChangeText={onChangeText} multiline label='Сообщение' />
           </InputContainer>
           <Button onClick={sendHandler} disabled={submitting || called || !text}>
             {called ? 'Отправлено!' : submitting ? 'Отправка...' : 'Отправить'}
