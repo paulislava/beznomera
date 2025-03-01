@@ -4,7 +4,7 @@ import { Text, Pressable } from 'react-native';
 import styled, { css } from 'styled-components/native';
 import { ExternalLink } from '../ExternalLink';
 import { isWeb } from '@/utils/env';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Glass } from '@/ui/Glass';
 
 type ButtonView = 'primary' | 'secondary' | 'glass';
 
@@ -78,14 +78,6 @@ const StyledText = styled(Text)`
   font-weight: 100;
 `;
 
-const StyledGradient = styled(LinearGradient)`
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  top: 0;
-  right: 0;
-`;
-
 const Button = forwardRef<any, ButtonProps>(
   ({ children, externalHref, onClick, disabled, view = 'primary' }, ref) => {
     const handleClick = useCallback(() => {
@@ -94,13 +86,7 @@ const Button = forwardRef<any, ButtonProps>(
 
     const content = (
       <StyledPressable ref={ref} $view={view} disabled={disabled} onPress={handleClick}>
-        {isWeb && view === 'glass' && (
-          <StyledGradient
-            colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          />
-        )}
+        {isWeb && view === 'glass' && <Glass />}
         <StyledText>{children}</StyledText>
       </StyledPressable>
     );

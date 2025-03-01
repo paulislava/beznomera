@@ -1,10 +1,9 @@
-import { getMessage } from '@/app/locale';
 import env from '@/utils/env';
 import { APIInfo } from '@paulislava/shared/api-routes';
 import { ResponseCode } from '@shared/errors';
 import { ResponseWithCode } from '@shared/responses';
 import { useFocusEffect } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export const BACKEND_URL = env('BACKEND_URL', '/api');
 
@@ -142,9 +141,11 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
 export function useAPI<T>(func: () => Promise<T>) {
   const [value, setValue] = useState<T>();
 
-  useFocusEffect(() => {
+  const callbackFunction = useCallback(() => {
     func().then(setValue);
-  });
+  }, [func]);
+
+  useFocusEffect(callbackFunction);
 
   return value;
 }

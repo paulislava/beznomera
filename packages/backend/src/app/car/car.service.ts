@@ -117,8 +117,9 @@ export class CarService {
   }
 
   async list({ userId }: RequestUser): Promise<ShortCarInfo[]> {
-    const cars = await this.carRepository.findBy({
-      owner: { id: userId },
+    const cars = await this.carRepository.find({
+      where: { owner: { id: userId } },
+      relations: ['owner', 'brand', 'color'],
     });
 
     return cars;
