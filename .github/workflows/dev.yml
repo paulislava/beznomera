@@ -9,16 +9,16 @@ jobs:
   build-backend:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v42
+      # - uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
+          
+      # - name: Get changed files
+      #   id: changed-files
+      #   uses: tj-actions/changed-files@v42
 
       - name: Build backend Docker image
-        if: ${{ !contains(steps.changed-files.outputs.all_changed_files, 'packages/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/backend/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/shared/') }}
+        # if: ${{ !contains(steps.changed-files.outputs.all_changed_files, 'packages/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/backend/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/shared/') }}
         run: |
           echo "Building backend Docker image..."
           docker build --target backend --rm -t beznomera:backend https://github.com/paulislava/beznomera.git
@@ -31,16 +31,16 @@ jobs:
   build-frontend:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      # - uses: actions/checkout@v4
+      #   with:
+      #     fetch-depth: 0
       
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v42
+      # - name: Get changed files
+      #   id: changed-files
+      #   uses: tj-actions/changed-files@v42
 
       - name: Build frontend Docker image
-        if: ${{ !contains(steps.changed-files.outputs.all_changed_files, 'packages/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/frontend/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/shared/') }}
+        # if: ${{ !contains(steps.changed-files.outputs.all_changed_files, 'packages/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/frontend/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/shared/') }}
         run: |
           echo "Building frontend Docker image..."
           frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
@@ -55,11 +55,9 @@ jobs:
     needs:
       - build-frontend
       - build-backend
-    if: always()
     steps:
       - name: Clean unused containers and volumes
         run: |
           echo "Deleting unused containers, volumes..."
-          docker container prune -f
           docker image prune -f
           docker volume prune -f
