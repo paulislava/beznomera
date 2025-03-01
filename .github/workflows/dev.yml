@@ -8,10 +8,7 @@ on:
 jobs:
   build-backend:
     runs-on: self-hosted
-    if: |
-      !contains(github.event.head_commit.modified, 'packages/') ||
-      contains(github.event.head_commit.modified, 'packages/backend/') ||
-      contains(github.event.head_commit.modified, 'packages/shared/')
+    if: ${{ !contains(github.event.head_commit.modified, 'packages/') ||  contains(github.event.head_commit.modified, 'packages/backend/') || contains(github.event.head_commit.modified, 'packages/shared/') }}
     steps:
       - name: Build backend Docker image
         run: |
@@ -25,10 +22,7 @@ jobs:
 
   build-frontend:
     runs-on: self-hosted
-    if: |
-      !contains(github.event.head_commit.modified, 'packages/') ||
-      contains(github.event.head_commit.modified, 'packages/frontend/') ||
-      contains(github.event.head_commit.modified, 'packages/shared/')
+    if: ${{ !contains(github.event.head_commit.modified, 'packages/') ||  contains(github.event.head_commit.modified, 'packages/frontend/') || contains(github.event.head_commit.modified, 'packages/shared/') }}
     steps:
       - name: Build frontend Docker image
         run: |
