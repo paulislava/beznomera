@@ -1,5 +1,7 @@
 ## Локально
 
+Запуск: docker-compose up
+
 # Сборка бэкенда
 docker build --target backend --rm -t beznomera:backend .
 
