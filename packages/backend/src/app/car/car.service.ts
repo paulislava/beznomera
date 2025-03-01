@@ -234,6 +234,7 @@ export class CarService {
   async getFullInfo(id: number, user: RequestUser): Promise<FullCarInfo> {
     const car = await this.carRepository.findOne({
       where: { id, owner: { id: user.userId } },
+      relations: ['owner', 'brand', 'color'],
     });
 
     if (!car) {

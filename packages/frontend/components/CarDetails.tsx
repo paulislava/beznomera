@@ -15,6 +15,7 @@ export const CarModelBrand = styled(CarModel)`
 export const CarNumber = styled(TextL)`
   font-weight: 200;
   margin-top: 20px;
+  text-align: center;
 `;
 
 export const ModelRow = styled(StyledViewContainer)`

@@ -63,9 +63,9 @@ const ChatDriverPage = () => {
       return;
     }
 
-    const send = (location?: GeolocationPosition) => {
-      setSubmitting(true);
+    setSubmitting(true);
 
+    const send = (location?: GeolocationPosition) => {
       carService
         .sendMessage(
           {

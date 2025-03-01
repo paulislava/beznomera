@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Pressable } from 'react-native';
 import { PageView } from '@/components/Themed';
 import useNeedAuth from '@/hooks/useNeedAuth';
 import Head from 'expo-router/head';
@@ -8,6 +8,7 @@ import { useAPI } from '@/utils/api';
 import styled from 'styled-components/native';
 import { TextL } from '@/components/Themed';
 import { Glass } from '@/ui/Glass';
+import { Link } from 'expo-router';
 
 export const ScrollContainer = styled(ScrollView)`
   width: 100%;
@@ -25,7 +26,7 @@ export const Container = styled(View)`
   height: 100%;
 `;
 
-export const CarItem = styled(View)`
+export const CarItem = styled(Pressable)`
   cursor: pointer;
   display: flex;
   flex-flow: row;
@@ -57,13 +58,15 @@ function CarsList() {
         <ScrollContainer contentContainerStyle={{ flex: 1 }}>
           <Container>
             {cars.map(car => (
-              <CarItem key={car.no}>
-                <Glass />
-                <TextL>{car.no}</TextL>
-                <TextL>
-                  {car.brandRaw || car.brand?.title} {car.model}
-                </TextL>
-              </CarItem>
+              <Link key={car.no} href={`/car/${car.id}`} asChild>
+                <CarItem>
+                  <Glass />
+                  <TextL>{car.no}</TextL>
+                  <TextL>
+                    {car.brandRaw || car.brand?.title} {car.model}
+                  </TextL>
+                </CarItem>
+              </Link>
             ))}
           </Container>
         </ScrollContainer>

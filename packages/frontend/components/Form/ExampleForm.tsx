@@ -21,7 +21,7 @@ const ExampleForm = () => {
   return (
     <Form
       onSubmit={onSubmit}
-      render={({ handleSubmit, form, submitting, pristine }) => (
+      render={({ handleSubmit, submitting, pristine }) => (
         <View style={styles.container}>
           <Field name='email' validate={value => required(value) || email(value)}>
             {({ input, meta }: FieldRenderProps) => (
