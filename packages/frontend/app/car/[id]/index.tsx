@@ -12,6 +12,7 @@ import styled from 'styled-components/native';
 import { BrandLogo, CarModel, CarModelBrand, ModelRow } from '@/components/CarDetails';
 import { CarNumber } from '@/components/CarDetails';
 import { CarExternalImage } from '@/components/CarDetails';
+import { pluralize } from '@/utils/strings';
 
 const StyledCarImage = styled(CarImage)`
   width: 100%;
@@ -90,10 +91,10 @@ export default function CarFullInfoScreen() {
           )}
 
           <StatsContainer>
-            <StatsItem>Позвали: {info.callsCount} раз</StatsItem>
-
+            <StatsItem>Позвали: {pluralize(info.callsCount, ['раз', 'раза', 'раз'])}</StatsItem>
             <StatsItem>
-              {info.messagesCount} сообщений в {info.chatsCount} чатах
+              {pluralize(info.messagesCount, ['сообщение', 'сообщения', 'сообщений'])} в{' '}
+              {pluralize(info.chatsCount, ['чате', 'чатах', 'чатах'])}
             </StatsItem>
           </StatsContainer>
 
