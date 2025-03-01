@@ -9,16 +9,26 @@ jobs:
   build-backend:
     runs-on: self-hosted
     steps:
-      # - uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
+      - name: Check changed files
+        id: check-changes
+        run: |
+          REPO="paulislava/beznomera"
+          BEFORE_SHA=$(curl -s "https://api.github.com/repos/$REPO/commits/master" | grep -o '"sha": "[^"]*' | head -1 | sed 's/"sha": "//')
+          AFTER_SHA=${{ github.sha }}
           
-      # - name: Get changed files
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v42
+          CHANGED_FILES=$(curl -s "https://api.github.com/repos/$REPO/compare/$BEFORE_SHA...$AFTER_SHA" | grep -o '"filename": "[^"]*' | sed 's/"filename": "//')
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          if echo "$CHANGED_FILES" | grep -q "^packages/backend/\|^packages/shared/\|^[^packages/]"; then
+            echo "BUILD_BACKEND=true" >> $GITHUB_ENV
+          else
+            echo "BUILD_BACKEND=false" >> $GITHUB_ENV
+          fi
 
       - name: Build backend Docker image
-        # if: ${{ !contains(steps.changed-files.outputs.all_changed_files, 'packages/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/backend/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/shared/') }}
+        if: env.BUILD_BACKEND == 'true'
         run: |
           echo "Building backend Docker image..."
           docker build --target backend --rm -t beznomera:backend https://github.com/paulislava/beznomera.git
@@ -31,16 +41,26 @@ jobs:
   build-frontend:
     runs-on: self-hosted
     steps:
-      # - uses: actions/checkout@v4
-      #   with:
-      #     fetch-depth: 0
-      
-      # - name: Get changed files
-      #   id: changed-files
-      #   uses: tj-actions/changed-files@v42
+      - name: Check changed files
+        id: check-changes
+        run: |
+          REPO="paulislava/beznomera"
+          BEFORE_SHA=$(curl -s "https://api.github.com/repos/$REPO/commits/master" | grep -o '"sha": "[^"]*' | head -1 | sed 's/"sha": "//')
+          AFTER_SHA=${{ github.sha }}
+          
+          CHANGED_FILES=$(curl -s "https://api.github.com/repos/$REPO/compare/$BEFORE_SHA...$AFTER_SHA" | grep -o '"filename": "[^"]*' | sed 's/"filename": "//')
+          
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          if echo "$CHANGED_FILES" | grep -q "^packages/frontend/\|^packages/shared/"; then
+            echo "BUILD_FRONTEND=true" >> $GITHUB_ENV
+          else
+            echo "BUILD_FRONTEND=false" >> $GITHUB_ENV
+          fi
 
       - name: Build frontend Docker image
-        # if: ${{ !contains(steps.changed-files.outputs.all_changed_files, 'packages/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/frontend/') || contains(steps.changed-files.outputs.all_changed_files, 'packages/shared/') }}
+        if: env.BUILD_FRONTEND == 'true'
         run: |
           echo "Building frontend Docker image..."
           frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
@@ -59,5 +79,6 @@ jobs:
       - name: Clean unused containers and volumes
         run: |
           echo "Deleting unused containers, volumes..."
+          docker container prune -f
           docker image prune -f
           docker volume prune -f
