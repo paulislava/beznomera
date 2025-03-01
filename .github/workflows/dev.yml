@@ -55,6 +55,7 @@ jobs:
     needs:
       - build-frontend
       - build-backend
+    if: always()
     steps:
       - name: Clean unused containers and volumes
         run: |
