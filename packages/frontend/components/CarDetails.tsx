@@ -43,5 +43,5 @@ export const CarExternalImage = styled(Image)<{ $aspectRatio: Maybe<number> }>`
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;
-  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 125};
+  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 142};
 `;
