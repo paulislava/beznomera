@@ -12,6 +12,7 @@ import { Button } from '@/ui/Button';
 import { FormFieldProps } from '@/ui/FormField/FormField.types';
 import { CarColorPicker } from '@/components/CarColorPicker';
 import { PRODUCTION_URL } from '@/constants/site';
+import { FormApi } from 'final-form';
 
 type Data = EditCarInfo;
 
@@ -22,9 +23,10 @@ export default function CarEditScreen(): JSX.Element {
   const getInfo = useCallback(() => carService.infoForUpdate(Number(id)), [id]);
   const info = useAPI(getInfo);
 
-  const onSubmit = useCallback((data: Data) => {
+  const onSubmit = useCallback((data: Data, form: FormApi<Data>) => {
     return carService.update(data, Number(id)).then(() => {
       alert('Автомобиль успешно обновлен');
+      form.restart(data);
       return true;
     });
   }, []);

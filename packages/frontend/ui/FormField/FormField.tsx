@@ -7,7 +7,7 @@ import { useValidators } from '@/hooks/useValidators';
 // import { FileField } from '@/ui/FileButton/FileField';
 import { useMemo } from 'react';
 import { inputPlaceholders } from './constants';
-import { parseFunc } from './FormField.utils';
+import { normalizeFunc, parseFunc } from './FormField.utils';
 import { View } from 'react-native';
 
 // Контейнер для поля и кнопки
@@ -79,6 +79,8 @@ function FormField<T = any>({
 
   const parse = useMemo(() => (type ? parseFunc(type) : undefined), [type]);
 
+  const normalize = useMemo(() => (type ? normalizeFunc(type) : undefined), [type]);
+
   /**
    * Отображение поля в форме.
    * @returns {JSX.Element}
@@ -91,6 +93,7 @@ function FormField<T = any>({
         component={component || finalComponent}
         type={finalType || 'text'}
         parse={parse}
+        normalize={normalize}
         errors={errors}
         placeholder={finalPlaceholder}
         {...props}
