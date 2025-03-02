@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ColorValue, Text as DefaultText, View as DefaultView } from 'react-native';
+import { ColorValue, Text as DefaultText, View as DefaultView, ScrollView } from 'react-native';
 import Colors from '@/constants/Colors';
 
 import styled, { css } from 'styled-components/native';
@@ -25,14 +25,9 @@ export const StyledViewContainer = styled(DefaultView)<{
   $backgroundColor?: ColorValue;
 }>`
   position: relative;
-  padding: 0 10px;
   z-index: 1;
-
-  ${({ $fullHeight }) =>
-    $fullHeight &&
-    css`
-      flex: 1;
-    `}
+  max-width: 600px;
+  width: 100%;
 
   ${({ $center }) =>
     $center &&
@@ -40,6 +35,16 @@ export const StyledViewContainer = styled(DefaultView)<{
       align-items: center;
       justify-content: center;
     `}
+
+  ${({ $fullHeight }) =>
+    $fullHeight &&
+    css`
+      flex: 1;
+    `}
+`;
+
+const ScrollableContainer = styled(ScrollView)`
+  flex: 1;
 `;
 
 export function useThemeColor(
@@ -84,14 +89,16 @@ export function PageView(props: ViewProps) {
       <SvgContainer fill='none'>
         <Rect width='100%' height='100%' fill='url(#paint0_linear_2005_86)' />
       </SvgContainer>
-      <StyledViewContainer
-        $fullHeight={fullHeight}
-        $center={center}
-        style={[{ backgroundColor }, style]}
-        {...otherProps}
-      >
-        {children}
-      </StyledViewContainer>
+      <ScrollableContainer contentContainerStyle={{ flex: 1, alignItems: 'center' }}>
+        <StyledViewContainer
+          $fullHeight={fullHeight}
+          $center={center}
+          style={[{ backgroundColor }, style]}
+          {...otherProps}
+        >
+          {children}
+        </StyledViewContainer>
+      </ScrollableContainer>
     </>
   );
 }

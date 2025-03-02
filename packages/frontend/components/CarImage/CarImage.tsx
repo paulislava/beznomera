@@ -1,6 +1,6 @@
 import { RgbColor } from '@shared/car/car.types';
-import { FC, useCallback, useEffect, useRef } from 'react';
-import { Easing, Pressable, ViewStyle } from 'react-native';
+import { FC, useCallback, useRef } from 'react';
+import { Easing, ViewStyle } from 'react-native';
 import { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import Svg, { G, Path } from 'react-native-svg';
 import styled from 'styled-components/native';
@@ -8,6 +8,7 @@ import styled from 'styled-components/native';
 type CarImageProps = {
   color?: Maybe<RgbColor>;
   style?: ViewStyle;
+  animated?: boolean;
 };
 
 const redColor: RgbColor = { r: 255, g: 0, b: 0 };
@@ -21,15 +22,17 @@ const StyledSvg = styled(Svg)`
   cursor: pointer;
 `;
 
-export const CarImage: FC<CarImageProps> = ({ color, style }) => {
+export const CarImage: FC<CarImageProps> = ({ color, style, animated = true }) => {
   const rotation = useSharedValue(0);
 
   const handlePress = useCallback(() => {
-    rotation.value = withTiming(rotation.value - 360, {
-      duration: 2000, // Длительность анимации
-      easing: Easing.out(Easing.ease) // Замедление в конце,
-    });
-  }, [rotation]);
+    if (animated) {
+      rotation.value = withTiming(rotation.value - 360, {
+        duration: 2000, // Длительность анимации
+        easing: Easing.out(Easing.ease) // Замедление в конце,
+      });
+    }
+  }, [rotation, animated]);
 
   const leftWheelRef = useRef<any>();
   const rightWheelRef = useRef<any>();

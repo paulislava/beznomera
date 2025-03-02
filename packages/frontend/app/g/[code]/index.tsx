@@ -1,4 +1,4 @@
-import Button from '@/components/Button/Button';
+import Button from '@/ui/Button/Button';
 import { Text, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';

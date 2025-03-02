@@ -10,7 +10,7 @@ import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
 import { isWeb } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
-import Button from '@/components/Button/Button';
+import Button from '@/ui/Button/Button';
 import TextInput from '@/ui/TextInput/TextInput';
 import {
   ModelRow,

@@ -1,13 +1,9 @@
 import React from 'react';
-import { TextInput as RawInput, TextInputProps } from 'react-native-paper';
+import { TextInput as RawInput } from 'react-native-paper';
 
 import styled from 'styled-components/native';
 import { Text } from '@/components/Themed';
-
-export interface FormFieldProps extends Omit<TextInputProps, 'theme'> {
-  touched?: boolean;
-  errorText?: string;
-}
+import { TextInputProps } from './TextInput.types';
 
 const ErrorText = styled(Text)`
   color: red;
@@ -15,7 +11,7 @@ const ErrorText = styled(Text)`
   margin-top: 4px;
 `;
 
-export const TextInput: React.FC<FormFieldProps> = ({ errorText, touched, ...props }) => {
+export const TextInput: React.FC<TextInputProps> = ({ errorText, touched, onChange, ...props }) => {
   return (
     <>
       <RawInput
@@ -26,6 +22,7 @@ export const TextInput: React.FC<FormFieldProps> = ({ errorText, touched, ...pro
         style={{ backgroundColor: 'transparent', minHeight: '100%' }}
         underlineStyle={{ marginLeft: 16 }}
         contentStyle={{ paddingTop: 0, marginTop: 26 }}
+        onChangeText={onChange}
         {...props}
       />
       {errorText && touched && <ErrorText>{errorText}</ErrorText>}

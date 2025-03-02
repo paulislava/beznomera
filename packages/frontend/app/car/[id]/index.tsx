@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { useLocalSearchParams, Stack } from 'expo-router';
-import { View, ScrollView, ImageSourcePropType, ImageStyle, StyleProp } from 'react-native';
+import { useGlobalSearchParams, Stack, Link } from 'expo-router';
+import { View, ImageStyle, StyleProp, ImageSourcePropType } from 'react-native';
 import { CarImage } from '../../../components/CarImage/CarImage';
 import { useAPI } from '@/utils/api';
 import { carService } from '@/services';
@@ -13,10 +13,12 @@ import { BrandLogo, CarModel, CarModelBrand, ModelRow } from '@/components/CarDe
 import { CarNumber } from '@/components/CarDetails';
 import { CarExternalImage } from '@/components/CarDetails';
 import { pluralize } from '@/utils/strings';
+import { Button } from '@/ui/Button';
 
 const StyledCarImage = styled(CarImage)`
+  margin: 40px 0;
   width: 100%;
-  height: 100%;
+  height: auto;
 `;
 
 const InfoContainer = styled(View)`
@@ -45,11 +47,16 @@ const StyledModelRow = styled(ModelRow)`
   margin-top: 20px;
 `;
 
+const StyledView = styled(View)`
+  width: 100%;
+`;
+
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
 export default function CarFullInfoScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
+  console.log(id);
   const info = useAPI(getInfo);
 
   const brandLogoSource: ImageSourcePropType = useMemo(
@@ -58,7 +65,7 @@ export default function CarFullInfoScreen() {
   );
 
   return (
-    <PageView fullHeight>
+    <PageView fullHeight center>
       <Stack.Screen
         options={{
           title: `${info?.no ?? 'Мое авто'}: информация`
@@ -68,7 +75,7 @@ export default function CarFullInfoScreen() {
         <title>{info?.no ?? 'Мое авто'}: информация</title>
       </Head>
       {info && (
-        <ScrollView>
+        <>
           {info.brand && (
             <StyledModelRow $center>
               <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
@@ -90,20 +97,26 @@ export default function CarFullInfoScreen() {
             <StyledCarImage color={info.color?.value ?? info.rawColor} />
           )}
 
-          <StatsContainer>
-            <StatsItem>Позвали: {pluralize(info.callsCount, ['раз', 'раза', 'раз'])}</StatsItem>
-            <StatsItem>
-              {pluralize(info.messagesCount, ['сообщение', 'сообщения', 'сообщений'])} в{' '}
-              {pluralize(info.chatsCount, ['чате', 'чатах', 'чатах'])}
-            </StatsItem>
-          </StatsContainer>
+          <StyledView>
+            <StatsContainer>
+              <StatsItem>Позвали: {pluralize(info.callsCount, ['раз', 'раза', 'раз'])}</StatsItem>
+              <StatsItem>
+                {pluralize(info.messagesCount, ['сообщение', 'сообщения', 'сообщений'])} в{' '}
+                {pluralize(info.chatsCount, ['чате', 'чатах', 'чатах'])}
+              </StatsItem>
+            </StatsContainer>
 
-          <InfoContainer>
-            {info.version && <InfoText>Версия: {info.version}</InfoText>}
-            {info.year && <InfoText>Год выпуска: {info.year}</InfoText>}
-            {info.color && <InfoText>Цвет: {info.color.title}</InfoText>}
-          </InfoContainer>
-        </ScrollView>
+            <InfoContainer>
+              {info.version && <InfoText>Версия: {info.version}</InfoText>}
+              {info.year && <InfoText>Год выпуска: {info.year}</InfoText>}
+              {info.color && <InfoText>Цвет: {info.color.title}</InfoText>}
+            </InfoContainer>
+          </StyledView>
+
+          <Link href={`/car/${id}/edit`} asChild>
+            <Button>Редактировать</Button>
+          </Link>
+        </>
       )}
     </PageView>
   );

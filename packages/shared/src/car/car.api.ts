@@ -1,5 +1,5 @@
 import { APIRoutes, apiInfo } from '../api-routes';
-import { CarInfo, FullCarInfo, ShortCarInfo } from './car.types';
+import { CarInfo, EditCarInfo, FullCarInfo, ShortCarInfo } from './car.types';
 
 export type LocationInfo = { latitude: number; longitude: number };
 export type CarCallBody = { coords?: LocationInfo };
@@ -11,6 +11,8 @@ export interface CarApi {
   list(...args: any[]): Promise<ShortCarInfo[]>;
   sendMessage(body: CarMessageBody, code: string, ...args: any[]): Promise<void>;
   fullInfo(id: number, ...args: any[]): Promise<FullCarInfo>;
+  infoForUpdate(id: number, ...args: any[]): Promise<EditCarInfo>;
+  update(body: EditCarInfo, id: number, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -27,7 +29,12 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   sendMessage: {
     path: code => `${code || `:${CODE_PARAM}`}/message`,
     method: 'POST'
-  }
+  },
+  update: {
+    path: id => `${id || `:${ID_PARAM}`}`,
+    method: 'POST'
+  },
+  infoForUpdate: id => `${id || `:${ID_PARAM}`}/info-for-update`
 };
 
 const CAR_API = apiInfo(CAR_ROUTES, 'car');

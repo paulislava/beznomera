@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback } from 'react';
 import { Text, Pressable } from 'react-native';
 
 import styled, { css } from 'styled-components/native';
-import { ExternalLink } from '../ExternalLink';
+import { ExternalLink } from '../../components/ExternalLink';
 import { isWeb } from '@/utils/env';
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
@@ -82,7 +82,7 @@ const StyledText = styled(Text)`
   font-weight: 100;
 `;
 
-const Button = forwardRef<any, ButtonProps>(
+export const Button = forwardRef<any, ButtonProps>(
   ({ children, externalHref, onClick, disabled, view = 'primary', event, eventParams }, ref) => {
     const handleClick = useCallback(() => {
       onClick?.();

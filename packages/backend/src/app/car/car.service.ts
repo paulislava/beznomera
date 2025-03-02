@@ -4,6 +4,7 @@ import { Car } from '../entities/car/car.entity';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import {
   CarInfo,
+  EditCarInfo,
   FullCarInfo,
   ShortCarInfo,
 } from '@paulislava/shared/car/car.types';
@@ -27,6 +28,7 @@ import { MessageSource } from '@paulislava/shared/chat/chat.types';
 import userAgentParser from 'useragent';
 import { ConfigService } from '../config/config.service';
 import { Response, Request } from 'express';
+import { CarUpdateDto } from './car.controller';
 
 @Injectable()
 export class CarService {
@@ -259,5 +261,63 @@ export class CarService {
       callsCount,
       chatsCount,
     };
+  }
+
+  async getInfoForUpdate(id: number, user: RequestUser): Promise<EditCarInfo> {
+    const car = await this.carRepository.findOne({
+      where: { id, owner: { id: user.userId } },
+      relations: ['brand', 'color'],
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    return {
+      no: car.no,
+      model: car.model,
+      version: car.version,
+      imageUrl: car.imageUrl,
+      color: {
+        value: car.color,
+        newValue: car.rawColor,
+      },
+      brand: {
+        value: car.brand,
+        newValue: car.brandRaw,
+      },
+      year: car.year,
+      imageRatio: car.imageRatio,
+    };
+  }
+
+  async update(
+    id: number,
+    body: EditCarInfo,
+    user: RequestUser,
+  ): Promise<void> {
+    const car = await this.carRepository.findOne({
+      where: { id, owner: { id: user.userId } },
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    await this.carRepository.update(car.id, {
+      no: body.no,
+      model: body.model,
+      version: body.version,
+      color: body.color.value && {
+        id: body.color.value.id,
+      },
+      brand: body.brand.value && {
+        id: body.brand.value.id,
+      },
+      rawColor: body.color.newValue,
+      brandRaw: body.brand.newValue,
+      year: body.year,
+      imageRatio: body.imageRatio,
+    });
   }
 }

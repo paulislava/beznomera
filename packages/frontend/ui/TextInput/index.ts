@@ -1,2 +1,3 @@
-export { default as TextInput } from './TextInput';
-export type { FormFieldProps } from './TextInput'; 
+export * from './TextInput';
+export type { TextInputProps } from './TextInput.types';
+export * from './FinalTextInput';

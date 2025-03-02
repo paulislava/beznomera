@@ -55,21 +55,19 @@ function CarsList() {
       </Head>
 
       {cars && (
-        <ScrollContainer contentContainerStyle={{ flex: 1 }}>
-          <Container>
-            {cars.map(car => (
-              <Link key={car.no} href={`/car/${car.id}`} asChild>
-                <CarItem>
-                  <Glass />
-                  <TextL>{car.no}</TextL>
-                  <TextL>
-                    {car.brandRaw || car.brand?.title} {car.model}
-                  </TextL>
-                </CarItem>
-              </Link>
-            ))}
-          </Container>
-        </ScrollContainer>
+        <Container>
+          {cars.map(car => (
+            <Link key={car.no} href={`/car/${car.id}/`} asChild>
+              <CarItem>
+                <Glass />
+                <TextL>{car.no}</TextL>
+                <TextL>
+                  {car.brandRaw || car.brand?.title} {car.model}
+                </TextL>
+              </CarItem>
+            </Link>
+          ))}
+        </Container>
       )}
     </PageView>
   );

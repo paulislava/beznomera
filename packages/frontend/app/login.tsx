@@ -5,7 +5,7 @@ import { Text, PageView } from '../components/Themed';
 import { authService } from '@/services';
 import withRouter, { WithRouterProps } from '@/utils/withRouter';
 import env, { isWeb } from '@/utils/env';
-import Button from '@/components/Button/Button';
+import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
 
 const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
