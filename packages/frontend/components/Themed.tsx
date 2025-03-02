@@ -28,6 +28,7 @@ export const StyledViewContainer = styled(DefaultView)<{
   z-index: 1;
   max-width: 600px;
   width: 100%;
+  padding: 0 10px;
 
   ${({ $center }) =>
     $center &&

@@ -11,18 +11,31 @@ const ErrorText = styled(Text)`
   margin-top: 4px;
 `;
 
-export const TextInput: React.FC<TextInputProps> = ({ errorText, touched, onChange, ...props }) => {
+const StyledInput = styled(RawInput)`
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 16px;
+`;
+
+export const TextInput: React.FC<TextInputProps> = ({
+  errorText,
+  touched,
+  onChange,
+  value,
+  ...props
+}) => {
   return (
     <>
-      <RawInput
+      <StyledInput
         mode='flat'
         outlineColor='white'
         textColor='#fff'
         activeUnderlineColor='#dbb3b3'
         style={{ backgroundColor: 'transparent', minHeight: '100%' }}
-        underlineStyle={{ marginLeft: 16 }}
+        underlineStyle={{ marginLeft: 16, marginRight: 16 }}
         contentStyle={{ paddingTop: 0, marginTop: 26 }}
         onChangeText={onChange}
+        value={value || undefined}
         {...props}
       />
       {errorText && touched && <ErrorText>{errorText}</ErrorText>}

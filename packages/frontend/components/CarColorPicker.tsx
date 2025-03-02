@@ -15,6 +15,7 @@ const StyledCarImage = styled(CarImage)`
 type CarColorPickerProps = FieldRenderProps<Creatable<ColorInfo, RgbColor>>;
 
 const Label = webStyled.label`
+  position: relative;
   display: block;
 
   max-width: 400px;
@@ -22,7 +23,12 @@ const Label = webStyled.label`
   margin: 20px 0;
 
   &>input {
-    display: none;
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
   }
 `;
 
@@ -51,11 +57,12 @@ export const CarColorPicker = ({ input: { value, onChange } }: CarColorPickerPro
   return (
     <>
       {isWeb && (
-        <Label>
-          <input type='color' value={hexValue} onChange={handleChange} />
-
-          <StyledCarImage color={value?.newValue ?? value?.value?.value} animated={false} />
-        </Label>
+        <>
+          <Label>
+            <input type='color' value={hexValue} onChange={handleChange} />
+            <StyledCarImage color={value?.newValue ?? value?.value?.value} animated={false} />
+          </Label>
+        </>
       )}
     </>
   );
