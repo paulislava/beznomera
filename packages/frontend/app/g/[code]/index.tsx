@@ -22,6 +22,7 @@ import {
   CarExternalImage,
   CarExternalImageWeb
 } from '@/components/CarDetails';
+import { PRODUCTION_URL } from '@/constants/site';
 
 const ButtonsContainer = styled(View)`
   display: flex;
@@ -98,20 +99,43 @@ const CallUserPage = () => {
     [info]
   );
 
+  const [title, description] = useMemo(
+    () =>
+      info
+        ? [
+            `${info.no}: связаться с водителем`,
+            `Связаться с владельцем автомобиля ${info.no}. ${info.brandRaw || info.brand?.title} ${
+              info.model || ''
+            }. Уведомление в Telegram, сообщение или звонок.`
+          ]
+        : [
+            'Связзаться с владельцем автомобиля. Уведомление в Telegram, сообщение или звонок.',
+            'Связаться с водителем'
+          ],
+    [info]
+  );
+
   return (
     <PageView fullHeight center>
       {!isWeb && (
         <Recaptcha
           ref={recaptcha}
           siteKey='6LfQpdkqAAAAAO3SXZIRkr4yso-Gm2DJFfetUjc0'
-          baseUrl='https://beznomera.net'
+          baseUrl={PRODUCTION_URL}
           onVerify={consoleFunc}
           onExpire={consoleFunc}
           size='invisible'
         />
       )}
       <Head>
-        <title>{info ? `${info.no}: информация об авто` : 'Информация об авто'}</title>
+        <title>{title}</title>
+        <meta name='description' content={description} />
+        <meta property='og:title' content={title} />
+        <meta property='og:description' content={description} />
+        {info?.imageUrl && <meta property='og:image' content={info.imageUrl} />}
+        <meta property='og:type' content='website' />
+        <meta name='robots' content='index, follow' />
+        <link rel='canonical' href={`${PRODUCTION_URL}/g/${code}`} />
       </Head>
       {requested && !info && <Text>Ошибка: ссылка недействительна</Text>}
 
