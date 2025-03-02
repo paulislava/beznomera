@@ -41,14 +41,18 @@ export const Nickname = styled(TextL)`
   margin-bottom: 20px;
 `;
 
-export const CarExternalImage = styled(Image)<{ $aspectRatio: Maybe<number> }>`
+export const CarExternalImage = styled(Image).attrs({ resizeMode: 'contain' })<{
+  $aspectRatio: Maybe<number>;
+}>`
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;
   aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 142};
 `;
 
-export const CarExternalImageWeb = webStyled.img<{ $aspectRatio: Maybe<number> }>`
+export const CarExternalImageWeb = webStyled.img.attrs({ loading: 'lazy' })<{
+  $aspectRatio: Maybe<number>;
+}>`
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;
