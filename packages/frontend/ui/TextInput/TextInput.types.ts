@@ -21,6 +21,7 @@ export type TextInputProps = RawInputProps & {
   onChange?: (value: string) => void;
   value?: Maybe<string>;
   multiline?: boolean;
+  beforeText?: string;
 };
 
 export type FinalTextInputProps = RawInputProps & FieldRenderProps<string>;

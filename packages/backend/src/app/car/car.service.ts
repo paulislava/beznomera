@@ -278,6 +278,7 @@ export class CarService {
       model: car.model,
       version: car.version,
       imageUrl: car.imageUrl,
+      code: car.code,
       color: {
         value: car.color,
         newValue: car.rawColor,
@@ -318,6 +319,8 @@ export class CarService {
       brandRaw: body.brand.newValue,
       year: body.year,
       imageRatio: body.imageRatio,
+      imageUrl: body.imageUrl,
+      code: body.code,
     });
   }
 }

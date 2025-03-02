@@ -25,7 +25,6 @@ type CarInfoBase = {
   model: Maybe<string>;
   version: Maybe<string>;
   imageRatio: Maybe<number>;
-
   imageUrl: Maybe<string>;
   year: Maybe<number>;
 };
@@ -52,4 +51,6 @@ export type FullCarInfo = ShortCarInfo & {
 export type EditCarInfo = CarInfoBase & {
   color: Creatable<ColorInfo>;
   brand: Creatable<BrandInfo>;
+
+  code: string;
 };

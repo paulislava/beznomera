@@ -118,6 +118,9 @@ export class CarUpdateDto implements EditCarInfo {
   @Type(() => CreatableStringDto)
   brand: Creatable<BrandInfo, string>;
 
+  @IsString()
+  code: string;
+
   @IsNumber()
   @IsOptional()
   year: Maybe<number>;

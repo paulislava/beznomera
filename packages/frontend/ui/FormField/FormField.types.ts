@@ -18,7 +18,7 @@ type RawFormFieldProps<T> = Omit<Partial<HTMLInputElement>, 'children' | 'type'>
     validate?: undefined;
 
     fileType?: FileType;
-  } & Pick<TextInputProps, 'center' | 'label' | 'rightContent'>;
+  } & Pick<TextInputProps, 'center' | 'label' | 'rightContent' | 'beforeText'>;
 
 export type FormFieldProps<T> = RawFormFieldProps<T> &
   (

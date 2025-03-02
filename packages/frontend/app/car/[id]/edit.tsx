@@ -11,6 +11,7 @@ import { EditCarInfo } from '@paulislava/shared/car/car.types';
 import { Button } from '@/ui/Button';
 import { FormFieldProps } from '@/ui/FormField/FormField.types';
 import { CarColorPicker } from '@/components/CarColorPicker';
+import { PRODUCTION_URL } from '@/constants/site';
 
 type Data = EditCarInfo;
 
@@ -48,6 +49,7 @@ export default function CarEditScreen(): JSX.Element {
               <Field name='year' type='number' label='Год выпуска' />
               <Field name='imageRatio' type='number' label='Соотношение сторон' />
               <Field name='imageUrl' label='Ссылка на изображение' />
+              <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
               {info.imageUrl ? (
                 <CarExternalImage
                   $aspectRatio={info.imageRatio}
