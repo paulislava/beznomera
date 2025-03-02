@@ -2,6 +2,7 @@ import styled from 'styled-components/native';
 import { CarImage } from './CarImage/CarImage';
 import { TextL, StyledViewContainer } from './Themed';
 import { Image } from 'react-native';
+import webStyled from 'styled-components';
 
 export const CarModel = styled(TextL)`
   font-weight: 100;
@@ -41,6 +42,13 @@ export const Nickname = styled(TextL)`
 `;
 
 export const CarExternalImage = styled(Image)<{ $aspectRatio: Maybe<number> }>`
+  margin: 40px auto;
+  width: calc(100% - 40px);
+  max-width: 400px;
+  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 142};
+`;
+
+export const CarExternalImageWeb = webStyled.img<{ $aspectRatio: Maybe<number> }>`
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;

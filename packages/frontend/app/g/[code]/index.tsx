@@ -5,7 +5,7 @@ import { CarInfo } from '@shared/car/car.types';
 import { Link, useGlobalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
+import { ImageSourcePropType, ImageStyle, Platform, StyleProp, View } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
@@ -19,7 +19,8 @@ import {
   CarModel,
   CarNumber,
   StyledCarImage,
-  CarExternalImage
+  CarExternalImage,
+  CarExternalImageWeb
 } from '@/components/CarDetails';
 
 const ButtonsContainer = styled(View)`
@@ -134,11 +135,22 @@ const CallUserPage = () => {
 
           {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           {info.imageUrl ? (
-            <CarExternalImage
-              $aspectRatio={info.imageRatio}
-              resizeMode='contain'
-              source={{ uri: info.imageUrl }}
-            />
+            Platform.select({
+              web: (
+                <CarExternalImageWeb
+                  $aspectRatio={info.imageRatio}
+                  src={info.imageUrl}
+                  loading='lazy'
+                />
+              ),
+              default: (
+                <CarExternalImage
+                  $aspectRatio={info.imageRatio}
+                  resizeMode='contain'
+                  source={{ uri: info.imageUrl }}
+                />
+              )
+            })
           ) : (
             <StyledCarImage color={info.color?.value ?? info.rawColor} />
           )}
