@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components/native';
 import { ExternalLink } from '../ExternalLink';
 import { isWeb } from '@/utils/env';
 import { Glass } from '@/ui/Glass';
+import { handleEvent } from '@/utils/log';
 
 type ButtonView = 'primary' | 'secondary' | 'glass';
 
@@ -14,6 +15,8 @@ interface ButtonProps {
   disabled?: boolean;
   view?: ButtonView;
   onClick?(): void;
+  event?: string;
+  eventParams?: Record<string, string | number | undefined>;
 }
 type ViewConfig = {
   background: string;
@@ -80,10 +83,13 @@ const StyledText = styled(Text)`
 `;
 
 const Button = forwardRef<any, ButtonProps>(
-  ({ children, externalHref, onClick, disabled, view = 'primary' }, ref) => {
+  ({ children, externalHref, onClick, disabled, view = 'primary', event, eventParams }, ref) => {
     const handleClick = useCallback(() => {
       onClick?.();
-    }, [onClick]);
+      if (event) {
+        handleEvent(event, eventParams);
+      }
+    }, [onClick, event, eventParams]);
 
     const content = (
       <StyledPressable ref={ref} $view={view} disabled={disabled} onPress={handleClick}>

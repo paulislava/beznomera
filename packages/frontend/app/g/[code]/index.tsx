@@ -55,6 +55,8 @@ const CallUserPage = () => {
       });
   }, [code]);
 
+  const eventData = useMemo(() => ({ carId: info?.id, code }), [info, code]);
+
   const callHandler = useCallback(() => {
     setSubmitting(true);
 
@@ -70,10 +72,13 @@ const CallUserPage = () => {
           code
         )
         .then(() => {
-          handleEvent('call', { carId: info?.id, code });
+          handleEvent('call_success', eventData);
           setCalled(true);
         })
-        .catch(showResponseMessage)
+        .catch(res => {
+          showResponseMessage(res);
+          handleEvent('call_error', { ...eventData, res });
+        })
         .finally(() => setSubmitting(false));
 
     // recaptcha.current?.open();
@@ -85,7 +90,7 @@ const CallUserPage = () => {
     } else {
       call();
     }
-  }, [info]);
+  }, [info, eventData]);
 
   const brandLogoSource: ImageSourcePropType = useMemo(
     () => ({ uri: info?.brand?.logoUrl ?? undefined }),
@@ -139,11 +144,21 @@ const CallUserPage = () => {
           )}
           <ButtonsContainer>
             {info.owner.tel && (
-              <Button externalHref={`tel:${info.owner.tel}`} view='glass'>
+              <Button
+                externalHref={`tel:${info.owner.tel}`}
+                view='glass'
+                event='tel_call'
+                eventParams={eventData}
+              >
                 Позвонить
               </Button>
             )}
-            <Button onClick={callHandler} disabled={submitting || called}>
+            <Button
+              onClick={callHandler}
+              disabled={submitting || called}
+              event='call'
+              eventParams={eventData}
+            >
               {called
                 ? 'Запрос отправлен!'
                 : submitting
@@ -151,7 +166,9 @@ const CallUserPage = () => {
                 : 'Позвать водителя'}
             </Button>
             <Link href={`/g/${code}/chat`} asChild>
-              <Button view='secondary'>Отправить сообщение</Button>
+              <Button view='secondary' event='go_chat' eventParams={eventData}>
+                Отправить сообщение
+              </Button>
             </Link>
           </ButtonsContainer>
         </>

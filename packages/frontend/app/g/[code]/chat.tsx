@@ -57,6 +57,8 @@ const ChatDriverPage = () => {
       });
   }, [code]);
 
+  const eventData = useMemo(() => ({ carId: info?.id, code }), [info, code]);
+
   const sendHandler = useCallback(() => {
     if (!text) {
       alert('No text!');
@@ -79,11 +81,14 @@ const ChatDriverPage = () => {
           code
         )
         .then(() => {
-          handleEvent('send_message', { carId: info?.id, code });
+          handleEvent('send_message_success', eventData);
           setCalled(true);
           setText('');
         })
-        .catch(showResponseMessage)
+        .catch(res => {
+          showResponseMessage(res);
+          handleEvent('send_message_error', { ...eventData, res });
+        })
         .finally(() => setSubmitting(false));
     };
 
@@ -145,7 +150,12 @@ const ChatDriverPage = () => {
           <InputContainer>
             <TextInput value={text} onChangeText={onChangeText} multiline label='Сообщение' />
           </InputContainer>
-          <Button onClick={sendHandler} disabled={submitting || called || !text}>
+          <Button
+            onClick={sendHandler}
+            event='send_message'
+            eventParams={eventData}
+            disabled={submitting || called || !text}
+          >
             {called ? 'Отправлено!' : submitting ? 'Отправка...' : 'Отправить'}
           </Button>
         </>
