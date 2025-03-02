@@ -49,12 +49,3 @@ export const CarExternalImage = styled(Image).attrs({ resizeMode: 'contain' })<{
   max-width: 400px;
   aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 142};
 `;
-
-export const CarExternalImageWeb = webStyled.img.attrs({ loading: 'lazy' })<{
-  $aspectRatio: Maybe<number>;
-}>`
-  margin: 40px auto;
-  width: calc(100% - 40px);
-  max-width: 400px;
-  aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 142};
-`;

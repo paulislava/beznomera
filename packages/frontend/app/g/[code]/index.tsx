@@ -159,12 +159,7 @@ const CallUserPage = () => {
 
           {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           {info.imageUrl ? (
-            Platform.select({
-              web: <CarExternalImageWeb $aspectRatio={info.imageRatio} src={info.imageUrl} />,
-              default: (
-                <CarExternalImage $aspectRatio={info.imageRatio} source={{ uri: info.imageUrl }} />
-              )
-            })
+            <CarExternalImage $aspectRatio={info.imageRatio} source={{ uri: info.imageUrl }} />
           ) : (
             <StyledCarImage color={info.color?.value ?? info.rawColor} />
           )}
