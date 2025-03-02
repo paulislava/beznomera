@@ -35,7 +35,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         underlineStyle={{ marginLeft: 16, marginRight: 16 }}
         contentStyle={{ paddingTop: 0, marginTop: 26 }}
         onChangeText={onChange}
-        value={value || undefined}
+        value={value ?? undefined}
         {...props}
       />
       {errorText && touched && <ErrorText>{errorText}</ErrorText>}

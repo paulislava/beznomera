@@ -40,7 +40,8 @@ const ChatDriverPage = () => {
   const [requested, setRequested] = useState(false);
   const [info, setInfo] = useState<CarInfo | null>(null);
   const [called, setCalled] = useState(false);
-  const [text, setText] = useState<string>();
+  const [text, setText] = useState<string>('');
+
   const [submitting, setSubmitting] = useState(false);
 
   // useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
@@ -101,7 +102,7 @@ const ChatDriverPage = () => {
     } else {
       send();
     }
-  }, [info, text]);
+  }, [info, text, setText]);
 
   const brandLogoSource: ImageSourcePropType = useMemo(
     () => ({ uri: info?.brand?.logoUrl ?? undefined }),
@@ -148,7 +149,7 @@ const ChatDriverPage = () => {
 
           {info.no && <CarNumber>{info.no}</CarNumber>}
           <InputContainer>
-            <TextInput value={text} onChangeText={onChangeText} multiline label='Сообщение' />
+            <TextInput value={text} onChange={onChangeText} multiline label='Сообщение' />
           </InputContainer>
           <Button
             onClick={sendHandler}
