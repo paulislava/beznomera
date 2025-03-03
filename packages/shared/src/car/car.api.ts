@@ -13,6 +13,7 @@ export interface CarApi {
   fullInfo(id: number, ...args: any[]): Promise<FullCarInfo>;
   infoForUpdate(id: number, ...args: any[]): Promise<EditCarInfo>;
   update(body: EditCarInfo, id: number, ...args: any[]): Promise<void>;
+  create(body: EditCarInfo, ...args: any[]): Promise<{ id: number }>;
 }
 
 export const CODE_PARAM = 'code';
@@ -31,10 +32,14 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
     method: 'POST'
   },
   update: {
-    path: id => `${id || `:${ID_PARAM}`}`,
+    path: id => `${id || `:${ID_PARAM}`}/update`,
     method: 'POST'
   },
-  infoForUpdate: id => `${id || `:${ID_PARAM}`}/info-for-update`
+  infoForUpdate: id => `${id || `:${ID_PARAM}`}/info-for-update`,
+  create: {
+    path: () => 'create',
+    method: 'POST'
+  }
 };
 
 const CAR_API = apiInfo(CAR_ROUTES, 'car');

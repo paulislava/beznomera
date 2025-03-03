@@ -25,9 +25,5 @@ export const parseFunc = (type: TypeValue) => {
   }
 };
 
-export const normalizeFunc = (type: TypeValue) => {
-  switch (type) {
-    case 'number':
-      return cleanNumber;
-  }
-};
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const normalizeFunc = (_: TypeValue) => undefined;

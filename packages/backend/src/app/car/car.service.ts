@@ -20,6 +20,7 @@ import { CALL_TIMEOUT_S } from '~/constants';
 import {
   CallNeedTimeoutException,
   CarNotFoundException,
+  ValidationException,
 } from './car.exceptions';
 import { Chat } from '../entities/chat/chat.entity';
 import { ChatMessage } from '../entities/chat/message.entity';
@@ -28,7 +29,9 @@ import { MessageSource } from '@paulislava/shared/chat/chat.types';
 import userAgentParser from 'useragent';
 import { ConfigService } from '../config/config.service';
 import { Response, Request } from 'express';
-import { CarUpdateDto } from './car.controller';
+import { CarCreateDto } from './car.controller';
+import { User } from '../entities/user/user.entity';
+import { SubmissionError, ValidationCode } from '@paulislava/shared/errors';
 
 @Injectable()
 export class CarService {
@@ -294,7 +297,7 @@ export class CarService {
 
   async update(
     id: number,
-    body: EditCarInfo,
+    data: EditCarInfo,
     user: RequestUser,
   ): Promise<void> {
     const car = await this.carRepository.findOne({
@@ -306,21 +309,79 @@ export class CarService {
     }
 
     await this.carRepository.update(car.id, {
-      no: body.no,
-      model: body.model,
-      version: body.version,
-      color: body.color.value && {
-        id: body.color.value.id,
+      no: data.no,
+      model: data.model,
+      version: data.version,
+      color: data.color?.value && {
+        id: data.color?.value.id,
       },
-      brand: body.brand.value && {
-        id: body.brand.value.id,
+      brand: data.brand?.value && {
+        id: data.brand?.value.id,
       },
-      rawColor: body.color.newValue,
-      brandRaw: body.brand.newValue,
-      year: body.year,
-      imageRatio: body.imageRatio,
-      imageUrl: body.imageUrl,
-      code: body.code,
+      rawColor: data.color?.newValue,
+      brandRaw: data.brand?.newValue,
+      year: data.year,
+      imageRatio: data.imageRatio,
+      imageUrl: data.imageUrl,
+      code: data.code,
     });
+  }
+
+  async create(data: CarCreateDto, user: RequestUser): Promise<number> {
+    // Проверяем уникальность номера и кода
+    const [existingNo, existingCode] = await Promise.all([
+      this.carRepository.findOne({ where: { no: data.no } }),
+      data.code && this.carRepository.findOne({ where: { code: data.code } }),
+    ]);
+
+    const errors: Record<string, SubmissionError[]> = {};
+
+    if (existingNo) {
+      errors.no = [
+        {
+          message: 'Автомобиль с таким номером уже существует',
+          code: ValidationCode.DUPLICATE_NUMBER,
+        },
+      ];
+    }
+
+    if (existingCode) {
+      errors.code = [
+        {
+          message: 'Автомобиль с таким кодом уже существует',
+          code: ValidationCode.DUPLICATE_CODE,
+        },
+      ];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationException(errors);
+    }
+
+    const code = data.code || data.no.toLowerCase().replace(/\s+/g, '');
+
+    const car = this.carRepository.create({
+      no: data.no,
+      model: data.model,
+      version: data.version,
+      year: data.year,
+      imageRatio: data.imageRatio,
+      imageUrl: data.imageUrl,
+      owner: {
+        id: user.userId,
+      },
+      code,
+      color: data.color?.value && {
+        id: data.color.value.id,
+      },
+      brand: data.brand?.value && {
+        id: data.brand?.value.id,
+      },
+      brandRaw: data.brand?.newValue,
+      rawColor: data.color?.newValue,
+    });
+
+    await this.carRepository.save(car);
+    return car.id;
   }
 }

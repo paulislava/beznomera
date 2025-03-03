@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { TextInput as RawInput } from 'react-native-paper';
 import { View } from 'react-native';
 import styled from 'styled-components/native';
 import { Text } from '@/components/Themed';
 import { TextInputProps } from './TextInput.types';
 import { TextInput as NativeTextInput } from 'react-native';
+import { RenderProps } from 'react-native-paper/lib/typescript/components/TextInput/types';
+import { useSetTrue, useSetFalse } from '@/hooks/booleans';
+
+const Container = styled(View)`
+  width: 100%;
+`;
 
 const ErrorText = styled(Text)`
   color: red;
   font-size: 12px;
   margin-top: 4px;
+  margin-left: 16px;
 `;
 
 const StyledInput = styled(RawInput)`
@@ -35,22 +42,30 @@ const BeforeText = styled(Text)`
 const RenderInput = styled(NativeTextInput)``;
 
 export const TextInput: React.FC<TextInputProps> = ({
-  errorText,
-  touched,
+  errors,
   onChange,
   value,
   beforeText,
   ...props
 }) => {
-  const renderProps = (inputProps: any) => (
-    <InputContainer>
-      {beforeText && <BeforeText>{beforeText}</BeforeText>}
-      <RenderInput {...inputProps} />
-    </InputContainer>
+  const [isFocused, setIsFocused] = useState(false);
+
+  const renderProps = useCallback(
+    (inputProps: RenderProps) => (
+      <InputContainer>
+        {beforeText && (inputProps.value || isFocused) && <BeforeText>{beforeText}</BeforeText>}
+        <RenderInput {...inputProps} />
+      </InputContainer>
+    ),
+    [beforeText, isFocused]
   );
 
+  const handleFocus = useSetTrue(setIsFocused);
+
+  const handleBlur = useSetFalse(setIsFocused);
+
   return (
-    <>
+    <Container>
       <StyledInput
         mode='flat'
         outlineColor='white'
@@ -60,12 +75,16 @@ export const TextInput: React.FC<TextInputProps> = ({
         underlineStyle={{ marginLeft: 16, marginRight: 16 }}
         contentStyle={{ paddingTop: 0, paddingLeft: 0, marginTop: 26 }}
         onChangeText={onChange}
-        value={value ?? (beforeText ? '\u200B' : undefined)}
+        value={value ?? undefined}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         {...props}
         render={renderProps}
       />
-      {errorText && touched && <ErrorText>{errorText}</ErrorText>}
-    </>
+      {errors &&
+        errors.length > 0 &&
+        errors.map(error => <ErrorText key={error.code}>{error.message}</ErrorText>)}
+    </Container>
   );
 };
 

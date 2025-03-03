@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TextInput } from './TextInput';
 import { FinalTextInputProps } from './TextInput.types';
 
-export const FinalTextInput: React.FC<FinalTextInputProps> = ({ input, meta, ...props }) => {
+export const FinalTextInput: React.FC<FinalTextInputProps> = ({
+  input,
+  meta,
+  errors,
+  ...props
+}) => {
+  const finalErrors = useMemo(
+    () => (meta.touched && !meta.dirtySinceLastSubmit ? errors : []),
+    [meta.touched, meta.dirtySinceLastSubmit, errors, meta.error]
+  );
+
   return (
-    <TextInput
-      value={input.value}
-      onChange={input.onChange}
-      touched={meta.touched}
-      errorText={meta.error}
-      {...props}
-    />
+    <TextInput value={input.value} onChange={input.onChange} errors={finalErrors} {...props} />
   );
 };
 

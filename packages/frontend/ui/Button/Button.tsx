@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback } from 'react';
-import { Text, Pressable } from 'react-native';
+import { Text, Pressable, StyleProp, ViewStyle } from 'react-native';
 
 import styled, { css } from 'styled-components/native';
 import { ExternalLink } from '../../components/ExternalLink';
@@ -17,7 +17,9 @@ interface ButtonProps {
   onClick?(): void;
   event?: string;
   eventParams?: Record<string, string | number | undefined>;
+  style?: StyleProp<ViewStyle>;
 }
+
 type ViewConfig = {
   background: string;
   color: string;
@@ -83,7 +85,10 @@ const StyledText = styled(Text)`
 `;
 
 export const Button = forwardRef<any, ButtonProps>(
-  ({ children, externalHref, onClick, disabled, view = 'primary', event, eventParams }, ref) => {
+  (
+    { children, externalHref, onClick, disabled, view = 'primary', event, eventParams, style },
+    ref
+  ) => {
     const handleClick = useCallback(() => {
       onClick?.();
       if (event) {
@@ -92,7 +97,13 @@ export const Button = forwardRef<any, ButtonProps>(
     }, [onClick, event, eventParams]);
 
     const content = (
-      <StyledPressable ref={ref} $view={view} disabled={disabled} onPress={handleClick}>
+      <StyledPressable
+        ref={ref}
+        $view={view}
+        disabled={disabled}
+        style={style}
+        onPress={handleClick}
+      >
         {isWeb && view === 'glass' && <Glass />}
         <StyledText>{children}</StyledText>
       </StyledPressable>

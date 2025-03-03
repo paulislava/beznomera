@@ -23,7 +23,7 @@ export default function TabLayout() {
         name='index'
         options={{
           title: 'Мои авто',
-          tabBarIcon: ({ color }) => <TabBarIcon name='code' color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name='car' color={color} />,
           headerRight: () => (
             <Link href='/modal' asChild>
               <Pressable>
@@ -41,10 +41,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='two'
+        name='car/new'
         options={{
-          title: 'Auth',
-          tabBarIcon: ({ color }) => <TabBarIcon name='code' color={color} />
+          title: 'Добавить авто',
+          tabBarIcon: ({ color }) => <TabBarIcon name='plus-circle' color={color} />
         }}
       />
     </Tabs>

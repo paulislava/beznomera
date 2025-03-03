@@ -6,10 +6,15 @@ export enum ResponseCode {
   NOT_FOUND = 'not-found'
 }
 
+export enum ValidationCode {
+  DUPLICATE_NUMBER = 'DUPLICATE_NUMBER',
+  DUPLICATE_CODE = 'DUPLICATE_CODE'
+}
+
 export type SubmissionError = {
-  code: string;
   message: string;
-  props: Record<string, any>;
+  code: ValidationCode;
+  props?: Record<string, any>;
 };
 
 export type FetchResult<T = undefined> = {

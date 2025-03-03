@@ -1,5 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
+import { RequestUser } from './user.types';
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
@@ -8,6 +9,6 @@ export const CurrentUser = createParamDecorator(
     if (!request.user) {
       throw new Error(`No user was loaded in request`);
     }
-    return request.user;
+    return request.user as RequestUser;
   },
 );

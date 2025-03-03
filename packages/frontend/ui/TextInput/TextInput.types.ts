@@ -15,13 +15,13 @@ export type RawInputProps = {
   maxRows?: number;
 };
 
-export type TextInputProps = RawInputProps & {
-  touched?: boolean;
-  errorText?: string;
-  onChange?: (value: string) => void;
-  value?: Maybe<string>;
-  multiline?: boolean;
-  beforeText?: string;
-};
+export type TextInputProps = RawInputProps &
+  Partial<Pick<FieldRenderProps<string>, 'meta'>> & {
+    errors?: SubmissionError[];
+    onChange?: (value: string) => void;
+    value?: Maybe<string>;
+    multiline?: boolean;
+    beforeText?: string;
+  };
 
 export type FinalTextInputProps = RawInputProps & FieldRenderProps<string>;

@@ -32,7 +32,6 @@ import { CurrentUser } from '../users/user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   IsNumber,
-  IsObject,
   IsOptional,
   IsString,
   ValidateNested,
@@ -97,6 +96,7 @@ export class CreatableRgbColorDto<T>
   @Type(() => RgbColorDto)
   newValue: RgbColor;
 }
+
 export class CarUpdateDto implements EditCarInfo {
   @IsString()
   no: string;
@@ -104,35 +104,38 @@ export class CarUpdateDto implements EditCarInfo {
   @IsString()
   model: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   version: Maybe<string>;
 
-  @IsObject()
+  @IsOptional()
   @ValidateNested()
   @Type(() => CreatableRgbColorDto)
   color: Creatable<ColorInfo, RgbColor>;
 
-  @IsObject()
+  @IsOptional()
   @ValidateNested()
   @Type(() => CreatableStringDto)
   brand: Creatable<BrandInfo, string>;
 
-  @IsString()
-  code: string;
-
-  @IsNumber()
   @IsOptional()
+  @IsString()
+  code: Maybe<string>;
+
+  @IsOptional()
+  @IsNumber()
   year: Maybe<number>;
 
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
   imageRatio: Maybe<number>;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   imageUrl: Maybe<string>;
 }
+
+export class CarCreateDto extends CarUpdateDto {}
 
 @Controller(CAR_API.path)
 export class CarController implements CarApi {
@@ -205,5 +208,14 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<void> {
     return this.carService.update(id, body, user);
+  }
+
+  @Post(CAR_API.backendRoutes.create)
+  @UseGuards(JwtAuthGuard)
+  create(
+    @Body() body: CarCreateDto,
+    @CurrentUser() user,
+  ): Promise<{ id: number }> {
+    return this.carService.create(body, user).then((id) => ({ id }));
   }
 }

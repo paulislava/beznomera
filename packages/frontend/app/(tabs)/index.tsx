@@ -9,6 +9,7 @@ import styled from 'styled-components/native';
 import { TextL } from '@/components/Themed';
 import { Glass } from '@/ui/Glass';
 import { Link } from 'expo-router';
+import { Button } from '@/ui/Button';
 
 export const ScrollContainer = styled(ScrollView)`
   width: 100%;
@@ -43,6 +44,10 @@ export const CarItem = styled(Pressable)`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 `;
 
+const AddButton = styled(Button)`
+  margin: 20px auto 0;
+`;
+
 function CarsList() {
   useNeedAuth();
 
@@ -67,6 +72,9 @@ function CarsList() {
               </CarItem>
             </Link>
           ))}
+          <Link href='/car/new' asChild>
+            <AddButton view='glass'>Добавить автомобиль</AddButton>
+          </Link>
         </Container>
       )}
     </PageView>
