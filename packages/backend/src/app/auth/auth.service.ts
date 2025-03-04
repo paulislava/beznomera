@@ -27,6 +27,8 @@ import { SmsHttpClientService } from '~/common/http-clients/sms-http-client/sms-
 import { randomDigitsString } from '~/common/utils/randomDigitsString';
 import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
 import { createHash, createHmac } from 'crypto';
+import querystring from 'querystring';
+import { WebAppInitData } from '@twa-dev/types';
 
 @Injectable()
 export class AuthService {
@@ -123,6 +125,31 @@ export class AuthService {
     this.saveAuthCookie({ userId: user.id }, res);
   }
 
+  async authTelegramWebApp(data: string, res: Response): Promise<void> {
+    const initData = this.checkTelegramWebAppData(data);
+
+    const findUser = await this.userRepository.findOne({
+      where: {
+        telegramID: initData.user.id,
+      },
+    });
+
+    if (findUser) {
+      this.saveAuthCookie({ userId: findUser.id }, res);
+      return;
+    }
+
+    const user = await this.userRepository.save(
+      this.userRepository.create({
+        firstName: initData.user.first_name,
+        nickname: initData.user.username,
+        telegramID: initData.user.id,
+      }),
+    );
+
+    this.saveAuthCookie({ userId: user.id }, res);
+  }
+
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
     if (authCode.user) {
       return authCode.user;
@@ -189,13 +216,50 @@ export class AuthService {
       .join('\n');
 
     // run a cryptographic hash function over the data to be authenticated and the secret
-    const hmac = createHmac('sha256', secretKey)
+    const hmac = createHmac('sha256', secretKey as any)
       .update(dataCheckString)
       .digest('hex');
 
     // compare the hash that you calculate on your side (hmac) with what Telegram sends you (hash) and return the result
     if (hmac !== hash) {
       throw new AuthServiceException('Telegram authentication failed');
+    }
+  }
+
+  private checkTelegramWebAppData(data: string): WebAppInitData {
+    const parsedData = querystring.parse(data);
+
+    // Извлекаем хэш из данных
+    const hash = parsedData.hash;
+    if (!hash) {
+      throw new Error('Hash not found in initData');
+    }
+
+    // Удаляем хэш из объекта, чтобы он не участвовал в вычислении хэша
+    delete parsedData.hash;
+
+    // Сортируем ключи в алфавитном порядке
+    const sortedKeys = Object.keys(parsedData).sort();
+
+    // Создаем строку для хэширования
+    const dataCheckString = sortedKeys
+      .map((key) => `${key}=${parsedData[key]}`)
+      .join('\n');
+
+    // Вычисляем хэш с использованием HMAC-SHA-256
+    const secretKey = createHmac('sha256', 'WebAppData')
+      .update(this.configService.telegram.token)
+      .digest();
+
+    const computedHash = createHmac('sha256', secretKey as any)
+      .update(dataCheckString)
+      .digest('hex');
+
+    // Сравниваем вычисленный хэш с предоставленным хэшем
+    if (computedHash === hash) {
+      return parsedData as unknown as WebAppInitData; // Данные валидны
+    } else {
+      throw new AuthServiceException('Invalid initData hash');
     }
   }
 

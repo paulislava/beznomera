@@ -1,0 +1,13 @@
+diff --git a/node_modules/@twa-dev/types/index.ts b/node_modules/@twa-dev/types/index.ts
+index 8a9dced..2bd8dd9 100644
+--- a/node_modules/@twa-dev/types/index.ts
++++ b/node_modules/@twa-dev/types/index.ts
+@@ -66,7 +66,7 @@ type CloudStorageKey = string;
+ type CloudStorageValue = string;
+ 
+ interface CloudStorageItems {
+-  [key: CloudStorageKey]: CloudStorageValue;
++  [key: string]: CloudStorageValue;
+ }
+ 
+ export interface CloudStorage {

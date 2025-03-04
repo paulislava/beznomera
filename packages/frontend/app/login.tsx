@@ -7,7 +7,15 @@ import withRouter, { WithRouterProps } from '@/utils/withRouter';
 import env, { isWeb } from '@/utils/env';
 import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+
+import { Telegram } from '@twa-dev/types';
+
+declare global {
+  interface Window {
+    Telegram?: Telegram;
+  }
+}
 
 const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
 
@@ -25,6 +33,22 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
         console.error(error);
       });
   }, []);
+
+  useFocusEffect(() => {
+    if (window.Telegram) {
+      authService
+        .authTelegramWebApp(window.Telegram.WebApp.initData)
+        .then(() => {
+          router.replace((to as any) ?? '/');
+        })
+        .catch((error: Error) => {
+          alert(
+            `Произошла ошибка при входе. Повторите попытку.\n${window.Telegram?.WebApp.initData}`
+          );
+          console.error(error);
+        });
+    }
+  });
 
   return (
     <PageView fullHeight center>

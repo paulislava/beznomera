@@ -45,4 +45,12 @@ export class AuthController implements AuthApi {
   @UseGuards(JwtAuthGuard)
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   async checkAuthorized(): Promise<void> {}
+
+  @Post(AUTH_API.backendRoutes.authTelegramWebApp)
+  async authTelegramWebApp(
+    @Body() data: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    await this.authService.authTelegramWebApp(data, res);
+  }
 }
