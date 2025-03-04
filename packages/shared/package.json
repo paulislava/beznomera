@@ -5,7 +5,8 @@
     "./*": "./build/*.js"
   },
   "scripts": {
-    "build": "tsc --build ."
+    "build": "tsc --build .",
+    "postinstall": "patch-package"
   },
   "typesVersions": {
     "*": {
