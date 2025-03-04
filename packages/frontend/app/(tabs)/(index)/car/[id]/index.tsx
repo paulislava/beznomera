@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useGlobalSearchParams, Stack, Link } from 'expo-router';
 import { View, ImageStyle, StyleProp, ImageSourcePropType, Platform } from 'react-native';
-import { CarImage } from '../../../components/CarImage/CarImage';
+import { CarImage } from '@/components/CarImage/CarImage';
 import { useAPI } from '@/utils/api';
 import { carService } from '@/services';
 import { PageView } from '@/components/Themed';
