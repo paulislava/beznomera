@@ -16,3 +16,7 @@ export interface AuthCheckData extends AuthStartData {
 }
 
 export type AuthTelegramData = TelegramUser;
+
+export type AuthTelegramWebAppData = {
+  data: string;
+};

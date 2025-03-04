@@ -7,6 +7,14 @@ import { ConfigService } from '../config/config.service';
 import { AuthCheckDto, AuthStartDto, AuthTelegramDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { AuthTelegramWebAppData } from '@paulislava/shared/auth/auth.types';
+import { IsString, IsNotEmpty } from 'class-validator';
+
+export class AuthTelegramWebAppDataDto implements AuthTelegramWebAppData {
+  @IsString()
+  @IsNotEmpty()
+  data: string;
+}
 
 @Controller(AUTH_API.path)
 export class AuthController implements AuthApi {
@@ -48,7 +56,7 @@ export class AuthController implements AuthApi {
 
   @Post(AUTH_API.backendRoutes.authTelegramWebApp)
   async authTelegramWebApp(
-    @Body() data: string,
+    @Body() { data }: AuthTelegramWebAppData,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
     await this.authService.authTelegramWebApp(data, res);

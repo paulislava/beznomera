@@ -28,7 +28,7 @@ import { randomDigitsString } from '~/common/utils/randomDigitsString';
 import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
 import { createHash, createHmac } from 'crypto';
 import querystring from 'querystring';
-import { WebAppInitData } from '@twa-dev/types';
+import { WebAppInitData } from '@paulislava/shared/auth/auth.api';
 
 @Injectable()
 export class AuthService {

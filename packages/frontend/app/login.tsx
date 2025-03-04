@@ -9,7 +9,7 @@ import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 
-import { Telegram } from '@twa-dev/types';
+import type { Telegram } from '@shared/auth/auth.api';
 
 declare global {
   interface Window {
@@ -39,13 +39,12 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
 
     if (initData) {
       authService
-        .authTelegramWebApp(initData)
+        .authTelegramWebApp({ data: initData })
         .then(() => {
           alert('Успешная авторизация ');
           router.replace((to as any) ?? '/');
         })
         .catch((error: Error) => {
-          navigator.clipboard.writeText(initData);
           alert(`Произошла ошибка при входе. Повторите попытку.`);
           console.error(error);
         });
