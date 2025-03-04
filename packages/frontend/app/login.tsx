@@ -41,7 +41,6 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
       authService
         .authTelegramWebApp({ data: initData })
         .then(() => {
-          alert('Успешная авторизация ');
           router.replace((to as any) ?? '/');
         })
         .catch((error: Error) => {
