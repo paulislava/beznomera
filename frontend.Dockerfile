@@ -6,6 +6,7 @@ COPY .prettierignore /app
 COPY *.json /app/
 COPY packages/shared/*.json /app/packages/shared/
 COPY packages/frontend/*.json /app/packages/frontend/
+COPY packages/shared/patches /app/packages/shared/patches
 RUN npm ci && \
   npm ci --prefix=packages/shared && \
   npm ci --prefix=packages/frontend && \
