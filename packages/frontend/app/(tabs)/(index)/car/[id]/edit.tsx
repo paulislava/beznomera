@@ -13,12 +13,14 @@ import { FormFieldProps } from '@/ui/FormField/FormField.types';
 import { CarColorPicker } from '@/components/CarColorPicker';
 import { PRODUCTION_URL } from '@/constants/site';
 import { FormApi } from 'final-form';
-
+import useNeedAuth from '@/hooks/useNeedAuth';
 type Data = EditCarInfo;
 
 const Field = FormField as ComponentType<FormFieldProps<Data>>;
 
 export default function CarEditScreen(): JSX.Element {
+  useNeedAuth();
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.infoForUpdate(Number(id)), [id]);
   const info = useAPI(getInfo);

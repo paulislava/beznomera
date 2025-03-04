@@ -17,6 +17,7 @@ import { Button } from '@/ui/Button';
 import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
+import useNeedAuth from '@/hooks/useNeedAuth';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -57,6 +58,8 @@ const StyledView = styled(View)`
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
 export default function CarFullInfoScreen() {
+  useNeedAuth();
+
   const colorScheme = useColorScheme();
 
   const { id } = useGlobalSearchParams<{ id: string }>();

@@ -7,17 +7,20 @@ import withRouter, { WithRouterProps } from '@/utils/withRouter';
 import env, { isWeb } from '@/utils/env';
 import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
+import { useLocalSearchParams } from 'expo-router';
 
 const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
 
 function LoginPage({ router }: WithRouterProps): React.ReactNode {
+  const { to } = useLocalSearchParams<{ to: string }>();
+
   const onTelegramAuth = useCallback((data: TelegramUser) => {
     authService
       .authTelegram(data)
       .then(() => {
-        router.replace('/');
+        router.replace((to as any) ?? '/');
       })
-      .catch(error => {
+      .catch((error: Error) => {
         alert('Произошла ошибка при входе. Повторите попытку');
         console.error(error);
       });
