@@ -257,6 +257,7 @@ export class AuthService {
 
     // Сравниваем вычисленный хэш с предоставленным хэшем
     if (computedHash === hash) {
+      console.log(parsedData);
       return parsedData as unknown as WebAppInitData; // Данные валидны
     } else {
       throw new AuthServiceException('Invalid initData hash');
