@@ -10,6 +10,7 @@ import { useSetTrue, useSetFalse } from '@/hooks/booleans';
 
 const Container = styled(View)`
   width: 100%;
+  flex: 1;
 `;
 
 const ErrorText = styled(Text)`

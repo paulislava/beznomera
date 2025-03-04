@@ -23,7 +23,6 @@ import {
 import { PRODUCTION_URL } from '@/constants/site';
 const InputContainer = styled(View)`
   margin: 20px 0;
-  margin-left: -16px;
   width: 100%;
   max-width: 600px;
   height: 30vh;

@@ -24,11 +24,12 @@ export const StyledViewContainer = styled(DefaultView)<{
   $center?: boolean;
   $backgroundColor?: ColorValue;
 }>`
-  position: relative;
   z-index: 1;
   max-width: 600px;
+  margin: auto;
+  min-height: 100%;
   width: 100%;
-  padding: 0 10px;
+  padding: 20px 10px;
 
   ${({ $center }) =>
     $center &&
@@ -44,7 +45,14 @@ export const StyledViewContainer = styled(DefaultView)<{
     `}
 `;
 
-const ScrollableContainer = styled(ScrollView)`
+const ScrollableContainer = styled(ScrollView).attrs({
+  // @ts-expect-error TODO: Найти альтернативу для display:
+  contentContainerStyle: {
+    flex: 1,
+    alignItems: 'center',
+    display: 'block'
+  }
+})`
   flex: 1;
 `;
 
@@ -90,7 +98,7 @@ export function PageView(props: ViewProps) {
       <SvgContainer fill='none'>
         <Rect width='100%' height='100%' fill='url(#paint0_linear_2005_86)' />
       </SvgContainer>
-      <ScrollableContainer contentContainerStyle={{ flex: 1, alignItems: 'center' }}>
+      <ScrollableContainer>
         <StyledViewContainer
           $fullHeight={fullHeight}
           $center={center}

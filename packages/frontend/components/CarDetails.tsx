@@ -1,8 +1,7 @@
 import styled from 'styled-components/native';
 import { CarImage } from './CarImage/CarImage';
-import { TextL, StyledViewContainer } from './Themed';
-import { Image } from 'react-native';
-import webStyled from 'styled-components';
+import { TextL } from './Themed';
+import { Image, View } from 'react-native';
 
 export const CarModel = styled(TextL)`
   font-weight: 100;
@@ -19,7 +18,7 @@ export const CarNumber = styled(TextL)`
   text-align: center;
 `;
 
-export const ModelRow = styled(StyledViewContainer)`
+export const ModelRow = styled(View)`
   flex-flow: row;
   width: 100%;
 `;
