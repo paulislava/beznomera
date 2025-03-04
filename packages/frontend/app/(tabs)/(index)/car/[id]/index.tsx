@@ -1,6 +1,13 @@
 import React, { useMemo } from 'react';
 import { useGlobalSearchParams, Stack, Link } from 'expo-router';
-import { View, ImageStyle, StyleProp, ImageSourcePropType, Platform } from 'react-native';
+import {
+  View,
+  ImageStyle,
+  StyleProp,
+  ImageSourcePropType,
+  Platform,
+  Pressable
+} from 'react-native';
 import { CarImage } from '@/components/CarImage/CarImage';
 import { useAPI } from '@/utils/api';
 import { carService } from '@/services';
@@ -14,6 +21,9 @@ import { CarNumber } from '@/components/CarDetails';
 import { CarExternalImage } from '@/components/CarDetails';
 import { pluralize } from '@/utils/strings';
 import { Button } from '@/ui/Button';
+import { FontAwesome } from '@expo/vector-icons';
+import { useColorScheme } from '@/components/useColorScheme';
+import Colors from '@/constants/Colors';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -54,6 +64,8 @@ const StyledView = styled(View)`
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
 export default function CarFullInfoScreen() {
+  const colorScheme = useColorScheme();
+
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
   console.log(id);
@@ -68,7 +80,21 @@ export default function CarFullInfoScreen() {
     <PageView fullHeight center>
       <Stack.Screen
         options={{
-          title: `${info?.no ?? 'Мое авто'}: информация`
+          title: `${info?.no ?? 'Мое авто'}: информация`,
+          headerRight: () => (
+            <Link href={`/car/${id}/edit`} asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name='edit'
+                    size={25}
+                    color={Colors[colorScheme ?? 'light'].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          )
         }}
       />
       <Head>

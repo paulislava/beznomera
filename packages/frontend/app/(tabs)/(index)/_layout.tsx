@@ -32,7 +32,12 @@ export default function IndexLayout() {
             )
           }}
         />
-        <Stack.Screen name='car/new' options={{ title: 'Добавить авто' }} />
+        <Stack.Screen
+          name='car/new'
+          options={{
+            title: 'Добавить авто'
+          }}
+        />
         <Stack.Screen name='car/[id]' options={{ headerShown: false }} />
       </Stack>
     </>
