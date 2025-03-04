@@ -26,4 +26,4 @@ const AUTH_ROUTES: APIRoutes<AuthApi> = {
 const AUTH_API = apiInfo(AUTH_ROUTES, 'auth');
 export default AUTH_API;
 
-export type { Telegram, WebAppInitData } from '@twa-dev/types';
+export type { Telegram, WebAppInitData, WebAppUser } from '@twa-dev/types';

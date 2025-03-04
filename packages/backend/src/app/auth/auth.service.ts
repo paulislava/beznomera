@@ -28,7 +28,7 @@ import { randomDigitsString } from '~/common/utils/randomDigitsString';
 import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
 import { createHash, createHmac } from 'crypto';
 import querystring from 'querystring';
-import { WebAppInitData } from '@paulislava/shared/auth/auth.api';
+import { WebAppUser } from '@paulislava/shared/auth/auth.api';
 
 @Injectable()
 export class AuthService {
@@ -117,6 +117,8 @@ export class AuthService {
     const user = await this.userRepository.save(
       this.userRepository.create({
         firstName: data.first_name,
+        // @ts-expect-error no type
+        lastName: data.last_name,
         nickname: data.username,
         telegramID: data.id,
       }),
@@ -126,11 +128,15 @@ export class AuthService {
   }
 
   async authTelegramWebApp(data: string, res: Response): Promise<void> {
-    const initData = this.checkTelegramWebAppData(data);
+    const userData = this.checkTelegramWebAppData(data);
+
+    if (!userData.id) {
+      throw new AuthServiceException('No telegram id in initData');
+    }
 
     const findUser = await this.userRepository.findOne({
       where: {
-        telegramID: initData.user.id,
+        telegramID: userData.id,
       },
     });
 
@@ -141,9 +147,10 @@ export class AuthService {
 
     const user = await this.userRepository.save(
       this.userRepository.create({
-        firstName: initData.user.first_name,
-        nickname: initData.user.username,
-        telegramID: initData.user.id,
+        firstName: userData.first_name,
+        lastName: userData.last_name,
+        nickname: userData.username,
+        telegramID: userData.id,
       }),
     );
 
@@ -226,7 +233,7 @@ export class AuthService {
     }
   }
 
-  private checkTelegramWebAppData(data: string): WebAppInitData {
+  private checkTelegramWebAppData(data: string): WebAppUser {
     const parsedData = querystring.parse(data);
 
     // Извлекаем хэш из данных
@@ -257,8 +264,7 @@ export class AuthService {
 
     // Сравниваем вычисленный хэш с предоставленным хэшем
     if (computedHash === hash) {
-      console.log(parsedData);
-      return parsedData as unknown as WebAppInitData; // Данные валидны
+      return JSON.parse(parsedData.user as string); // Данные валидны
     } else {
       throw new AuthServiceException('Invalid initData hash');
     }
