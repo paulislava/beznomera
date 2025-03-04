@@ -1,13 +1,6 @@
 import React, { useMemo } from 'react';
 import { useGlobalSearchParams, Stack, Link } from 'expo-router';
-import {
-  View,
-  ImageStyle,
-  StyleProp,
-  ImageSourcePropType,
-  Platform,
-  Pressable
-} from 'react-native';
+import { View, ImageStyle, StyleProp, ImageSourcePropType, Pressable } from 'react-native';
 import { CarImage } from '@/components/CarImage/CarImage';
 import { useAPI } from '@/utils/api';
 import { carService } from '@/services';
@@ -68,7 +61,7 @@ export default function CarFullInfoScreen() {
 
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
-  console.log(id);
+
   const info = useAPI(getInfo);
 
   const brandLogoSource: ImageSourcePropType = useMemo(
@@ -114,27 +107,11 @@ export default function CarFullInfoScreen() {
 
           {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           {info.imageUrl ? (
-            Platform.select({
-              web: (
-                <img
-                  src={info.imageUrl}
-                  loading='lazy'
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    aspectRatio: info.imageRatio || 400 / 142,
-                    objectFit: 'contain'
-                  }}
-                />
-              ),
-              default: (
-                <CarExternalImage
-                  $aspectRatio={info.imageRatio}
-                  resizeMode='contain'
-                  source={{ uri: info.imageUrl }}
-                />
-              )
-            })
+            <CarExternalImage
+              $aspectRatio={info.imageRatio}
+              resizeMode='contain'
+              source={{ uri: info.imageUrl }}
+            />
           ) : (
             <StyledCarImage color={info.color?.value ?? info.rawColor} />
           )}
