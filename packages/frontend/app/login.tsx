@@ -13,7 +13,7 @@ import { Telegram } from '@twa-dev/types';
 
 declare global {
   interface Window {
-    Telegram?: Telegram;
+    Telegram: Telegram;
   }
 }
 
@@ -35,10 +35,15 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
   }, []);
 
   useFocusEffect(() => {
-    if (window.Telegram) {
+    const { initData } = window.Telegram.WebApp;
+
+    if (initData) {
+      alert(initData);
+
       authService
-        .authTelegramWebApp(window.Telegram.WebApp.initData)
+        .authTelegramWebApp(initData)
         .then(() => {
+          alert('Успешная авторизация ');
           router.replace((to as any) ?? '/');
         })
         .catch((error: Error) => {

@@ -53,10 +53,6 @@ function CarsList() {
 
   const cars = useAPI(carService.list);
 
-  if (window.Telegram) {
-    alert(JSON.stringify(window.Telegram));
-  }
-
   return (
     <PageView fullHeight>
       <Head>
