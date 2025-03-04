@@ -38,8 +38,6 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
     const { initData } = window.Telegram.WebApp;
 
     if (initData) {
-      alert(initData);
-
       authService
         .authTelegramWebApp(initData)
         .then(() => {
@@ -47,9 +45,8 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
           router.replace((to as any) ?? '/');
         })
         .catch((error: Error) => {
-          alert(
-            `Произошла ошибка при входе. Повторите попытку.\n${window.Telegram?.WebApp.initData}`
-          );
+          navigator.clipboard.writeText(initData);
+          alert(`Произошла ошибка при входе. Повторите попытку.`);
           console.error(error);
         });
     }
