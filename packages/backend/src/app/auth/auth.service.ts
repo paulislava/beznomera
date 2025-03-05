@@ -117,6 +117,7 @@ export class AuthService {
     const user = await this.userRepository.save(
       this.userRepository.create({
         firstName: data.first_name,
+        // @ts-ignore
         lastName: data.last_name,
         nickname: data.username,
         telegramID: data.id,
