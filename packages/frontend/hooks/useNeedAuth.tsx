@@ -1,4 +1,5 @@
 import { authService } from '@/services';
+import { webApp } from '@/utils/telegram';
 import { useFocusEffect, usePathname, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
@@ -13,19 +14,31 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
   const pathname = usePathname();
 
   useFocusEffect(() => {
+    const successAuth = () => {
+      setRequested(true);
+
+      setAuthorized(true);
+      props?.onAuth?.();
+    };
+
+    const errorAuth = () => {
+      setRequested(true);
+      setAuthorized(false);
+      router.replace(`/login`);
+      router.setParams({ to: pathname });
+    };
+
     authService
       .checkAuthorized()
-      .then(() => {
-        setRequested(true);
-
-        setAuthorized(true);
-        props?.onAuth?.();
-      })
+      .then(successAuth)
       .catch(() => {
-        setRequested(true);
-        setAuthorized(false);
-        router.replace(`/login`);
-        router.setParams({ to: pathname });
+        const { initData } = webApp;
+
+        if (initData) {
+          authService.authTelegramWebApp({ data: initData }).then(successAuth).catch(errorAuth);
+        } else {
+          errorAuth();
+        }
       });
   });
 

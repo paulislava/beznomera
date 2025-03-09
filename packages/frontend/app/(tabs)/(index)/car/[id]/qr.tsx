@@ -17,6 +17,9 @@ import { Canvg } from 'canvg';
 import webStyled from 'styled-components';
 import { Loading } from '@/components/Loading';
 import { CenterContainer } from '@/ui/Styled';
+import { downloadFile } from '@/utils/downloadFile';
+import { webApp } from '@/utils/telegram';
+
 const QRCodeContainer = styled(View)`
   margin: 20px 0;
   align-items: center;
@@ -42,16 +45,20 @@ export default function CarQRScreen() {
 
   const downloadQR = useCallback(() => {
     if (qrRef.current && isWeb) {
-      qrRef.current.download('png', `${info?.no}-qr.png`);
+      if (webApp) {
+        webApp.downloadFile({
+          url: (qrRef.current as any).canvasRef.current.toDataURL('png'),
+          file_name: `${info?.no}-qr.png`
+        });
+      } else {
+        qrRef.current.download('png', `${info?.no}-qr.png`);
+      }
     }
   }, [info?.no]);
 
   const downloadPlate = useCallback(() => {
     if (canvasRef.current && isWeb) {
-      const link = document.createElement('a');
-      link.href = canvasRef.current.toDataURL('png');
-      link.download = `${info?.no}-автовизитка.png`;
-      link.click();
+      downloadFile(canvasRef.current.toDataURL('png'), `${info?.no}-автовизитка.png`);
     }
   }, [info?.no]);
 
@@ -74,9 +81,7 @@ export default function CarQRScreen() {
 
           await svg.render();
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const qrCanvas = hiddenQrRef.current.canvasRef.current as HTMLCanvasElement;
+          const qrCanvas = (hiddenQrRef.current as any).canvasRef.current as HTMLCanvasElement;
 
           ctx.drawImage(qrCanvas, 1401, 102, 365, 365);
 
