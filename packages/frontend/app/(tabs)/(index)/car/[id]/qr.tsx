@@ -18,7 +18,7 @@ import webStyled from 'styled-components';
 import { Loading } from '@/components/Loading';
 import { CenterContainer } from '@/ui/Styled';
 import { downloadFile } from '@/utils/downloadFile';
-import { webApp } from '@/utils/telegram';
+import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk';
 
 const QRCodeContainer = styled(View)`
   margin: 20px 0;
@@ -45,11 +45,11 @@ export default function CarQRScreen() {
 
   const downloadQR = useCallback(() => {
     if (qrRef.current && isWeb) {
-      if (webApp) {
-        webApp.downloadFile({
-          url: (qrRef.current as any).canvasRef.current.toDataURL('png'),
-          file_name: `${info?.no}-qr.png`
-        });
+      if (downloadFileTelegram.isAvailable()) {
+        downloadFileTelegram(
+          (qrRef.current as any).canvasRef.current.toDataURL('png'),
+          `${info?.no}-qr.png`
+        );
       } else {
         qrRef.current.download('png', `${info?.no}-qr.png`);
       }
