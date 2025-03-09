@@ -1,17 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  FindOptionsWhere,
+  Repository,
+  Not,
+  IsNull,
+} from 'typeorm';
 import {
   CarInfo,
   EditCarInfo,
   FullCarInfo,
   ShortCarInfo,
+  CarPlateBody,
+  CarCallBody,
+  CarMessageBody,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
 import { RequestUser } from '../users/user.types';
-import { CarCallBody, CarMessageBody } from '@paulislava/shared/car/car.api';
 import { Agent } from 'useragent';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore cannot find module?
@@ -383,5 +391,39 @@ export class CarService {
 
     await this.carRepository.save(car);
     return car.id;
+  }
+
+  async sendPlate(image: string, id: number, user: RequestUser): Promise<void> {
+    const car = await this.carRepository.findOne({
+      where: { id, owner: { id: user.userId } },
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    await this.telegramService.sendPhoto(
+      image,
+      user,
+      `Автовизитка ${car.no}.png`,
+      `Автовизитка ${car.no}`,
+    );
+  }
+
+  async sendQR(image: string, id: number, user: RequestUser): Promise<void> {
+    const car = await this.carRepository.findOne({
+      where: { id, owner: { id: user.userId } },
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    await this.telegramService.sendPhoto(
+      image,
+      user,
+      `QR-код ${car.no}.png`,
+      `QR-код ${car.no}`,
+    );
   }
 }

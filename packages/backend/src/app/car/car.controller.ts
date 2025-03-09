@@ -13,10 +13,7 @@ import {
 import CAR_API, {
   CODE_PARAM,
   CarApi,
-  CarCallBody,
-  CarMessageBody,
   ID_PARAM,
-  LocationInfo,
 } from '@paulislava/shared/car/car.api';
 import {
   CarInfo,
@@ -26,6 +23,9 @@ import {
   ColorInfo,
   BrandInfo,
   RgbColor,
+  LocationInfo,
+  CarCallBody,
+  CarMessageBody,
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -40,6 +40,7 @@ import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
 import { Response, Request } from 'express';
 import { Creatable } from '@paulislava/shared/forms';
+import { ImageBody } from '@paulislava/shared/core.types';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -75,6 +76,11 @@ export class CreatableStringDto<T>
   @IsString()
   @IsOptional()
   newValue: Maybe<string>;
+}
+
+export class ImageDto implements ImageBody {
+  @IsString()
+  image: string;
 }
 
 export class RgbColorDto implements RgbColor {
@@ -217,5 +223,25 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<{ id: number }> {
     return this.carService.create(body, user).then((id) => ({ id }));
+  }
+
+  @Post(CAR_API.backendRoutes.sendPlate)
+  @UseGuards(JwtAuthGuard)
+  async sendPlate(
+    @Body() { image }: ImageDto,
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @CurrentUser() user,
+  ): Promise<void> {
+    await this.carService.sendPlate(image, id, user);
+  }
+
+  @Post(CAR_API.backendRoutes.sendQR)
+  @UseGuards(JwtAuthGuard)
+  async sendQR(
+    @Body() { image }: ImageDto,
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @CurrentUser() user,
+  ): Promise<void> {
+    await this.carService.sendQR(image, id, user);
   }
 }

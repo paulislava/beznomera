@@ -57,8 +57,19 @@ async function bootstrap() {
     prefix: prefixPath(`/${ASSETS_URI_PATH}`),
   });
 
-  app.use(bodyParser.urlencoded({ verify: rawBodyBuffer, extended: true }));
-  app.use(bodyParser.json({ verify: rawBodyBuffer }));
+  app.use(
+    bodyParser.urlencoded({
+      verify: rawBodyBuffer,
+      extended: true,
+      limit: '50mb',
+    }),
+  );
+  app.use(
+    bodyParser.json({
+      verify: rawBodyBuffer,
+      limit: '50mb',
+    }),
+  );
 
   const appPort = process.env.APP_PORT ?? 3000;
   console.log(`Listening on port ${appPort}`);

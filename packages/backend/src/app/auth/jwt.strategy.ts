@@ -25,6 +25,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: null | RequestUser): null | RequestUser {
+    if (!payload.telegramID) {
+      return null;
+    }
     return payload;
   }
 }

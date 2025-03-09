@@ -57,7 +57,7 @@ export class AuthService {
     const authCode = await this.authCheck(authMode, identifier, code);
     const user = await this.getOrCreateUserByAuthCode(authCode);
 
-    this.saveAuthCookie({ userId: user.id }, res);
+    this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
   }
 
   @Transactional()
@@ -110,7 +110,10 @@ export class AuthService {
     });
 
     if (findUser) {
-      this.saveAuthCookie({ userId: findUser.id }, res);
+      this.saveAuthCookie(
+        { userId: findUser.id, telegramID: findUser.telegramID },
+        res,
+      );
       return;
     }
 
@@ -124,7 +127,7 @@ export class AuthService {
       }),
     );
 
-    this.saveAuthCookie({ userId: user.id }, res);
+    this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
   }
 
   async authTelegramWebApp(data: string, res: Response): Promise<void> {
@@ -141,7 +144,10 @@ export class AuthService {
     });
 
     if (findUser) {
-      this.saveAuthCookie({ userId: findUser.id }, res);
+      this.saveAuthCookie(
+        { userId: findUser.id, telegramID: findUser.telegramID },
+        res,
+      );
       return;
     }
 
@@ -154,7 +160,7 @@ export class AuthService {
       }),
     );
 
-    this.saveAuthCookie({ userId: user.id }, res);
+    this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
   }
 
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {

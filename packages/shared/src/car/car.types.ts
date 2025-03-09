@@ -1,3 +1,4 @@
+import { ImageBody } from '../core.types';
 import { Creatable } from '../forms';
 import { UserProfile } from '../user/user.types';
 
@@ -55,3 +56,8 @@ export type EditCarInfo = CarInfoBase & {
 
   code: string;
 };
+export type LocationInfo = { latitude: number; longitude: number };
+export type CarCallBody = { coords?: LocationInfo };
+export type CarMessageBody = { coords?: LocationInfo; text: string };
+
+export type CarPlateBody = ImageBody;

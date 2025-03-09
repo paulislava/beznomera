@@ -1,9 +1,13 @@
 import { APIRoutes, apiInfo } from '../api-routes';
-import { CarInfo, EditCarInfo, FullCarInfo, ShortCarInfo } from './car.types';
-
-export type LocationInfo = { latitude: number; longitude: number };
-export type CarCallBody = { coords?: LocationInfo };
-export type CarMessageBody = { coords?: LocationInfo; text: string };
+import {
+  CarCallBody,
+  CarInfo,
+  CarMessageBody,
+  EditCarInfo,
+  FullCarInfo,
+  ShortCarInfo,
+  CarPlateBody
+} from './car.types';
 
 export interface CarApi {
   info(code: string, ...args: any[]): Promise<CarInfo>;
@@ -14,6 +18,8 @@ export interface CarApi {
   infoForUpdate(id: number, ...args: any[]): Promise<EditCarInfo>;
   update(body: EditCarInfo, id: number, ...args: any[]): Promise<void>;
   create(body: EditCarInfo, ...args: any[]): Promise<{ id: number }>;
+  sendPlate(body: CarPlateBody, id: number, ...args: any[]): Promise<void>;
+  sendQR(body: CarPlateBody, id: number, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -33,6 +39,14 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   },
   update: {
     path: id => `${id || `:${ID_PARAM}`}/update`,
+    method: 'POST'
+  },
+  sendPlate: {
+    path: id => `${id || `:${ID_PARAM}`}/send-plate`,
+    method: 'POST'
+  },
+  sendQR: {
+    path: id => `${id || `:${ID_PARAM}`}/send-qr`,
     method: 'POST'
   },
   infoForUpdate: id => `${id || `:${ID_PARAM}`}/info-for-update`,

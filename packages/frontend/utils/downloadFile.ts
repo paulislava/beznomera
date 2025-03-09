@@ -10,9 +10,7 @@ export const downloadFile = async (url: string, filename: string) => {
 
   if (downloadFileTelegram.isAvailable()) {
     try {
-      await downloadFileTelegram(url, filename).catch(err => {
-        alert(JSON.stringify(err));
-      });
+      await downloadFileTelegram(url, filename);
     } catch (error) {
       console.error(error);
       standartDownload();

@@ -53,12 +53,18 @@ export default function CarQRScreen() {
       } else {
         qrRef.current.download('png', `${info?.no}-qr.png`);
       }
+
+      const dataUrl = (qrRef.current as any).canvasRef.current.toDataURL('png');
+      await carService.sendQR({ image: dataUrl }, Number(id));
     }
   }, [info?.no]);
 
   const downloadPlate = useCallback(async () => {
     if (canvasRef.current && isWeb) {
-      await downloadFile(canvasRef.current.toDataURL('png'), `${info?.no}-автовизитка.png`);
+      const dataUrl = canvasRef.current.toDataURL('png');
+      await downloadFile(dataUrl, `${info?.no}-автовизитка.png`);
+
+      await carService.sendPlate({ image: dataUrl }, Number(id));
     }
   }, [info?.no]);
 
