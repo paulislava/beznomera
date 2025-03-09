@@ -1,7 +1,7 @@
 import { authService } from '@/services';
 import { useFocusEffect, usePathname, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { initDataRaw } from '@telegram-apps/sdk-react';
+import { initData } from '@telegram-apps/sdk-react';
 
 interface UseNeedAuthProps {
   onAuth?(): void | Promise<void>;
@@ -32,11 +32,13 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
       .checkAuthorized()
       .then(successAuth)
       .catch(() => {
-        const initData = initDataRaw();
+        const initDataRaw = initData.raw();
 
-        if (initData) {
-          authService.authTelegramWebApp({ data: initData }).then(successAuth).catch(errorAuth);
+        if (initDataRaw) {
+          alert('Есть initData');
+          authService.authTelegramWebApp({ data: initDataRaw }).then(successAuth).catch(errorAuth);
         } else {
+          alert('initData is undefined');
           errorAuth();
         }
       });
