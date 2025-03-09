@@ -35,10 +35,8 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
         const initDataRaw = initData.raw();
 
         if (initDataRaw) {
-          alert('Есть initData');
           authService.authTelegramWebApp({ data: initDataRaw }).then(successAuth).catch(errorAuth);
         } else {
-          alert('initData is undefined');
           errorAuth();
         }
       });
