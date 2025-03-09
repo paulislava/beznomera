@@ -22,6 +22,7 @@ import QRCode from 'react-native-qrcode-svg';
 import { CenterContainer } from '@/ui/Styled';
 import { PRODUCTION_URL } from '@/constants/site';
 import { isWeb } from '@/utils/env';
+import { Canvg } from 'canvg';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -66,7 +67,24 @@ const QRCodeContainer = styled(View)`
   align-items: center;
   padding: 20px;
   border-radius: 8px;
+  position: relative;
 `;
+
+const WebCanvas = ({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasElement> }) => {
+  if (!isWeb) return null;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={400}
+      height={400}
+      style={{
+        position: 'absolute',
+        opacity: 0,
+        pointerEvents: 'none'
+      }}
+    />
+  );
+};
 
 const QRButtonsContainer = styled(View)`
   margin-top: 10px;
@@ -81,6 +99,7 @@ export default function CarFullInfoScreen() {
 
   const colorScheme = useColorScheme();
   const qrRef = useRef<any>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
@@ -92,15 +111,24 @@ export default function CarFullInfoScreen() {
     [info]
   );
 
-  const handleDownloadQR = useCallback(() => {
-    if (qrRef.current) {
-      qrRef.current.toDataURL((dataURL: string) => {
-        const link = document.createElement('a');
-        link.download = `qr-code-${info?.no || 'car'}.png`;
-        link.href = `data:image/png;base64,${dataURL}`;
-        link.click();
-        link.remove();
-      });
+  const handleDownloadQR = useCallback(async () => {
+    if (qrRef.current && canvasRef.current && isWeb) {
+      const svgElement = qrRef.current.elementRef.current;
+      console.log(svgElement);
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) return;
+
+      const v = await Canvg.from(ctx, svgElement.outerHTML);
+      await v.render();
+
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `qr-code-${info?.no || 'car'}.png`;
+      link.href = dataUrl;
+      link.click();
+      link.remove();
     }
   }, [info?.no]);
 
@@ -160,6 +188,7 @@ export default function CarFullInfoScreen() {
             </StatsContainer>
 
             <QRCodeContainer>
+              <WebCanvas canvasRef={canvasRef} />
               <QRCode
                 value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
                 size={200}
@@ -169,7 +198,6 @@ export default function CarFullInfoScreen() {
                 logoSize={100}
                 logoMargin={2}
                 logoBackgroundColor='transparent'
-                // @ts-ignore
                 getRef={ref => (qrRef.current = ref)}
               />
               {isWeb && (
