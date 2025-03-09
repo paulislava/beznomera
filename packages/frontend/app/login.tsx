@@ -27,12 +27,11 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
   }, []);
 
   useFocusEffect(() => {
-    if (webApp) {
-      const webApp = getWebApp();
+    const webApp = getWebApp();
 
-      if (webApp?.initData) {
-        authService
-          .authTelegramWebApp({ data: webApp.initData })
+    if (webApp?.initData) {
+      authService
+        .authTelegramWebApp({ data: webApp.initData })
         .then(() => {
           router.replace((to as any) ?? '/');
         })
