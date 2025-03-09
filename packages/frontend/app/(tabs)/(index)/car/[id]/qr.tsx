@@ -43,10 +43,10 @@ export default function CarQRScreen() {
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
   const info = useAPI(getInfo);
 
-  const downloadQR = useCallback(() => {
+  const downloadQR = useCallback(async () => {
     if (qrRef.current && isWeb) {
       if (downloadFileTelegram.isAvailable()) {
-        downloadFileTelegram(
+        await downloadFileTelegram(
           (qrRef.current as any).canvasRef.current.toDataURL('png'),
           `${info?.no}-qr.png`
         );
@@ -56,9 +56,9 @@ export default function CarQRScreen() {
     }
   }, [info?.no]);
 
-  const downloadPlate = useCallback(() => {
+  const downloadPlate = useCallback(async () => {
     if (canvasRef.current && isWeb) {
-      downloadFile(canvasRef.current.toDataURL('png'), `${info?.no}-автовизитка.png`);
+      await downloadFile(canvasRef.current.toDataURL('png'), `${info?.no}-автовизитка.png`);
     }
   }, [info?.no]);
 
