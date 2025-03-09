@@ -21,6 +21,8 @@ import useNeedAuth from '@/hooks/useNeedAuth';
 import QRCode from 'react-native-qrcode-svg';
 import { CenterContainer } from '@/ui/Styled';
 import { PRODUCTION_URL } from '@/constants/site';
+import { isWeb } from '@/utils/env';
+
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
   width: 100%;
@@ -66,10 +68,19 @@ const QRCodeContainer = styled(View)`
   border-radius: 8px;
 `;
 
+const QRButtonsContainer = styled(View)`
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+`;
+
 export default function CarFullInfoScreen() {
   useNeedAuth();
 
   const colorScheme = useColorScheme();
+  const qrRef = React.useRef();
 
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
@@ -80,6 +91,19 @@ export default function CarFullInfoScreen() {
     () => ({ uri: info?.brand?.logoUrl ?? undefined }),
     [info]
   );
+
+  const handleDownloadQR = useCallback(() => {
+    if (qrRef.current) {
+      // @ts-ignore
+      qrRef.current.toDataURL(dataURL => {
+        const link = document.createElement('a');
+        link.download = `qr-code-${info?.no || 'car'}.png`;
+        link.href = dataURL;
+        console.log(dataURL);
+        link.click();
+      });
+    }
+  }, [info?.no]);
 
   return (
     <PageView fullHeight>
@@ -146,7 +170,14 @@ export default function CarFullInfoScreen() {
                 logoSize={100}
                 logoMargin={2}
                 logoBackgroundColor='transparent'
+                // @ts-ignore
+                getRef={ref => (qrRef.current = ref)}
               />
+              {isWeb && (
+                <QRButtonsContainer>
+                  <Button onClick={handleDownloadQR}>Скачать QR-код</Button>
+                </QRButtonsContainer>
+              )}
             </QRCodeContainer>
 
             <InfoContainer>
