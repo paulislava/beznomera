@@ -90,7 +90,6 @@ export const Button = forwardRef<any, ButtonProps>(
     ref
   ) => {
     const theme = useColorScheme();
-    console.log(theme);
 
     const handleClick = useCallback(() => {
       onClick?.();

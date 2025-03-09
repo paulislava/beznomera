@@ -97,7 +97,7 @@ export default function CarFullInfoScreen() {
       qrRef.current.toDataURL((dataURL: string) => {
         const link = document.createElement('a');
         link.download = `qr-code-${info?.no || 'car'}.png`;
-        link.href = dataURL;
+        link.href = `data:image/png;base64,${dataURL}`;
         link.click();
         link.remove();
       });
