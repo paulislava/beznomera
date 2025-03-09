@@ -46,6 +46,7 @@ export type FullCarInfo = ShortCarInfo & {
   messagesCount: number;
   callsCount: number;
   chatsCount: number;
+  code: string;
 };
 
 export type EditCarInfo = CarInfoBase & {

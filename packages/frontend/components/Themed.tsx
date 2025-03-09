@@ -4,7 +4,13 @@
  */
 
 import React from 'react';
-import { ColorValue, Text as DefaultText, View as DefaultView, ScrollView } from 'react-native';
+import {
+  ColorValue,
+  Text as DefaultText,
+  View as DefaultView,
+  ScrollView,
+  useColorScheme
+} from 'react-native';
 import Colors from '@/constants/Colors';
 
 import styled, { css } from 'styled-components/native';
@@ -60,8 +66,7 @@ export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName?: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
-  // const theme = useColorScheme() ?? 'dark';
-  const theme = 'dark';
+  const theme = useColorScheme() ?? 'dark';
   const colorFromProps = props[theme];
 
   if (colorFromProps) {

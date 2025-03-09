@@ -18,7 +18,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import useNeedAuth from '@/hooks/useNeedAuth';
-
+import QRCode from 'react-native-qrcode-svg';
+import { CenterContainer } from '@/ui/Styled';
+import { PRODUCTION_URL } from '@/constants/site';
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
   width: 100%;
@@ -57,6 +59,13 @@ const StyledView = styled(View)`
 
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
+const QRCodeContainer = styled(View)`
+  margin: 20px 0;
+  align-items: center;
+  padding: 20px;
+  border-radius: 8px;
+`;
+
 export default function CarFullInfoScreen() {
   useNeedAuth();
 
@@ -73,7 +82,7 @@ export default function CarFullInfoScreen() {
   );
 
   return (
-    <PageView fullHeight center>
+    <PageView fullHeight>
       <Stack.Screen
         options={{
           title: `${info?.no ?? 'Мое авто'}: информация`,
@@ -99,7 +108,7 @@ export default function CarFullInfoScreen() {
       {info && (
         <>
           {info.brand && (
-            <StyledModelRow $center>
+            <StyledModelRow>
               <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
               {info.brand.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
               <CarModel>{info.model}</CarModel>
@@ -108,7 +117,6 @@ export default function CarFullInfoScreen() {
 
           {info.no && <CarNumber>{info.no}</CarNumber>}
 
-          {/* {info.no && <CarNumber>{info.no}</CarNumber>} */}
           {info.imageUrl ? (
             <CarExternalImage
               $aspectRatio={info.imageRatio}
@@ -128,6 +136,19 @@ export default function CarFullInfoScreen() {
               </StatsItem>
             </StatsContainer>
 
+            <QRCodeContainer>
+              <QRCode
+                value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
+                size={200}
+                color='white'
+                backgroundColor='transparent'
+                logo={{ uri: 'https://cdn.beznomera.net/logo-for-qr-dark.png' }}
+                logoSize={100}
+                logoMargin={2}
+                logoBackgroundColor='transparent'
+              />
+            </QRCodeContainer>
+
             <InfoContainer>
               {info.version && <InfoText>Версия: {info.version}</InfoText>}
               {info.year && <InfoText>Год выпуска: {info.year}</InfoText>}
@@ -135,9 +156,11 @@ export default function CarFullInfoScreen() {
             </InfoContainer>
           </StyledView>
 
-          <Link href={`/car/${id}/edit`} asChild>
-            <Button>Редактировать</Button>
-          </Link>
+          <CenterContainer>
+            <Link href={`/car/${id}/edit`} asChild>
+              <Button>Редактировать</Button>
+            </Link>
+          </CenterContainer>
         </>
       )}
     </PageView>
