@@ -2,13 +2,14 @@ import React, { useEffect } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from '@/components/useColorScheme';
-import { SITE_TITLE } from '@/constants/site';
+import { PRODUCTION_URL, SITE_TITLE } from '@/constants/site';
 import styled from 'styled-components';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
 import { HelmetProvider } from 'react-helmet-async';
+import Head from 'expo-router/head';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -65,9 +66,13 @@ const helmetContext = {};
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const pathname = usePathname();
 
   return (
     <HelmetProvider context={helmetContext}>
+      <Head>
+        <link rel='canonical' href={`${PRODUCTION_URL}${pathname}`} />
+      </Head>
       <Container>
         <StyledSvg width={0} height={0}>
           <Defs>
