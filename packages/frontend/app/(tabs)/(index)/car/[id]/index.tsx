@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useGlobalSearchParams, Stack, Link } from 'expo-router';
 import { View, ImageStyle, StyleProp, ImageSourcePropType, Pressable } from 'react-native';
 import { CarImage } from '@/components/CarImage/CarImage';
@@ -80,7 +80,7 @@ export default function CarFullInfoScreen() {
   useNeedAuth();
 
   const colorScheme = useColorScheme();
-  const qrRef = React.useRef();
+  const qrRef = useRef<any>(null);
 
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
@@ -94,8 +94,7 @@ export default function CarFullInfoScreen() {
 
   const handleDownloadQR = useCallback(() => {
     if (qrRef.current) {
-      // @ts-ignore
-      qrRef.current.toDataURL(dataURL => {
+      qrRef.current.toDataURL((dataURL: string) => {
         const link = document.createElement('a');
         link.download = `qr-code-${info?.no || 'car'}.png`;
         link.href = dataURL;
