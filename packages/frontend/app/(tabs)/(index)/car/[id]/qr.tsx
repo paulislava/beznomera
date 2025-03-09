@@ -41,7 +41,7 @@ export default function CarQRScreen() {
 
   const handleDownloadQR = useCallback(() => {
     if (qrRef.current && isWeb) {
-      qrRef.current.download('png');
+      qrRef.current.download('png', `${info?.no}-qr.png`);
     }
   }, []);
 
