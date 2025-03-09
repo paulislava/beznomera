@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useGlobalSearchParams, Stack } from 'expo-router';
 import { View } from 'react-native';
 import { PageView } from '@/components/Themed';
@@ -7,43 +7,91 @@ import { Button } from '@/ui/Button';
 import { QRCode } from 'react-qrcode-logo';
 import { PRODUCTION_URL } from '@/constants/site';
 import { isWeb } from '@/utils/env';
-import { cdnFileUrl } from '@/utils/files';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useAPI } from '@/utils/api';
 import { carService } from '@/services';
 import useNeedAuth from '@/hooks/useNeedAuth';
-
+import { QRTemplate } from '@/components/QRTemplate';
+import Svg from 'react-native-svg';
+import { Canvg } from 'canvg';
+import webStyled from 'styled-components';
+import { Loading } from '@/components/Loading';
+import { CenterContainer } from '@/ui/Styled';
 const QRCodeContainer = styled(View)`
   margin: 20px 0;
   align-items: center;
-  padding: 20px;
-  border-radius: 8px;
-  position: relative;
 `;
 
-const QRButtonsContainer = styled(View)`
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
+const StyledCanvas = webStyled.canvas`
+  margin-bottom: 20px;
 `;
 
 export default function CarQRScreen() {
   useNeedAuth();
 
   const theme = useColorScheme();
-  const qrRef = useRef<QRCode>(null);
   const { id } = useGlobalSearchParams<{ id: string }>();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const templateRef = useRef<Svg>(null);
+
+  const hiddenQrRef = useRef<QRCode>(null);
+  const qrRef = useRef<QRCode>(null);
 
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
   const info = useAPI(getInfo);
 
-  const handleDownloadQR = useCallback(() => {
+  const downloadQR = useCallback(() => {
     if (qrRef.current && isWeb) {
       qrRef.current.download('png', `${info?.no}-qr.png`);
     }
-  }, []);
+  }, [info?.no]);
+
+  const downloadPlate = useCallback(() => {
+    if (canvasRef.current && isWeb) {
+      const link = document.createElement('a');
+      link.href = canvasRef.current.toDataURL('png');
+      link.download = `${info?.no}-автовизитка.png`;
+      link.click();
+    }
+  }, [info?.no]);
+
+  const [canvasLoaded, setCanvasLoaded] = useState(false);
+
+  const generateQR = useCallback(async () => {
+    if (info?.no && canvasRef.current && templateRef.current && hiddenQrRef.current) {
+      const canvas = canvasRef.current;
+
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          const svg = await Canvg.from(
+            ctx,
+            (templateRef.current.elementRef as any).current.outerHTML,
+            { scaleWidth: 1858, scaleHeight: 662 }
+          );
+
+          await svg.render();
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          const qrCanvas = hiddenQrRef.current.canvasRef.current as HTMLCanvasElement;
+
+          ctx.drawImage(qrCanvas, 1401, 102, 365, 365);
+
+          canvas.style.height = 'auto';
+          canvas.style.width = '100%';
+        }
+      }
+    }
+  }, [info?.no]);
+
+  useEffect(() => {
+    generateQR().then(() => {
+      setCanvasLoaded(true);
+    });
+  }, [generateQR]);
 
   return (
     <PageView fullHeight>
@@ -52,31 +100,57 @@ export default function CarQRScreen() {
           title: info?.no ? `${info.no}: QR-код` : 'QR-код автомобиля'
         }}
       />
-
-      <QRCodeContainer>
-        {isWeb && info && (
+      {info ? (
+        <>
           <QRCode
             value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
             size={200}
             qrStyle='fluid'
             ecLevel='H'
             eyeRadius={15}
-            fgColor={theme === 'dark' ? '#fff' : '#090633'}
+            fgColor={'#fff'}
             bgColor='transparent'
-            logoImage={`/logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`}
             logoWidth={100}
             logoHeight={100}
+            quietZone={0}
             removeQrCodeBehindLogo={true}
             logoPaddingStyle='square'
-            ref={qrRef}
+            ref={hiddenQrRef}
+            style={{ display: 'none' }}
           />
-        )}
-        {isWeb && (
-          <QRButtonsContainer>
-            <Button onClick={handleDownloadQR}>Скачать QR-код</Button>
-          </QRButtonsContainer>
-        )}
-      </QRCodeContainer>
+
+          <QRTemplate svgRef={templateRef} />
+          <StyledCanvas ref={canvasRef}></StyledCanvas>
+          {canvasLoaded && (
+            <CenterContainer>
+              <Button onClick={downloadPlate}>Скачать автовизитку</Button>
+            </CenterContainer>
+          )}
+          <QRCodeContainer>
+            <QRCode
+              value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
+              size={200}
+              qrStyle='fluid'
+              ecLevel='H'
+              eyeRadius={15}
+              fgColor={theme === 'dark' ? '#fff' : '#090633'}
+              bgColor='transparent'
+              logoImage={`/logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`}
+              logoWidth={100}
+              logoHeight={100}
+              removeQrCodeBehindLogo={true}
+              logoPaddingStyle='square'
+              ref={qrRef}
+            />
+
+            <CenterContainer>
+              <Button onClick={downloadQR}>Скачать QR-код</Button>
+            </CenterContainer>
+          </QRCodeContainer>
+        </>
+      ) : (
+        <Loading />
+      )}
     </PageView>
   );
 }
