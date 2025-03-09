@@ -98,8 +98,8 @@ export default function CarFullInfoScreen() {
         const link = document.createElement('a');
         link.download = `qr-code-${info?.no || 'car'}.png`;
         link.href = dataURL;
-        console.log(dataURL);
         link.click();
+        link.remove();
       });
     }
   }, [info?.no]);
