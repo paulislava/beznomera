@@ -162,6 +162,7 @@ export default function CarFullInfoScreen() {
                   value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
                   size={200}
                   qrStyle='fluid'
+                  ecLevel='H'
                   eyeRadius={15}
                   fgColor={theme === 'dark' ? '#fff' : '#090633'}
                   bgColor='transparent'
