@@ -1,5 +1,5 @@
 import { authService } from '@/services';
-import { webApp } from '@/utils/telegram';
+import { getWebApp } from '@/utils/telegram';
 import { useFocusEffect, usePathname, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
@@ -32,10 +32,13 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
       .checkAuthorized()
       .then(successAuth)
       .catch(() => {
-        const { initData } = webApp;
+        const webApp = getWebApp();
 
-        if (initData) {
-          authService.authTelegramWebApp({ data: initData }).then(successAuth).catch(errorAuth);
+        if (webApp?.initData) {
+          authService
+            .authTelegramWebApp({ data: webApp.initData })
+            .then(successAuth)
+            .catch(errorAuth);
         } else {
           errorAuth();
         }
