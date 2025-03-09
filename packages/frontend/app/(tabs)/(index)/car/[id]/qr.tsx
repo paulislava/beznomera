@@ -45,26 +45,24 @@ export default function CarQRScreen() {
 
   const downloadQR = useCallback(async () => {
     if (qrRef.current && isWeb) {
+      const dataUrl = (qrRef.current as any).canvasRef.current.toDataURL('png');
+
+      carService.sendQR({ image: dataUrl }, Number(id));
+
       if (downloadFileTelegram.isAvailable()) {
-        await downloadFileTelegram(
-          (qrRef.current as any).canvasRef.current.toDataURL('png'),
-          `${info?.no}-qr.png`
-        );
+        await downloadFileTelegram(dataUrl, `${info?.no}-qr.png`);
       } else {
         qrRef.current.download('png', `${info?.no}-qr.png`);
       }
-
-      const dataUrl = (qrRef.current as any).canvasRef.current.toDataURL('png');
-      await carService.sendQR({ image: dataUrl }, Number(id));
     }
   }, [info?.no]);
 
   const downloadPlate = useCallback(async () => {
     if (canvasRef.current && isWeb) {
       const dataUrl = canvasRef.current.toDataURL('png');
-      await downloadFile(dataUrl, `${info?.no}-автовизитка.png`);
 
-      await carService.sendPlate({ image: dataUrl }, Number(id));
+      carService.sendPlate({ image: dataUrl }, Number(id));
+      await downloadFile(dataUrl, `${info?.no}-автовизитка.png`);
     }
   }, [info?.no]);
 
