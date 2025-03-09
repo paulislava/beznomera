@@ -8,7 +8,9 @@ import env, { isWeb } from '@/utils/env';
 import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { getWebApp } from '@/utils/telegram';
+
+import { initDataRaw } from '@telegram-apps/sdk';
+
 const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
 
 function LoginPage({ router }: WithRouterProps): React.ReactNode {
@@ -27,11 +29,11 @@ function LoginPage({ router }: WithRouterProps): React.ReactNode {
   }, []);
 
   useFocusEffect(() => {
-    const webApp = getWebApp();
+    const initData = initDataRaw();
 
-    if (webApp?.initData) {
+    if (initData) {
       authService
-        .authTelegramWebApp({ data: webApp.initData })
+        .authTelegramWebApp({ data: initData })
         .then(() => {
           router.replace((to as any) ?? '/');
         })

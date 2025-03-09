@@ -1,4 +1,4 @@
-import { getWebApp } from './telegram';
+import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk';
 
 export const downloadFile = (url: string, filename: string) => {
   const standartDownload = () => {
@@ -9,11 +9,9 @@ export const downloadFile = (url: string, filename: string) => {
     alert('standart download file');
   };
 
-  const webApp = getWebApp();
-
-  if (webApp) {
+  if (downloadFileTelegram.isAvailable()) {
     try {
-      webApp.downloadFile({ url, file_name: filename });
+      downloadFileTelegram(url, filename);
       alert('download file!');
     } catch (error) {
       console.error(error);
