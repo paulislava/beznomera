@@ -59,6 +59,10 @@ const StyledView = styled(View)`
   width: 100%;
 `;
 
+const QRButtonContainer = styled(CenterContainer)`
+  margin: 20px 0;
+`;
+
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
 const QRCodeContainer = styled(View)`
@@ -156,30 +160,11 @@ export default function CarFullInfoScreen() {
               </StatsItem>
             </StatsContainer>
 
-            <QRCodeContainer>
-              {isWeb && info && (
-                <QRCode
-                  value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
-                  size={200}
-                  qrStyle='fluid'
-                  ecLevel='H'
-                  eyeRadius={15}
-                  fgColor={theme === 'dark' ? '#fff' : '#090633'}
-                  bgColor='transparent'
-                  logoImage={cdnFileUrl(`logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`)}
-                  logoWidth={100}
-                  logoHeight={100}
-                  removeQrCodeBehindLogo={true}
-                  logoPaddingStyle='square'
-                  ref={qrRef}
-                />
-              )}
-              {isWeb && (
-                <QRButtonsContainer>
-                  <Button onClick={handleDownloadQR}>Скачать QR-код</Button>
-                </QRButtonsContainer>
-              )}
-            </QRCodeContainer>
+            <QRButtonContainer>
+              <Link href={`/car/${id}/qr`} asChild>
+                <Button>Получить QR-код</Button>
+              </Link>
+            </QRButtonContainer>
 
             <InfoContainer>
               {info.version && <InfoText>Версия: {info.version}</InfoText>}
