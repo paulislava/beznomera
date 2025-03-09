@@ -63,7 +63,7 @@ export default function CarQRScreen() {
             eyeRadius={15}
             fgColor={theme === 'dark' ? '#fff' : '#090633'}
             bgColor='transparent'
-            logoImage={cdnFileUrl(`logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`)}
+            logoImage={`/logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`}
             logoWidth={100}
             logoHeight={100}
             removeQrCodeBehindLogo={true}
