@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { TextInput as RawInput } from 'react-native-paper';
-import { View } from 'react-native';
+import { ColorSchemeName, useColorScheme, View } from 'react-native';
 import styled from 'styled-components/native';
 import { Text } from '@/components/Themed';
 import { TextInputProps } from './TextInput.types';
@@ -32,8 +32,8 @@ const InputContainer = styled(View)`
   padding-left: 16px;
 `;
 
-const BeforeText = styled(Text)`
-  color: #fff;
+const BeforeText = styled(Text)<{ $theme: ColorSchemeName }>`
+  color: ${({ $theme }) => ($theme === 'light' ? '#000' : '#fff')};
   margin: 26px 0 4px;
   font-size: 16px;
   line-height: 19.2px;
@@ -50,11 +50,14 @@ export const TextInput: React.FC<TextInputProps> = ({
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const theme = useColorScheme();
 
   const renderProps = useCallback(
     (inputProps: RenderProps) => (
       <InputContainer>
-        {beforeText && (inputProps.value || isFocused) && <BeforeText>{beforeText}</BeforeText>}
+        {beforeText && (inputProps.value || isFocused) && (
+          <BeforeText $theme={theme}>{beforeText}</BeforeText>
+        )}
         <RenderInput {...inputProps} />
       </InputContainer>
     ),
@@ -70,7 +73,7 @@ export const TextInput: React.FC<TextInputProps> = ({
       <StyledInput
         mode='flat'
         outlineColor='white'
-        textColor='#fff'
+        textColor={theme === 'light' ? '#000' : '#fff'}
         activeUnderlineColor='#dbb3b3'
         style={{ backgroundColor: 'transparent', minHeight: '100%' }}
         underlineStyle={{ marginLeft: 16, marginRight: 16 }}
