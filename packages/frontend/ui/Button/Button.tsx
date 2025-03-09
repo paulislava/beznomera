@@ -18,6 +18,7 @@ interface ButtonProps {
   event?: string;
   eventParams?: Record<string, string | number | undefined>;
   style?: StyleProp<ViewStyle>;
+  noFollowNoIndex?: boolean;
 }
 
 type ViewConfig = {
@@ -86,7 +87,17 @@ const StyledText = styled(Text)`
 
 export const Button = forwardRef<any, ButtonProps>(
   (
-    { children, externalHref, onClick, disabled, view = 'primary', event, eventParams, style },
+    {
+      children,
+      externalHref,
+      onClick,
+      disabled,
+      view = 'primary',
+      event,
+      eventParams,
+      style,
+      noFollowNoIndex
+    },
     ref
   ) => {
     const theme = useColorScheme();
@@ -113,7 +124,14 @@ export const Button = forwardRef<any, ButtonProps>(
     );
 
     if (externalHref) {
-      return <ExternalLink href={externalHref}>{content}</ExternalLink>;
+      return (
+        <ExternalLink
+          href={externalHref}
+          rel={noFollowNoIndex ? 'nofollow noopener noreferrer' : ''}
+        >
+          {content}
+        </ExternalLink>
+      );
     }
 
     return content;

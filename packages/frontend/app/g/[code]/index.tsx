@@ -174,6 +174,7 @@ const CallUserPage = () => {
                 view='glass'
                 event='tel_call'
                 eventParams={eventData}
+                noFollowNoIndex
               >
                 Позвонить
               </Button>
