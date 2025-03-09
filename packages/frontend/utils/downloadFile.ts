@@ -1,4 +1,4 @@
-import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk';
+import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk-react';
 
 export const downloadFile = (url: string, filename: string) => {
   const standartDownload = () => {

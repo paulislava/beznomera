@@ -18,7 +18,7 @@ import webStyled from 'styled-components';
 import { Loading } from '@/components/Loading';
 import { CenterContainer } from '@/ui/Styled';
 import { downloadFile } from '@/utils/downloadFile';
-import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk';
+import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk-react';
 
 const QRCodeContainer = styled(View)`
   margin: 20px 0;

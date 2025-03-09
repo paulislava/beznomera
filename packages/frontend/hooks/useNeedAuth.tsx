@@ -1,7 +1,7 @@
 import { authService } from '@/services';
 import { useFocusEffect, usePathname, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { initDataRaw } from '@telegram-apps/sdk';
+import { initDataRaw } from '@telegram-apps/sdk-react';
 
 interface UseNeedAuthProps {
   onAuth?(): void | Promise<void>;

@@ -19,7 +19,7 @@
     "@expo/vector-icons": "^14.0.0",
     "@paulislava/shared": "file:../shared",
     "@react-navigation/native": "^6.0.2",
-    "@telegram-apps/sdk": "^3.5.1",
+    "@telegram-apps/sdk-react": "^3.1.2",
     "canvg": "^4.0.2",
     "expo": "~50.0.6",
     "expo-dev-client": "~3.3.12",

@@ -9,7 +9,7 @@ import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 
-import { initDataRaw } from '@telegram-apps/sdk';
+import { initDataRaw } from '@telegram-apps/sdk-react';
 
 const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
 

@@ -1,4 +1,4 @@
-import { init } from '@telegram-apps/sdk';
+import { init } from '@telegram-apps/sdk-react';
 
 export let isTelegramWebApp = false;
 
