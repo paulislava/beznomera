@@ -18,11 +18,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import useNeedAuth from '@/hooks/useNeedAuth';
-import QRCode from 'react-native-qrcode-svg';
+import { QRCode } from 'react-qrcode-logo';
 import { CenterContainer } from '@/ui/Styled';
 import { PRODUCTION_URL } from '@/constants/site';
 import { isWeb } from '@/utils/env';
-import { Canvg } from 'canvg';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -70,22 +69,6 @@ const QRCodeContainer = styled(View)`
   position: relative;
 `;
 
-const WebCanvas = ({ canvasRef }: { canvasRef: React.RefObject<HTMLCanvasElement> }) => {
-  if (!isWeb) return null;
-  return (
-    <canvas
-      ref={canvasRef}
-      width={400}
-      height={400}
-      style={{
-        position: 'absolute',
-        opacity: 0,
-        pointerEvents: 'none'
-      }}
-    />
-  );
-};
-
 const QRButtonsContainer = styled(View)`
   margin-top: 10px;
   display: flex;
@@ -98,8 +81,7 @@ export default function CarFullInfoScreen() {
   useNeedAuth();
 
   const colorScheme = useColorScheme();
-  const qrRef = useRef<any>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const qrRef = useRef<QRCode>(null);
 
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
@@ -113,24 +95,9 @@ export default function CarFullInfoScreen() {
 
   const theme = useColorScheme();
 
-  const handleDownloadQR = useCallback(async () => {
-    if (qrRef.current && canvasRef.current && isWeb) {
-      const svgElement = qrRef.current.elementRef.current;
-      console.log(svgElement);
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-
-      if (!ctx) return;
-
-      const v = await Canvg.from(ctx, svgElement.outerHTML);
-      await v.render();
-
-      const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = `qr-code-${info?.no || 'car'}.png`;
-      link.href = dataUrl;
-      link.click();
-      link.remove();
+  const handleDownloadQR = useCallback(() => {
+    if (qrRef.current && isWeb) {
+      qrRef.current.download('png');
     }
   }, [info?.no]);
 
@@ -190,22 +157,26 @@ export default function CarFullInfoScreen() {
             </StatsContainer>
 
             <QRCodeContainer>
-              <WebCanvas canvasRef={canvasRef} />
-              <QRCode
-                value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
-                size={200}
-                color={theme === 'dark' ? '#fff' : '#090633'}
-                backgroundColor='transparent'
-                logo={
-                  theme === 'dark'
-                    ? require('@/assets/images/qr-logo.png')
-                    : require('@/assets/images/qr-logo-white.png')
-                }
-                logoSize={100}
-                logoMargin={2}
-                logoBackgroundColor='transparent'
-                getRef={ref => (qrRef.current = ref)}
-              />
+              {isWeb && info && (
+                <QRCode
+                  value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
+                  size={200}
+                  qrStyle='fluid'
+                  eyeRadius={15}
+                  fgColor={theme === 'dark' ? '#fff' : '#090633'}
+                  bgColor='transparent'
+                  logoImage={
+                    theme === 'dark'
+                      ? 'https://cdn.beznomera.net/logo-for-qr-dark.png'
+                      : require('@/assets/images/qr-logo-white.png')
+                  }
+                  logoWidth={100}
+                  logoHeight={100}
+                  removeQrCodeBehindLogo={true}
+                  logoPaddingStyle='square'
+                  ref={qrRef}
+                />
+              )}
               {isWeb && (
                 <QRButtonsContainer>
                   <Button onClick={handleDownloadQR}>Скачать QR-код</Button>
