@@ -96,13 +96,16 @@ const SvgContainer = styled(Svg)`
 
 export function PageView(props: ViewProps) {
   const { style, lightColor, darkColor, fullHeight, center, children, ...otherProps } = props;
+  const theme = useColorScheme();
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor });
 
   return (
     <>
-      <SvgContainer fill='none'>
-        <Rect width='100%' height='100%' fill='url(#paint0_linear_2005_86)' />
-      </SvgContainer>
+      {theme === 'dark' && (
+        <SvgContainer fill='none'>
+          <Rect width='100%' height='100%' fill='url(#paint0_linear_2005_86)' />
+        </SvgContainer>
+      )}
       <ScrollableContainer>
         <StyledViewContainer
           $fullHeight={fullHeight}

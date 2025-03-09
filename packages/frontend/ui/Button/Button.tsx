@@ -1,12 +1,12 @@
 import React, { forwardRef, useCallback } from 'react';
-import { Text, Pressable, StyleProp, ViewStyle } from 'react-native';
+import { Text, Pressable, StyleProp, ViewStyle, ColorSchemeName } from 'react-native';
 
 import styled, { css } from 'styled-components/native';
 import { ExternalLink } from '../../components/ExternalLink';
 import { isWeb } from '@/utils/env';
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
-
+import { useColorScheme } from '@/components/useColorScheme';
 type ButtonView = 'primary' | 'secondary' | 'glass';
 
 interface ButtonProps {
@@ -22,7 +22,7 @@ interface ButtonProps {
 
 type ViewConfig = {
   background: string;
-  color: string;
+  color: string | { light: string; dark: string };
 };
 
 const viewConfigs: Record<ButtonView, ViewConfig> = {
@@ -36,22 +36,22 @@ const viewConfigs: Record<ButtonView, ViewConfig> = {
   },
   glass: {
     background: `rgba(255, 255, 255, 0.1)`,
-    color: '#fff'
+    color: { light: '#000', dark: '#fff' }
   }
 };
 
 const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
 
-const StyledPressable = styled(Pressable)<{ $view: ButtonView }>`
+const StyledPressable = styled(Pressable)<{ $view: ButtonView; $theme: ColorSchemeName }>`
   border-radius: 35px;
   overflow: hidden;
 
-  ${({ $view }) => {
+  ${({ $view, $theme }) => {
     const config = getViewConfig($view);
 
     return css`
       background: ${config.background};
-      color: ${config.color};
+      color: ${typeof config.color === 'string' ? config.color : config.color[$theme ?? 'dark']};
 
       ${$view === 'glass' &&
       css`
@@ -89,6 +89,8 @@ export const Button = forwardRef<any, ButtonProps>(
     { children, externalHref, onClick, disabled, view = 'primary', event, eventParams, style },
     ref
   ) => {
+    const theme = useColorScheme();
+
     const handleClick = useCallback(() => {
       onClick?.();
       if (event) {
@@ -98,6 +100,7 @@ export const Button = forwardRef<any, ButtonProps>(
 
     const content = (
       <StyledPressable
+        $theme={theme}
         ref={ref}
         $view={view}
         disabled={disabled}
