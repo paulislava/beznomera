@@ -6,18 +6,18 @@ export const downloadFile = (url: string, filename: string) => {
     link.href = url;
     link.download = filename;
     link.click();
-    alert('standart download file');
   };
 
   if (downloadFileTelegram.isAvailable()) {
+    alert('Функция доступна!');
     try {
       downloadFileTelegram(url, filename);
-      alert('download file!');
     } catch (error) {
       console.error(error);
       standartDownload();
     }
   } else {
+    alert('Функция недоступна!');
     standartDownload();
   }
 };
