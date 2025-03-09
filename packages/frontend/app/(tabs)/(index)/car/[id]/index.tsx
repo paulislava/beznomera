@@ -22,7 +22,7 @@ import { QRCode } from 'react-qrcode-logo';
 import { CenterContainer } from '@/ui/Styled';
 import { PRODUCTION_URL } from '@/constants/site';
 import { isWeb } from '@/utils/env';
-
+import { cdnFileUrl } from '@/utils/files';
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
   width: 100%;
@@ -165,11 +165,7 @@ export default function CarFullInfoScreen() {
                   eyeRadius={15}
                   fgColor={theme === 'dark' ? '#fff' : '#090633'}
                   bgColor='transparent'
-                  logoImage={
-                    theme === 'dark'
-                      ? 'https://cdn.beznomera.net/logo-for-qr-dark.png'
-                      : require('@/assets/images/qr-logo-white.png')
-                  }
+                  logoImage={cdnFileUrl(`logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`)}
                   logoWidth={100}
                   logoHeight={100}
                   removeQrCodeBehindLogo={true}
