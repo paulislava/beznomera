@@ -10,14 +10,12 @@ import styled from 'styled-components';
 import Svg, { Defs, LinearGradient, Stop } from 'react-native-svg';
 import { HelmetProvider } from 'react-helmet-async';
 import Head from 'expo-router/head';
-import { init } from '@telegram-apps/sdk';
+import { initWebApp } from '@/utils/telegram';
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary
 } from 'expo-router';
-
-init();
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -26,6 +24,8 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+initWebApp();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
