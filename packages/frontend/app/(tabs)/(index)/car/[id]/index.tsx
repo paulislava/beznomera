@@ -111,6 +111,8 @@ export default function CarFullInfoScreen() {
     [info]
   );
 
+  const theme = useColorScheme();
+
   const handleDownloadQR = useCallback(async () => {
     if (qrRef.current && canvasRef.current && isWeb) {
       const svgElement = qrRef.current.elementRef.current;
@@ -192,9 +194,13 @@ export default function CarFullInfoScreen() {
               <QRCode
                 value={`${PRODUCTION_URL}/g/${info.code}?from=qr`}
                 size={200}
-                color='white'
+                color={theme === 'dark' ? '#fff' : '#090633'}
                 backgroundColor='transparent'
-                logo={{ uri: 'https://cdn.beznomera.net/logo-for-qr-dark.png' }}
+                logo={
+                  theme === 'dark'
+                    ? require('@/assets/images/qr-logo.png')
+                    : require('@/assets/images/qr-logo-white.png')
+                }
                 logoSize={100}
                 logoMargin={2}
                 logoBackgroundColor='transparent'
