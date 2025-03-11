@@ -1,4 +1,4 @@
-FROM node:18.12-slim AS build-frontend
+FROM node:20.18-slim AS build-frontend
 COPY .npmrc /root/.npmrc
 WORKDIR /app
 COPY .eslintignore /app
@@ -26,7 +26,7 @@ RUN npm run build:frontend
 RUN (cd /app/packages/shared; npm prune --production)
 RUN (cd /app/packages/frontend; npm prune --production)
 
-FROM node:18.12-slim AS frontend
+FROM node:20.18-slim AS frontend
 
 EXPOSE 80
 

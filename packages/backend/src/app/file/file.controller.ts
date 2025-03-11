@@ -1,0 +1,45 @@
+import {
+  Controller,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+  Param,
+  UseGuards,
+  ParseEnumPipe,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileService } from './file.service';
+import { File } from '../entities/file.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../users/user.decorator';
+import { RequestUser } from '../users/user.types';
+import { FileFolder } from './file.types';
+import { WrongMimetypeException } from './file.exceptions';
+
+@Controller('files')
+export class FileController {
+  constructor(private readonly fileService: FileService) {}
+
+  @Post(':folder')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      fileFilter: (req, file, callback) => {
+        if (
+          file.mimetype !== 'image/png' ||
+          !file.originalname.endsWith('.png')
+        ) {
+          return callback(new WrongMimetypeException(), false);
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  @UseGuards(JwtAuthGuard)
+  async uploadFile(
+    @Param('folder', new ParseEnumPipe(FileFolder)) folder: FileFolder,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: RequestUser,
+  ): Promise<File> {
+    return this.fileService.uploadFile(file, folder, user);
+  }
+}

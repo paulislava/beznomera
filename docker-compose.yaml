@@ -1,6 +1,6 @@
 services:
   root:
-    image: node:18.12-slim
+    image: node:20.18-slim
     environment:
       - HOME=/tmp
     volumes:
@@ -33,7 +33,7 @@ services:
       - ${DATABASE_PORT:-5432}:5432
 
   backend:
-    image: node:18.12-slim
+    image: node:20.18-slim
     environment:
       - HOME=/tmp
       - NODE_ENV=development
@@ -42,6 +42,7 @@ services:
       - APP_PORT=${BACKEND_PORT}
       - DISABLE_TELEGRAM=${DISABLE_TELEGRAM}
       - ROUTE_PREFIX=${BACKEND_PREFIX}
+      - CDN_URL=${CDN_URL}
     volumes:
       - .:/app
     working_dir: /app
@@ -57,11 +58,12 @@ services:
         npm run start:backend:nodemon
 
   frontend:
-    image: node:18.12-slim
+    image: node:20.18-slim
     environment:
       - HOME=/tmp
       - EXPO_PUBLIC_BACKEND_URL=${BACKEND_URL}
       - EXPO_PUBLIC_TELEGRAM_BOT_NAME=${TELEGRAM_BOT_NAME}
+      - EXPO_PUBLIC_CDN_URL=${CDN_URL}
       - FRONTEND_PORT=${FRONTEND_PORT:-4000}
       - NODE_ENV=development
     volumes:

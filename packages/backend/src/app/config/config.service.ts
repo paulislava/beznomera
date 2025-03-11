@@ -12,6 +12,7 @@ import {
   AuthConfig,
   DatabaseConfig,
   MailConfig,
+  S3Config,
   SmsConfig,
   TelegramConfig,
   Version,
@@ -49,6 +50,10 @@ export class ConfigService implements ApplicationConfig {
 
   get telegram(): TelegramConfig {
     return this.config.telegram;
+  }
+
+  get s3(): S3Config {
+    return this.config.s3;
   }
 
   get version(): Version {

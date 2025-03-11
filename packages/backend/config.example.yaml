@@ -33,3 +33,9 @@ webdav:
 
 telegram:
   token: TOKEN
+
+s3:
+  accessKeyId: your_access_key_id
+  secretAccessKey: your_secret_access_key
+  endpoint: your_endpoint
+  bucket: your_bucket_name

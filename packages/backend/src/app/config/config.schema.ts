@@ -120,6 +120,24 @@ export class TelegramConfig {
   token: string;
 }
 
+export class S3Config {
+  @IsString()
+  @IsDefined()
+  readonly accessKeyId: string;
+
+  @IsString()
+  @IsDefined()
+  readonly secretAccessKey: string;
+
+  @IsString()
+  @IsDefined()
+  readonly endpoint: string;
+
+  @IsString()
+  @IsDefined()
+  readonly bucket: string;
+}
+
 export class ApplicationConfig {
   @IsDefined()
   @ValidateNested()
@@ -150,6 +168,11 @@ export class ApplicationConfig {
   @ValidateNested()
   @Type(() => TelegramConfig)
   readonly telegram: TelegramConfig;
+
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => S3Config)
+  readonly s3: S3Config;
 }
 
 export interface Version {

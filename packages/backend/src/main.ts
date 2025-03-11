@@ -8,7 +8,10 @@ import { ServerResponse } from 'http';
 import { Request } from 'express';
 import { NestFactory } from '@nestjs/core';
 import bodyParser from 'body-parser';
-import { initializeTransactionalContext } from 'typeorm-transactional-cls-hooked';
+import {
+  initializeTransactionalContext,
+  StorageDriver,
+} from 'typeorm-transactional';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -33,7 +36,7 @@ const rawBodyBuffer = (
 };
 
 async function bootstrap() {
-  initializeTransactionalContext();
+  initializeTransactionalContext({ storageDriver: StorageDriver.AUTO });
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bodyParser: false,
     cors: {

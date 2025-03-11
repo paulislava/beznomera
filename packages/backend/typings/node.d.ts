@@ -6,5 +6,6 @@ declare namespace NodeJS {
     APP_PORT: number;
     ROUTE_PREFIX: string | undefined;
     DISABLE_TELEGRAM?: string;
+    CDN_URL: string;
   }
 }

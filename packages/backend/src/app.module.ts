@@ -11,12 +11,16 @@ import { MailModule } from './app/mail/mail.module';
 import { UserModule } from './app/users/user.module';
 import { CarModule } from './app/car/car.module';
 import { TelegramModule } from './app/telegram/telegram.module';
+import { FileModule } from './app/file/file.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule,
     EventEmitterModule.forRoot({ global: true }),
     DatabaseModule,
+    FileModule,
     HttpClientsModule,
     MailModule,
     AuthModule,

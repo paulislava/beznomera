@@ -2,15 +2,19 @@ import { join } from 'path';
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ClsModule } from 'nestjs-cls';
 
+import { DataSource } from 'typeorm';
 import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
+import { addTransactionalDataSource } from 'typeorm-transactional';
+
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [ConfigModule, ClsModule],
       inject: [ConfigService],
       useFactory(config: ConfigService): TypeOrmModuleOptions {
         return {
@@ -26,6 +30,13 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
           migrations: [join(__dirname, '../', 'migrations', '**')],
           namingStrategy: new SnakeNamingStrategy(),
         };
+      },
+      async dataSourceFactory(options) {
+        if (!options) {
+          throw new Error('Invalid options passed');
+        }
+
+        return addTransactionalDataSource(new DataSource(options));
       },
     }),
   ],

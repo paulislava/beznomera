@@ -1,4 +1,4 @@
-FROM node:18.12-slim AS build-backend
+FROM node:20.18-slim AS build-backend
 COPY .npmrc /root/.npmrc
 WORKDIR /app
 COPY .eslintignore /app
@@ -23,7 +23,7 @@ ENV NODE_ENV=production
 RUN npm run build:backend
 RUN npm prune --production
 
-FROM node:18.12-slim AS backend
+FROM node:20.18-slim AS backend
 
 EXPOSE 3000
 
