@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
 import { File } from '../entities/file.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, Repository } from 'typeorm';
+import { LessThan, Repository, Not } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { ConfigService } from '../config/config.service';
 import { RequestUser } from '../users/user.types';
-import { FileFolder } from './file.types';
+import { FileFolder } from '@paulislava/shared/file/file.types';
+
 import { TEMP_FILE_LIFETIME } from './file.constant';
 import { Cron } from '@nestjs/schedule';
 
@@ -54,6 +55,8 @@ export class FileService {
       })
       .promise();
 
+    await this.checkPrevFile(fileEntity);
+
     return fileEntity;
   }
 
@@ -62,14 +65,9 @@ export class FileService {
       where: { id: fileId },
     });
 
-    await this.s3
-      .deleteObject({
-        Bucket: this.configService.s3.bucket,
-        Key: file.fileKey(),
-      })
-      .promise();
+    await this.deleteFileFromS3(file);
 
-    await this.fileRepository.remove(file);
+    await file.remove();
   }
 
   @Cron('*/5 * * * *')
@@ -84,5 +82,32 @@ export class FileService {
     for (const file of files) {
       await this.deleteFile(file.id);
     }
+  }
+
+  private async checkPrevFile(file: File): Promise<void> {
+    if (file.folder !== FileFolder.Temp) {
+      return;
+    }
+
+    const prevFiles = await this.fileRepository.find({
+      where: {
+        folder: file.folder,
+        userId: file.userId,
+        id: Not(file.id),
+      },
+    });
+
+    await Promise.all(
+      prevFiles.map(async (prevFile) => {
+        await this.deleteFile(prevFile.id);
+      }),
+    );
+  }
+
+  private async deleteFileFromS3(file: File) {
+    return this.s3.deleteObject({
+      Bucket: this.configService.s3.bucket,
+      Key: file.fileKey(),
+    });
   }
 }

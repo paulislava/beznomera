@@ -9,16 +9,19 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
-import { File } from '../entities/file.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import { RequestUser } from '../users/user.types';
-import { FileFolder } from './file.types';
-import { WrongMimetypeException } from './file.exceptions';
+import { FileFolder, FileInfo } from '@paulislava/shared/file/file.types';
 
+import { WrongMimetypeException } from './file.exceptions';
+import { FileSerializer } from './file.serializer';
 @Controller('files')
 export class FileController {
-  constructor(private readonly fileService: FileService) {}
+  constructor(
+    private readonly fileService: FileService,
+    private readonly fileSerializer: FileSerializer,
+  ) {}
 
   @Post(':folder')
   @UseInterceptors(
@@ -39,7 +42,8 @@ export class FileController {
     @Param('folder', new ParseEnumPipe(FileFolder)) folder: FileFolder,
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: RequestUser,
-  ): Promise<File> {
-    return this.fileService.uploadFile(file, folder, user);
+  ): Promise<FileInfo> {
+    const fileEntity = await this.fileService.uploadFile(file, folder, user);
+    return this.fileSerializer.info(fileEntity);
   }
 }

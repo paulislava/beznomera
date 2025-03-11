@@ -8,7 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from './user/user.entity';
-import { FileFolder } from '../file/file.types';
+import { FileFolder } from '@paulislava/shared/file/file.types';
 
 @Entity()
 export class File extends BaseEntity {
