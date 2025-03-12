@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { useGlobalSearchParams, Stack, Link } from 'expo-router';
 import { View, ImageStyle, StyleProp, ImageSourcePropType, Pressable } from 'react-native';
 import { CarImage } from '@/components/CarImage/CarImage';
@@ -18,11 +18,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from '@/components/useColorScheme';
 import Colors from '@/constants/Colors';
 import useNeedAuth from '@/hooks/useNeedAuth';
-import { QRCode } from 'react-qrcode-logo';
-import { CenterContainer } from '@/ui/Styled';
-import { PRODUCTION_URL } from '@/constants/site';
-import { isWeb } from '@/utils/env';
-import { cdnFileUrl } from '@/utils/files';
+import { CenterContainer, ButtonsContainer } from '@/ui/Styled';
+import { requestContactPromise } from '@telegram-apps/sdk-react';
+import { isTelegramWebApp } from '@/utils/telegram';
+
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
   width: 100%;
@@ -65,27 +64,10 @@ const QRButtonContainer = styled(CenterContainer)`
 
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
-const QRCodeContainer = styled(View)`
-  margin: 20px 0;
-  align-items: center;
-  padding: 20px;
-  border-radius: 8px;
-  position: relative;
-`;
-
-const QRButtonsContainer = styled(View)`
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-`;
-
 export default function CarFullInfoScreen() {
   useNeedAuth();
 
   const colorScheme = useColorScheme();
-  const qrRef = useRef<QRCode>(null);
 
   const { id } = useGlobalSearchParams<{ id: string }>();
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
@@ -97,13 +79,11 @@ export default function CarFullInfoScreen() {
     [info]
   );
 
-  const theme = useColorScheme();
+  const handleAddOwner = useCallback(async () => {
+    const contact = await requestContactPromise();
 
-  const handleDownloadQR = useCallback(() => {
-    if (qrRef.current && isWeb) {
-      qrRef.current.download('png');
-    }
-  }, [info?.no]);
+    console.log(contact);
+  }, []);
 
   return (
     <PageView fullHeight>
@@ -173,11 +153,16 @@ export default function CarFullInfoScreen() {
             </InfoContainer>
           </StyledView>
 
-          <CenterContainer>
+          <ButtonsContainer>
             <Link href={`/car/${id}/edit`} asChild>
               <Button>Редактировать</Button>
             </Link>
-          </CenterContainer>
+            {isTelegramWebApp && (
+              <Button view='secondary' onClick={handleAddOwner}>
+                Добавить владельца
+              </Button>
+            )}
+          </ButtonsContainer>
         </>
       )}
     </PageView>
