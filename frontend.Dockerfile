@@ -2,12 +2,12 @@ FROM node:20.18-slim AS build-frontend
 COPY .npmrc /root/.npmrc
 WORKDIR /app
 
-COPY .env.production .env
 COPY .eslintignore /app
 COPY .prettierignore /app
 COPY *.json /app/
 COPY packages/shared/*.json /app/packages/shared/
 COPY packages/frontend/*.json /app/packages/frontend/
+COPY packages/frontend/.env.production /app/packages/frontend/.env
 COPY packages/shared/patches /app/packages/shared/patches
 
 RUN npm ci && \
