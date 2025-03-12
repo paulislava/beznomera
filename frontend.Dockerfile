@@ -27,7 +27,7 @@ FROM node:20.18-slim AS frontend
 
 EXPOSE 80
 
-COPY --from=build-frontend /app/.env /app/.env
+COPY --from=build-frontend /app/packages/frontend/.env /app/.env
 COPY --from=build-frontend /app/packages/frontend/node_modules /app/node_modules
 COPY --from=build-frontend /app/packages/shared /app/node_modules/@paulislava/shared
 COPY --from=build-frontend /app/packages/frontend/dist /app
