@@ -30,9 +30,10 @@ jobs:
       - name: Build frontend Docker image
         run: |
           echo "Building frontend Docker image..."
-          docker build --rm -f frontend.Dockerfile \
-            --build-arg ENV_FILE=/home/admin/web/beznomera.paulislava.space/frontend.env \
-            -t beznomera:frontend https://github.com/paulislava/beznomera.git
+
+          # Собираем образ с переменными окружения
+          docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
+          
           docker stop beznomera_frontend || true
           docker rm -f beznomera_frontend || true
 

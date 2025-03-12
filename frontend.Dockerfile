@@ -2,8 +2,7 @@ FROM node:20.18-slim AS build-frontend
 COPY .npmrc /root/.npmrc
 WORKDIR /app
 
-ARG ENV_FILE
-COPY ${ENV_FILE} .env
+COPY .env.production .env
 COPY .eslintignore /app
 COPY .prettierignore /app
 COPY *.json /app/
