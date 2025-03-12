@@ -1,5 +1,5 @@
-import React, { forwardRef, useCallback } from 'react';
-import { Text, Pressable, StyleProp, ViewStyle, ColorSchemeName } from 'react-native';
+import React, { forwardRef, useCallback, useState } from 'react';
+import { Text, Pressable, StyleProp, ViewStyle, ColorSchemeName, View } from 'react-native';
 
 import styled, { css } from 'styled-components/native';
 import { ExternalLink } from '../../components/ExternalLink';
@@ -7,6 +7,7 @@ import { isWeb } from '@/utils/env';
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
 import { useColorScheme } from '@/components/useColorScheme';
+import { Loading } from '@/components/Loading';
 type ButtonView = 'primary' | 'secondary' | 'glass';
 
 interface ButtonProps {
@@ -14,7 +15,7 @@ interface ButtonProps {
   externalHref?: string;
   disabled?: boolean;
   view?: ButtonView;
-  onClick?(): void;
+  onClick?(): void | Promise<void>;
   event?: string;
   eventParams?: Record<string, string | number | undefined>;
   style?: StyleProp<ViewStyle>;
@@ -75,7 +76,7 @@ const StyledPressable = styled(Pressable)<{ $view: ButtonView; $theme: ColorSche
     `}
 `;
 
-const StyledText = styled(Text)`
+const StyledText = styled(Text)<{ $visible: boolean }>`
   color: inherit;
   font-size: 17px;
 
@@ -83,6 +84,22 @@ const StyledText = styled(Text)`
 
   padding: 15px 25px;
   font-weight: 100;
+
+  ${({ $visible }) =>
+    !$visible &&
+    css`
+      visibility: hidden;
+    `}
+`;
+
+const LoadingContainer = styled(View)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const Button = forwardRef<any, ButtonProps>(
@@ -101,11 +118,21 @@ export const Button = forwardRef<any, ButtonProps>(
     ref
   ) => {
     const theme = useColorScheme();
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleClick = useCallback(() => {
-      onClick?.();
+    const handleClick = useCallback(async () => {
       if (event) {
         handleEvent(event, eventParams);
+      }
+
+      const click = onClick?.();
+
+      const isPromise = click instanceof Promise;
+
+      if (isPromise) {
+        setIsLoading(true);
+        await click;
+        setIsLoading(false);
       }
     }, [onClick, event, eventParams]);
 
@@ -119,7 +146,13 @@ export const Button = forwardRef<any, ButtonProps>(
         onPress={handleClick}
       >
         {isWeb && view === 'glass' && <Glass />}
-        <StyledText>{children}</StyledText>
+        <StyledText $visible={!isLoading}>{children}</StyledText>
+
+        {isLoading && (
+          <LoadingContainer>
+            <Loading size={25} />
+          </LoadingContainer>
+        )}
       </StyledPressable>
     );
 

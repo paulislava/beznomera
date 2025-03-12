@@ -57,45 +57,54 @@ export default function CarQRScreen() {
     }
   }, [info?.no]);
 
-  const downloadQR = useCallback(async () => {
-    if (qrRef.current && isWeb) {
-      (qrRef.current as any).canvasRef.current.toBlob(async (blob: Blob) => {
-        if (!blob) {
-          throw new Error('Blob is null');
+  const downloadQR = useCallback(
+    () =>
+      new Promise<void>(resolve => {
+        if (qrRef.current && isWeb) {
+          (qrRef.current as any).canvasRef.current.toBlob(async (blob: Blob) => {
+            if (!blob) {
+              throw new Error('Blob is null');
+            }
+            const file = new File([blob], `${info?.no}-qr.png`, { type: 'image/png' });
+
+            const fileInfo = await uploadFile(file, FileFolder.Temp);
+
+            await downloadFile(fileInfo.url, `${info?.no}-qr.png`);
+            resolve();
+          });
         }
-        const file = new File([blob], `${info?.no}-qr.png`, { type: 'image/png' });
-
-        const fileInfo = await uploadFile(file, FileFolder.Temp);
-
-        await downloadFile(fileInfo.url, `${info?.no}-qr.png`);
-      });
-    }
-  }, [info?.no]);
+      }),
+    [info?.no]
+  );
 
   const sendPlate = useCallback(async () => {
     if (canvasRef.current && isWeb) {
       const dataUrl = canvasRef.current.toDataURL('png');
 
       await carService.sendPlate({ image: dataUrl }, Number(id));
-      await downloadFile(dataUrl, `${info?.no}-автовизитка.png`);
     }
   }, [info?.no]);
 
-  const downloadPlate = useCallback(async () => {
-    if (canvasRef.current && isWeb) {
-      canvasRef.current.toBlob(async blob => {
-        if (!blob) {
-          throw new Error('Blob is null');
+  const downloadPlate = useCallback(
+    () =>
+      new Promise<void>(resolve => {
+        if (canvasRef.current && isWeb) {
+          canvasRef.current.toBlob(async blob => {
+            if (!blob) {
+              throw new Error('Blob is null');
+            }
+
+            const file = new File([blob], `${info?.no}-автовизитка.png`, { type: 'image/png' });
+
+            const fileInfo = await uploadFile(file, FileFolder.Temp);
+
+            await downloadFile(fileInfo.url, `${info?.no}-автовизитка.png`);
+            resolve();
+          });
         }
-
-        const file = new File([blob], `${info?.no}-автовизитка.png`, { type: 'image/png' });
-
-        const fileInfo = await uploadFile(file, FileFolder.Temp);
-
-        await downloadFile(fileInfo.url, `${info?.no}-автовизитка.png`);
-      });
-    }
-  }, [info?.no]);
+      }),
+    [info?.no]
+  );
 
   const [canvasLoaded, setCanvasLoaded] = useState(false);
 

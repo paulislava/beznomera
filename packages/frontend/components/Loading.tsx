@@ -9,12 +9,16 @@ const LoadingContainer = styled(View)`
   align-items: center;
 `;
 
-export const Loading: React.FC = () => {
+export type LoadingProps = {
+  size?: number | 'small' | 'large';
+};
+
+export const Loading: React.FC<LoadingProps> = ({ size = 'large' }) => {
   const theme = useColorScheme();
 
   return (
     <LoadingContainer>
-      <ActivityIndicator size='large' color={theme === 'dark' ? '#ffffff' : '#090633'} />
+      <ActivityIndicator size={size} color={theme === 'dark' ? '#ffffff' : '#090633'} />
     </LoadingContainer>
   );
 };
