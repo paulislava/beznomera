@@ -120,6 +120,10 @@ export const Button = forwardRef<any, ButtonProps>(
     const [isLoading, setIsLoading] = useState(false);
 
     const handleClick = useCallback(async () => {
+      if (isLoading) {
+        return;
+      }
+
       if (event) {
         handleEvent(event, eventParams);
       }
@@ -133,7 +137,7 @@ export const Button = forwardRef<any, ButtonProps>(
         await click;
         setIsLoading(false);
       }
-    }, [onClick, event, eventParams]);
+    }, [onClick, event, eventParams, isLoading]);
 
     const content = (
       <StyledPressable
