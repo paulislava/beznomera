@@ -39,3 +39,4 @@ s3:
   secretAccessKey: your_secret_access_key
   endpoint: your_endpoint
   bucket: your_bucket_name
+  region: your_region

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { S3 } from 'aws-sdk';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3';
 import { File } from '../entities/file.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository, Not } from 'typeorm';
@@ -13,17 +17,21 @@ import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class FileService {
-  private s3: S3;
+  private s3Client: S3Client;
 
   constructor(
     private configService: ConfigService,
     @InjectRepository(File)
     private fileRepository: Repository<File>,
   ) {
-    this.s3 = new S3({
-      accessKeyId: this.configService.s3.accessKeyId,
-      secretAccessKey: this.configService.s3.secretAccessKey,
+    this.s3Client = new S3Client({
+      credentials: {
+        accessKeyId: this.configService.s3.accessKeyId,
+        secretAccessKey: this.configService.s3.secretAccessKey,
+      },
       endpoint: this.configService.s3.endpoint,
+      region: this.configService.s3.region,
+      forcePathStyle: true, // Добавлено для совместимости с S3-совместимыми хранилищами
     });
   }
 
@@ -46,14 +54,14 @@ export class FileService {
 
     await fileEntity.save();
 
-    await this.s3
-      .upload({
+    await this.s3Client.send(
+      new PutObjectCommand({
         Bucket: this.configService.s3.bucket,
         Key: fileEntity.fileKey(),
         Body: file.buffer,
         ContentType: file.mimetype,
-      })
-      .promise();
+      }),
+    );
 
     await this.checkPrevFile(fileEntity);
 
@@ -105,9 +113,11 @@ export class FileService {
   }
 
   private async deleteFileFromS3(file: File) {
-    return this.s3.deleteObject({
-      Bucket: this.configService.s3.bucket,
-      Key: file.fileKey(),
-    });
+    return this.s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: this.configService.s3.bucket,
+        Key: file.fileKey(),
+      }),
+    );
   }
 }

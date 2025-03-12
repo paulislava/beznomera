@@ -136,6 +136,10 @@ export class S3Config {
   @IsString()
   @IsDefined()
   readonly bucket: string;
+
+  @IsString()
+  @IsDefined()
+  readonly region: string;
 }
 
 export class ApplicationConfig {
