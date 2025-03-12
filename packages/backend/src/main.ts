@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { addAlias } from 'module-alias';
 
 addAlias('~', __dirname);
