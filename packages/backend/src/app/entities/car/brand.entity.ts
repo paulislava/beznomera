@@ -6,12 +6,15 @@ export class Brand extends BaseEntity implements BrandInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   title: string;
 
-  @Column()
+  @Column({ unique: true })
   slug: string;
 
   @Column({ nullable: true })
   logoUrl: string | null;
+
+  @Column({ nullable: true })
+  logoUrlColored: string | null;
 }
