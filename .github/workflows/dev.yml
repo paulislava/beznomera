@@ -21,7 +21,7 @@ jobs:
           docker stop beznomera_backend || true
           docker rm -f beznomera_backend || true
 
-          docker run --name beznomera_backend -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -v /home/admin/web/beznomera.paulislava.space/ip-location-data:/app/node_modules/ip-location-api/data -v /home/admin/web/beznomera.paulislava.space/.env:/backend.env beznomera:backend
+          docker run --name beznomera_backend -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -v /home/admin/web/beznomera.paulislava.space/ip-location-data:/app/node_modules/ip-location-api/data -v /home/admin/web/beznomera.paulislava.space/backend.env:/.env beznomera:backend
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_backend) || true
 
   build-frontend:
