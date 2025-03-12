@@ -16,16 +16,20 @@ import { FileFolder, FileInfo } from '@paulislava/shared/file/file.types';
 
 import { WrongMimetypeException } from './file.exceptions';
 import { FileSerializer } from './file.serializer';
-@Controller('files')
-export class FileController {
+import FILE_API, {
+  FileApi,
+  FILE_NAME_PARAM,
+} from '@paulislava/shared/file/file.api';
+@Controller(FILE_API.path)
+export class FileController implements FileApi {
   constructor(
     private readonly fileService: FileService,
     private readonly fileSerializer: FileSerializer,
   ) {}
 
-  @Post(':folder')
+  @Post(FILE_API.backendRoutes.upload)
   @UseInterceptors(
-    FileInterceptor('file', {
+    FileInterceptor(FILE_NAME_PARAM, {
       fileFilter: (req, file, callback) => {
         if (
           file.mimetype !== 'image/png' ||
@@ -38,9 +42,9 @@ export class FileController {
     }),
   )
   @UseGuards(JwtAuthGuard)
-  async uploadFile(
+  async upload(
+    @UploadedFile(FILE_NAME_PARAM) file: Express.Multer.File,
     @Param('folder', new ParseEnumPipe(FileFolder)) folder: FileFolder,
-    @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: RequestUser,
   ): Promise<FileInfo> {
     const fileEntity = await this.fileService.uploadFile(file, folder, user);

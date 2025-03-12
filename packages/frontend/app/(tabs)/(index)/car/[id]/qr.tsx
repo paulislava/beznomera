@@ -8,7 +8,7 @@ import { QRCode } from 'react-qrcode-logo';
 import { PRODUCTION_URL } from '@/constants/site';
 import { isWeb } from '@/utils/env';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useAPI } from '@/utils/api';
+import { useAPI } from '@/utils/api-service';
 import { carService } from '@/services';
 import useNeedAuth from '@/hooks/useNeedAuth';
 import { QRTemplate } from '@/components/QRTemplate';
@@ -18,7 +18,8 @@ import webStyled from 'styled-components';
 import { Loading } from '@/components/Loading';
 import { CenterContainer } from '@/ui/Styled';
 import { downloadFile } from '@/utils/downloadFile';
-import { downloadFile as downloadFileTelegram } from '@telegram-apps/sdk-react';
+import { uploadFile } from '@/utils/files';
+import { FileFolder } from '@shared/file/file.types';
 
 const QRCodeContainer = styled(View)`
   margin: 20px 0;
@@ -27,6 +28,11 @@ const QRCodeContainer = styled(View)`
 
 const StyledCanvas = webStyled.canvas`
   margin-bottom: 20px;
+`;
+
+const ButtonsRow = styled(CenterContainer)`
+  flex-flow: row;
+  gap: 10px;
 `;
 
 export default function CarQRScreen() {
@@ -43,26 +49,51 @@ export default function CarQRScreen() {
   const getInfo = useCallback(() => carService.fullInfo(Number(id)), [id]);
   const info = useAPI(getInfo);
 
-  const downloadQR = useCallback(async () => {
+  const sendQR = useCallback(async () => {
     if (qrRef.current && isWeb) {
       const dataUrl = (qrRef.current as any).canvasRef.current.toDataURL('png');
 
       await carService.sendQR({ image: dataUrl }, Number(id));
-
-      if (downloadFileTelegram.isAvailable()) {
-        await downloadFileTelegram(dataUrl, `${info?.no}-qr.png`);
-      } else {
-        qrRef.current.download('png', `${info?.no}-qr.png`);
-      }
     }
   }, [info?.no]);
 
-  const downloadPlate = useCallback(async () => {
+  const downloadQR = useCallback(async () => {
+    if (qrRef.current && isWeb) {
+      (qrRef.current as any).canvasRef.current.toBlob(async (blob: Blob) => {
+        if (!blob) {
+          throw new Error('Blob is null');
+        }
+        const file = new File([blob], `${info?.no}-qr.png`, { type: 'image/png' });
+
+        const fileInfo = await uploadFile(file, FileFolder.Temp);
+
+        await downloadFile(fileInfo.url, `${info?.no}-qr.png`);
+      });
+    }
+  }, [info?.no]);
+
+  const sendPlate = useCallback(async () => {
     if (canvasRef.current && isWeb) {
       const dataUrl = canvasRef.current.toDataURL('png');
 
       await carService.sendPlate({ image: dataUrl }, Number(id));
       await downloadFile(dataUrl, `${info?.no}-автовизитка.png`);
+    }
+  }, [info?.no]);
+
+  const downloadPlate = useCallback(async () => {
+    if (canvasRef.current && isWeb) {
+      canvasRef.current.toBlob(async blob => {
+        if (!blob) {
+          throw new Error('Blob is null');
+        }
+
+        const file = new File([blob], `${info?.no}-автовизитка.png`, { type: 'image/png' });
+
+        const fileInfo = await uploadFile(file, FileFolder.Temp);
+
+        await downloadFile(fileInfo.url, `${info?.no}-автовизитка.png`);
+      });
     }
   }, [info?.no]);
 
@@ -131,9 +162,12 @@ export default function CarQRScreen() {
           <QRTemplate svgRef={templateRef} />
           <StyledCanvas ref={canvasRef}></StyledCanvas>
           {canvasLoaded && (
-            <CenterContainer>
-              <Button onClick={downloadPlate}>Скачать автовизитку</Button>
-            </CenterContainer>
+            <ButtonsRow>
+              <Button onClick={sendPlate}>Отправить в Telegram</Button>
+              <Button onClick={downloadPlate} view='glass'>
+                Скачать автовизитку
+              </Button>
+            </ButtonsRow>
           )}
           <QRCodeContainer>
             <QRCode
@@ -151,11 +185,13 @@ export default function CarQRScreen() {
               logoPaddingStyle='square'
               ref={qrRef}
             />
-
-            <CenterContainer>
-              <Button onClick={downloadQR}>Скачать QR-код</Button>
-            </CenterContainer>
           </QRCodeContainer>
+          <ButtonsRow>
+            <Button onClick={sendQR}>Отправить в Telegram</Button>
+            <Button onClick={downloadQR} view='glass'>
+              Скачать QR-код
+            </Button>
+          </ButtonsRow>
         </>
       ) : (
         <Loading />

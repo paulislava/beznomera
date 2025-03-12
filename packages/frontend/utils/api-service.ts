@@ -73,10 +73,12 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
 
   async post<Path extends keyof T>(
     path: Path,
-    body?: T[Path] extends (...args: any[]) => any ? Parameters<T[Path]>[0] : any,
+    body?: (T[Path] extends (...args: any[]) => any ? Parameters<T[Path]>[0] : any) | FormData,
     pathSegments?: Parameters<APIInfo<T>['simpleRoutes'][Path]>,
     options?: RequestInit
   ): Promise<ReturnType<T[Path]>> {
+    const isFormData = body instanceof FormData;
+
     const res = await this.fetch({
       path,
       pathSegments,
@@ -84,10 +86,10 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
         ...options,
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
           ...options?.headers
         },
-        body: body && JSON.stringify(body)
+        body: isFormData ? body : JSON.stringify(body)
       }
     });
 
@@ -127,9 +129,13 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
             case 'POST':
               const body = route.noBody ? undefined : args[0];
               const pathSegments = route.noBody ? args : args.slice(1);
-              return service.post(key as keyof T, body, pathSegments as any);
+              return service.post(key as keyof T, body, pathSegments as any, {
+                headers: route.headers
+              });
             default:
-              return service.get(key as keyof T, args as any);
+              return service.get(key as keyof T, args as any, {
+                headers: route.headers
+              });
           }
         }
       };

@@ -1,6 +1,6 @@
 import React, { useCallback, ComponentType } from 'react';
 import { useLocalSearchParams, Stack } from 'expo-router';
-import { useAPI } from '@/utils/api';
+import { useAPI } from '@/utils/api-service';
 import { carService } from '@/services';
 import { PageView } from '@/components/Themed';
 import Head from 'expo-router/head';

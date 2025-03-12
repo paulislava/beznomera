@@ -4,6 +4,7 @@ export const downloadFile = async (url: string, filename: string) => {
   const standartDownload = () => {
     const link = document.createElement('a');
     link.href = url;
+    link.target = '_blank';
     link.download = filename;
     link.click();
   };

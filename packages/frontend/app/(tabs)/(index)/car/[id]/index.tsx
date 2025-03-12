@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from 'react';
 import { useGlobalSearchParams, Stack, Link } from 'expo-router';
 import { View, ImageStyle, StyleProp, ImageSourcePropType, Pressable } from 'react-native';
 import { CarImage } from '@/components/CarImage/CarImage';
-import { useAPI } from '@/utils/api';
+import { useAPI } from '@/utils/api-service';
 import { carService } from '@/services';
 import { PageView } from '@/components/Themed';
 import Head from 'expo-router/head';

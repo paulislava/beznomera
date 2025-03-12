@@ -3,6 +3,8 @@ type FunctionalRoute = (...pathSegments: (string | number)[]) => string;
 interface RouteProps {
   method: 'GET' | 'POST';
   noBody?: boolean;
+  formData?: boolean;
+  headers?: Record<string, string>;
 }
 
 const STANDART_API_METHOD: RouteProps['method'] = 'GET';
