@@ -32,7 +32,6 @@
     "@nestjs/schedule": "^5.0.1",
     "@nestjs/typeorm": "^10.0.2",
     "@paulislava/shared": "file:../shared",
-    "aws-sdk": "^2.1531.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cjstoesm": "^2.1.2",

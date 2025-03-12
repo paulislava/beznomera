@@ -7,6 +7,7 @@ COPY *.json /app/
 COPY packages/shared/*.json /app/packages/shared/
 COPY packages/backend/*.json /app/packages/backend/
 COPY packages/shared/patches /app/packages/shared/patches
+
 RUN npm ci && \
   npm ci --prefix=packages/shared && \
   npm ci --prefix=packages/backend && \
