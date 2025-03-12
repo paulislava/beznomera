@@ -31,7 +31,7 @@ const StyledCanvas = webStyled.canvas`
 `;
 
 const ButtonsRow = styled(CenterContainer)`
-  flex-flow: row;
+  flex-flow: row wrap;
   gap: 10px;
 `;
 
