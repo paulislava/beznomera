@@ -9,7 +9,9 @@ const cleanSnils = (snils: string) => {
 };
 
 const cleanNumber = (number: string) => {
-  return number ? number.replace(/[^\d]/g, '') : '';
+  const value = number ? number.replace(/[^\d]/g, '') : '';
+
+  return value ? parseInt(value) : undefined;
 };
 
 export const parseFunc = (type: TypeValue) => {
@@ -24,6 +26,3 @@ export const parseFunc = (type: TypeValue) => {
       return undefined;
   }
 };
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const normalizeFunc = (_: TypeValue) => undefined;

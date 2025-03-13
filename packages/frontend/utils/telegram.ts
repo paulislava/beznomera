@@ -1,4 +1,4 @@
-import { init, miniApp, initData } from '@telegram-apps/sdk-react';
+import { init, miniApp, initData, expandViewport } from '@telegram-apps/sdk-react';
 
 export let isTelegramWebApp = false;
 
@@ -9,6 +9,7 @@ export const initWebApp = () => {
     miniApp.ready();
     initData.restore();
     isTelegramWebApp = true;
+    expandViewport();
   } catch (error) {
     console.error(error);
   }

@@ -79,8 +79,6 @@ function FormField<T = any>({
 
   const parse = useMemo(() => (type ? parseFunc(type) : undefined), [type]);
 
-  const normalize = useMemo(() => (type ? normalizeFunc(type) : undefined), [type]);
-
   /**
    * Отображение поля в форме.
    * @returns {JSX.Element}
@@ -93,7 +91,6 @@ function FormField<T = any>({
         component={component || finalComponent}
         type={finalType || 'text'}
         parse={parse}
-        normalize={normalize}
         errors={errors}
         placeholder={finalPlaceholder}
         {...props}
