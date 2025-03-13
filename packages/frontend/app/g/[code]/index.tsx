@@ -42,7 +42,6 @@ const CallUserPage = () => {
   const [requested, setRequested] = useState(false);
   const [info, setInfo] = useState<CarInfo | null>(null);
   const [called, setCalled] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
 
   // useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
 
@@ -60,40 +59,46 @@ const CallUserPage = () => {
 
   const eventData = useMemo(() => ({ carId: info?.id, code }), [info, code]);
 
-  const callHandler = useCallback(() => {
-    setSubmitting(true);
+  const callHandler = useCallback(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const call = (location?: GeolocationPosition) =>
+          carService
+            .call(
+              location
+                ? {
+                    coords: {
+                      latitude: location.coords.latitude,
+                      longitude: location.coords.longitude
+                    }
+                  }
+                : {},
 
-    const call = (location?: GeolocationPosition) =>
-      carService
-        .call(
-          location
-            ? {
-                coords: { latitude: location.coords.latitude, longitude: location.coords.longitude }
-              }
-            : {},
+              code
+            )
+            .then(() => {
+              handleEvent('call_success', eventData);
+              setCalled(true);
+              resolve();
+            })
+            .catch(res => {
+              reject(res);
+              showResponseMessage(res);
+              handleEvent('call_error', { ...eventData, res });
+            });
 
-          code
-        )
-        .then(() => {
-          handleEvent('call_success', eventData);
-          setCalled(true);
-        })
-        .catch(res => {
-          showResponseMessage(res);
-          handleEvent('call_error', { ...eventData, res });
-        })
-        .finally(() => setSubmitting(false));
+        // recaptcha.current?.open();
 
-    // recaptcha.current?.open();
+        // return;
 
-    // return;
-
-    if (navigator?.geolocation) {
-      navigator.geolocation.getCurrentPosition(call, () => call());
-    } else {
-      call();
-    }
-  }, [info, eventData]);
+        if (navigator?.geolocation) {
+          navigator.geolocation.getCurrentPosition(call, () => call());
+        } else {
+          call();
+        }
+      }),
+    [info, eventData]
+  );
 
   const brandLogoSource: ImageSourcePropType = useMemo(
     () => ({ uri: info?.brand?.logoUrl ?? undefined }),
@@ -184,15 +189,11 @@ const CallUserPage = () => {
             <Button
               fullWidth
               onClick={callHandler}
-              disabled={submitting || called}
+              disabled={called}
               event='call'
               eventParams={eventData}
             >
-              {called
-                ? 'Запрос отправлен!'
-                : submitting
-                ? 'Отправка запроса...'
-                : 'Позвать водителя'}
+              {called ? 'Запрос отправлен!' : 'Позвать водителя'}
             </Button>
             <Link href={`/g/${code}/chat`} asChild>
               <Button fullWidth view='secondary' event='go_chat' eventParams={eventData}>

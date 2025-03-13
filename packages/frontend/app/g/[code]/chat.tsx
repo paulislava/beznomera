@@ -41,10 +41,6 @@ const ChatDriverPage = () => {
   const [called, setCalled] = useState(false);
   const [text, setText] = useState<string>('');
 
-  const [submitting, setSubmitting] = useState(false);
-
-  // useSetTitle(info ? `${info.owner?.nickname}: информация об авто` : 'Информация об авто');
-
   useEffect(() => {
     carService
       .info(code)
@@ -65,42 +61,43 @@ const ChatDriverPage = () => {
       return;
     }
 
-    setSubmitting(true);
-
-    const send = (location?: GeolocationPosition) => {
-      carService
-        .sendMessage(
-          {
-            coords: location && {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude
+    return new Promise<void>((resolve, reject) => {
+      const send = (location?: GeolocationPosition) => {
+        carService
+          .sendMessage(
+            {
+              coords: location && {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+              },
+              text
             },
-            text
-          },
 
-          code
-        )
-        .then(() => {
-          handleEvent('send_message_success', eventData);
-          setCalled(true);
-          setText('');
-        })
-        .catch(res => {
-          showResponseMessage(res);
-          handleEvent('send_message_error', { ...eventData, res });
-        })
-        .finally(() => setSubmitting(false));
-    };
+            code
+          )
+          .then(() => {
+            handleEvent('send_message_success', eventData);
+            setCalled(true);
+            setText('');
+            resolve();
+          })
+          .catch(res => {
+            reject(res);
+            showResponseMessage(res);
+            handleEvent('send_message_error', { ...eventData, res });
+          });
+      };
 
-    // recaptcha.current?.open();
+      // recaptcha.current?.open();
 
-    // return;
+      // return;
 
-    if (navigator?.geolocation) {
-      navigator.geolocation.getCurrentPosition(send, () => send());
-    } else {
-      send();
-    }
+      if (navigator?.geolocation) {
+        navigator.geolocation.getCurrentPosition(send, () => send());
+      } else {
+        send();
+      }
+    });
   }, [info, text, setText]);
 
   const brandLogoSource: ImageSourcePropType = useMemo(
@@ -139,7 +136,7 @@ const ChatDriverPage = () => {
           )}
 
           {info.brand && (
-            <ModelRow $center>
+            <ModelRow>
               <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
               {info.brand.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
               <CarModel>{info.model}</CarModel>
@@ -154,9 +151,9 @@ const ChatDriverPage = () => {
             onClick={sendHandler}
             event='send_message'
             eventParams={eventData}
-            disabled={submitting || called || !text}
+            disabled={called || !text}
           >
-            {called ? 'Отправлено!' : submitting ? 'Отправка...' : 'Отправить'}
+            {called ? 'Отправлено!' : 'Отправить'}
           </Button>
         </>
       )}

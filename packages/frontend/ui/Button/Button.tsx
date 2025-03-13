@@ -154,8 +154,7 @@ export const Button = forwardRef<any, ButtonProps>(
 
       if (isPromise) {
         setIsLoading(true);
-        await click;
-        setIsLoading(false);
+        await click.finally(() => setIsLoading(false));
       }
     }, [onClick, event, eventParams, isLoading]);
 
