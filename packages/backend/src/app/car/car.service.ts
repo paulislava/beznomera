@@ -426,4 +426,16 @@ export class CarService {
       `QR-код ${car.no}`,
     );
   }
+
+  async delete(id: number, user: RequestUser): Promise<void> {
+    const car = await this.carRepository.findOne({
+      where: { id, owner: { id: user.userId } },
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    await car.remove();
+  }
 }

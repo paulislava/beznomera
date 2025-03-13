@@ -96,6 +96,20 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
     return this.formatResult(res);
   }
 
+  async delete<Path extends keyof T>(
+    path: Path,
+    pathSegments?: Parameters<APIInfo<T>['simpleRoutes'][Path]>,
+    options?: RequestInit
+  ): Promise<ReturnType<T[Path]>> {
+    const res = await this.fetch({
+      path,
+      options: { ...options, method: 'DELETE' },
+      pathSegments: pathSegments
+    });
+
+    return this.formatResult(res);
+  }
+
   private async formatResult(res: Response) {
     if (res.headers.get('Content-Type')?.startsWith('application/json')) {
       return res.json();
@@ -130,6 +144,10 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
               const body = route.noBody ? undefined : args[0];
               const pathSegments = route.noBody ? args : args.slice(1);
               return service.post(key as keyof T, body, pathSegments as any, {
+                headers: route.headers
+              });
+            case 'DELETE':
+              return service.delete(key as keyof T, args as any, {
                 headers: route.headers
               });
             default:

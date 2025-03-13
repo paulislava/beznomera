@@ -16,9 +16,17 @@ export type LoadingProps = {
 export const Loading: React.FC<LoadingProps> = ({ size = 'large' }) => {
   const theme = useColorScheme();
 
+  return <RawLoading size={size} color={theme === 'dark' ? '#ffffff' : '#090633'} />;
+};
+
+type RawLoadingProps = LoadingProps & {
+  color: string;
+};
+
+export const RawLoading: React.FC<RawLoadingProps> = ({ size = 'large', color }) => {
   return (
     <LoadingContainer>
-      <ActivityIndicator size={size} color={theme === 'dark' ? '#ffffff' : '#090633'} />
+      <ActivityIndicator size={size} color={color} />
     </LoadingContainer>
   );
 };

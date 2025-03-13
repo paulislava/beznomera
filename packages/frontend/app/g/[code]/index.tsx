@@ -19,14 +19,14 @@ import {
   CarModel,
   CarNumber,
   StyledCarImage,
-  CarExternalImage,
-  CarExternalImageWeb
+  CarExternalImage
 } from '@/components/CarDetails';
 import { PRODUCTION_URL } from '@/constants/site';
 
 const ButtonsContainer = styled(View)`
   display: flex;
   flex-flow: column;
+  justify-content: center;
   gap: 10px;
 `;
 

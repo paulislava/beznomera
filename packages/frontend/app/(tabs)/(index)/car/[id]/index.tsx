@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useGlobalSearchParams, Stack, Link } from 'expo-router';
+import { useGlobalSearchParams, Stack, Link, router } from 'expo-router';
 import { View, ImageStyle, StyleProp, ImageSourcePropType, Pressable } from 'react-native';
 import { CarImage } from '@/components/CarImage/CarImage';
 import { useAPI } from '@/utils/api-service';
@@ -62,6 +62,10 @@ const QRButtonContainer = styled(CenterContainer)`
   margin: 20px 0;
 `;
 
+const DeleteButtonContainer = styled(CenterContainer)`
+  margin-top: 20px;
+`;
+
 const brandLogoStyle: StyleProp<ImageStyle> = { resizeMode: 'contain' };
 
 export default function CarFullInfoScreen() {
@@ -84,6 +88,20 @@ export default function CarFullInfoScreen() {
 
     console.log(contact);
   }, []);
+
+  const handleDelete = useCallback(async () => {
+    if (!confirm('Вы уверены, что хотите удалить этот автомобиль?')) {
+      return;
+    }
+
+    try {
+      await carService.delete(Number(id));
+      router.replace('/');
+    } catch (error) {
+      console.error('Failed to delete car:', error);
+      alert('Не удалось удалить автомобиль');
+    }
+  }, [id]);
 
   return (
     <PageView fullHeight>
@@ -163,6 +181,11 @@ export default function CarFullInfoScreen() {
               </Button>
             )}
           </ButtonsContainer>
+          <DeleteButtonContainer>
+            <Button view='danger' onClick={handleDelete}>
+              Удалить
+            </Button>
+          </DeleteButtonContainer>
         </>
       )}
     </PageView>

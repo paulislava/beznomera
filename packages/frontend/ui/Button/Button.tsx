@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo, useState } from 'react';
 import { Text, Pressable, StyleProp, ViewStyle, ColorSchemeName, View } from 'react-native';
 
 import styled, { css } from 'styled-components/native';
@@ -7,8 +7,9 @@ import { isWeb } from '@/utils/env';
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
 import { useColorScheme } from '@/components/useColorScheme';
-import { Loading } from '@/components/Loading';
-type ButtonView = 'primary' | 'secondary' | 'glass';
+import { RawLoading } from '@/components/Loading';
+
+type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
 
 interface ButtonProps {
   children?: React.ReactNode;
@@ -39,6 +40,10 @@ const viewConfigs: Record<ButtonView, ViewConfig> = {
   glass: {
     background: `rgba(255, 255, 255, 0.1)`,
     color: { light: '#000', dark: '#fff' }
+  },
+  danger: {
+    background: '#ff0000',
+    color: '#fff'
   }
 };
 
@@ -47,6 +52,7 @@ const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
 const StyledPressable = styled(Pressable)<{ $view: ButtonView; $theme: ColorSchemeName }>`
   border-radius: 35px;
   overflow: hidden;
+  width: max-content;
 
   ${({ $view, $theme }) => {
     const config = getViewConfig($view);
@@ -139,6 +145,8 @@ export const Button = forwardRef<any, ButtonProps>(
       }
     }, [onClick, event, eventParams, isLoading]);
 
+    const viewConfig = useMemo(() => getViewConfig(view), [view]);
+
     const content = (
       <StyledPressable
         $theme={theme}
@@ -153,7 +161,14 @@ export const Button = forwardRef<any, ButtonProps>(
 
         {isLoading && (
           <LoadingContainer>
-            <Loading size={25} />
+            <RawLoading
+              size={25}
+              color={
+                typeof viewConfig.color === 'string'
+                  ? viewConfig.color
+                  : viewConfig.color[theme ?? 'dark']
+              }
+            />
           </LoadingContainer>
         )}
       </StyledPressable>

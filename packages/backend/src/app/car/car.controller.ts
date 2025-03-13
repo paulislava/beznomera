@@ -9,6 +9,7 @@ import {
   Req,
   Res,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import CAR_API, {
   CODE_PARAM,
@@ -243,5 +244,14 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<void> {
     await this.carService.sendQR(image, id, user);
+  }
+
+  @Delete(CAR_API.backendRoutes.delete)
+  @UseGuards(JwtAuthGuard)
+  async delete(
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @CurrentUser() user,
+  ): Promise<void> {
+    await this.carService.delete(id, user);
   }
 }

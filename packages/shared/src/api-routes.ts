@@ -1,7 +1,7 @@
 type FunctionalRoute = (...pathSegments: (string | number)[]) => string;
 
 interface RouteProps {
-  method: 'GET' | 'POST';
+  method: 'GET' | 'POST' | 'DELETE' | 'PUT';
   noBody?: boolean;
   formData?: boolean;
   headers?: Record<string, string>;

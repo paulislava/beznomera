@@ -20,6 +20,7 @@ export interface CarApi {
   create(body: EditCarInfo, ...args: any[]): Promise<{ id: number }>;
   sendPlate(body: CarPlateBody, id: number, ...args: any[]): Promise<void>;
   sendQR(body: CarPlateBody, id: number, ...args: any[]): Promise<void>;
+  delete(id: number, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -32,7 +33,7 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
     path: code => `${code || `:${CODE_PARAM}`}/call`,
     method: 'POST'
   },
-  list: () => `list`,
+  list: 'list',
   sendMessage: {
     path: code => `${code || `:${CODE_PARAM}`}/message`,
     method: 'POST'
@@ -51,8 +52,12 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   },
   infoForUpdate: id => `${id || `:${ID_PARAM}`}/info-for-update`,
   create: {
-    path: () => 'create',
+    path: 'create',
     method: 'POST'
+  },
+  delete: {
+    path: id => `${id || `:${ID_PARAM}`}`,
+    method: 'DELETE'
   }
 };
 
