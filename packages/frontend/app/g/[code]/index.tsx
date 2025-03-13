@@ -27,6 +27,7 @@ const ButtonsContainer = styled(View)`
   display: flex;
   flex-flow: column;
   justify-content: center;
+  align-items: center;
   gap: 10px;
 `;
 
@@ -148,7 +149,7 @@ const CallUserPage = () => {
           )}
 
           {info.brand && (
-            <ModelRow $center>
+            <ModelRow>
               <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
               {info.brand.logoUrl && <BrandLogo style={brandLogoStyle} source={brandLogoSource} />}
               <CarModel>{info.model}</CarModel>
@@ -170,6 +171,7 @@ const CallUserPage = () => {
           <ButtonsContainer>
             {info.owner.tel && (
               <Button
+                fullWidth
                 externalHref={`tel:${info.owner.tel}`}
                 view='glass'
                 event='tel_call'
@@ -180,6 +182,7 @@ const CallUserPage = () => {
               </Button>
             )}
             <Button
+              fullWidth
               onClick={callHandler}
               disabled={submitting || called}
               event='call'
@@ -192,7 +195,7 @@ const CallUserPage = () => {
                 : 'Позвать водителя'}
             </Button>
             <Link href={`/g/${code}/chat`} asChild>
-              <Button view='secondary' event='go_chat' eventParams={eventData}>
+              <Button fullWidth view='secondary' event='go_chat' eventParams={eventData}>
                 Отправить сообщение
               </Button>
             </Link>

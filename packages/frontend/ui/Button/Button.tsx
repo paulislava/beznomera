@@ -21,6 +21,7 @@ interface ButtonProps {
   eventParams?: Record<string, string | number | undefined>;
   style?: StyleProp<ViewStyle>;
   noFollowNoIndex?: boolean;
+  fullWidth?: boolean;
 }
 
 type ViewConfig = {
@@ -49,10 +50,14 @@ const viewConfigs: Record<ButtonView, ViewConfig> = {
 
 const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
 
-const StyledPressable = styled(Pressable)<{ $view: ButtonView; $theme: ColorSchemeName }>`
+const StyledPressable = styled(Pressable)<{
+  $view: ButtonView;
+  $theme: ColorSchemeName;
+  $fullWidth?: boolean;
+}>`
   border-radius: 35px;
   overflow: hidden;
-  width: max-content;
+  width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
 
   ${({ $view, $theme }) => {
     const config = getViewConfig($view);
@@ -107,6 +112,14 @@ const LoadingContainer = styled(View)`
   align-items: center;
 `;
 
+const StyledLink = styled(ExternalLink)<{ $fullWidth?: boolean }>`
+  ${({ $fullWidth }) =>
+    $fullWidth &&
+    css`
+      width: 100%;
+    `}
+`;
+
 export const Button = forwardRef<any, ButtonProps>(
   (
     {
@@ -118,7 +131,8 @@ export const Button = forwardRef<any, ButtonProps>(
       event,
       eventParams,
       style,
-      noFollowNoIndex
+      noFollowNoIndex,
+      fullWidth
     },
     ref
   ) => {
@@ -150,6 +164,7 @@ export const Button = forwardRef<any, ButtonProps>(
     const content = (
       <StyledPressable
         $theme={theme}
+        $fullWidth={fullWidth}
         ref={ref}
         $view={view}
         disabled={disabled}
@@ -176,12 +191,13 @@ export const Button = forwardRef<any, ButtonProps>(
 
     if (externalHref) {
       return (
-        <ExternalLink
+        <StyledLink
           href={externalHref}
           rel={noFollowNoIndex ? 'nofollow noopener noreferrer' : ''}
+          $fullWidth={fullWidth}
         >
           {content}
-        </ExternalLink>
+        </StyledLink>
       );
     }
 
