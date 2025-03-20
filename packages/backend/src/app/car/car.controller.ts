@@ -30,7 +30,7 @@ import {
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard, OptionalJwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   IsNumber,
   IsOptional,
@@ -42,6 +42,7 @@ import userAgentParser from 'useragent';
 import { Response, Request } from 'express';
 import { Creatable } from '@paulislava/shared/forms';
 import { ImageBody } from '@paulislava/shared/core.types';
+import { RequestUser } from '../users/user.types';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -172,12 +173,14 @@ export class CarController implements CarApi {
   }
 
   @Post(CAR_API.backendRoutes.sendMessage)
+  @UseGuards(OptionalJwtAuthGuard)
   async sendMessage(
     @Body() body: CarMessageBody,
     @Param(CODE_PARAM) code: string,
     @Req() req: Request,
     @Ip() ip: string,
     @Res() res: Response,
+    @CurrentUser(true) user?: RequestUser,
   ): Promise<void> {
     return this.carService.sendMessage(
       code,
@@ -186,6 +189,7 @@ export class CarController implements CarApi {
       ip,
       res,
       req,
+      user,
     );
   }
 

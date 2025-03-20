@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectBot } from 'nestjs-telegraf';
-import { Telegraf } from 'telegraf';
+import { Ctx, InjectBot, On } from 'nestjs-telegraf';
+import { Context, Telegraf } from 'telegraf';
 import { User } from '../entities/user/user.entity';
 import { LocationInfo } from '@paulislava/shared/car/car.types';
 import { ExtraLocation } from 'telegraf/typings/telegram-types';
@@ -14,9 +14,19 @@ export class TelegramService {
 
   // constructor() {}
 
-  async sendMessage(message: string, recipient: User) {
+  @On('text')
+  async handleMessage() {
+    console.log('message');
+  }
+
+  async sendMessage(
+    message: string,
+    recipient: User,
+    replyToMessageId?: number,
+  ) {
     return this.bot.telegram.sendMessage(recipient.telegramID, message, {
       parse_mode: 'HTML',
+      reply_to_message_id: replyToMessageId,
     });
   }
 

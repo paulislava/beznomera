@@ -152,8 +152,9 @@ export class CarService {
     ip: string,
     res: Response,
     req: Request,
+    user?: RequestUser,
   ) {
-    const userId = req.user?.userId;
+    const userId = user?.userId;
     const anonymousId = req.cookies[this.configService.auth.anonymousIdCookie];
 
     const { id, no, owner } = await this.carRepository.findOneOrFail({
@@ -208,19 +209,22 @@ export class CarService {
 
     const chat = await getChat();
 
-    const message = await this.messagesRepository.save({
-      chat,
-      car: { id },
-      text,
-      location: coords,
-      source: MessageSource.Sender,
-    });
-
     const agentInfo = userAgentParser.parse(userAgent);
 
     const tgText = `${no}: новое сообщение:\n${text}\n\nОтправлено из: ${agentInfo.family}, ${agentInfo.os.family}.\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
 
     const tgMessage = await this.telegramService.sendMessage(tgText, owner);
+
+    await this.messagesRepository.save(
+      this.messagesRepository.create({
+        chat,
+        car: { id },
+        text,
+        location: coords,
+        userId,
+        telegramId: tgMessage.message_id,
+      }),
+    );
 
     if (coords) {
       await this.telegramService.sendLocation(coords, owner, {

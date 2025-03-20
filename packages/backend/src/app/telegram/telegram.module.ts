@@ -6,10 +6,14 @@ import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 
 import { TelegramService } from './telegram.service';
+import { TelegramUpdate } from './telegram.update';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatMessage } from '../entities/chat/message.entity';
 
 @Module({
   imports: [
     ConfigModule,
+    TypeOrmModule.forFeature([ChatMessage]),
     ...(process.env.DISABLE_TELEGRAM === '1'
       ? []
       : [
@@ -23,6 +27,6 @@ import { TelegramService } from './telegram.service';
           }),
         ]),
   ],
-  providers: [Telegraf, TelegramService],
+  providers: [Telegraf, TelegramService, TelegramUpdate],
 })
 export class TelegramModule {}
