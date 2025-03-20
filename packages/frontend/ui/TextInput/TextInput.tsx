@@ -11,6 +11,7 @@ import { useSetTrue, useSetFalse } from '@/hooks/booleans';
 const Container = styled(View)`
   width: 100%;
   flex: 1;
+  height: 100%;
 `;
 
 const ErrorText = styled(Text)`
@@ -24,12 +25,14 @@ const StyledInput = styled(RawInput)`
   width: 100%;
   box-sizing: border-box;
   padding-right: 16px;
+  height: 100%;
 `;
 
-const InputContainer = styled(View)`
-  flex-direction: row;
-  align-items: center;
+const InputContainer = styled(View)<{ $isRow?: boolean }>`
+  flex-direction: ${({ $isRow }) => ($isRow ? 'row' : 'column')};
+  align-items: start;
   padding-left: 16px;
+  height: 100%;
 `;
 
 const BeforeText = styled(Text)<{ $theme: ColorSchemeName }>`
@@ -54,7 +57,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 
   const renderProps = useCallback(
     (inputProps: RenderProps) => (
-      <InputContainer>
+      <InputContainer $isRow={Boolean(beforeText && (inputProps.value || isFocused))}>
         {beforeText && (inputProps.value || isFocused) && (
           <BeforeText $theme={theme}>{beforeText}</BeforeText>
         )}
@@ -77,7 +80,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         activeUnderlineColor='#dbb3b3'
         style={{ backgroundColor: 'transparent', minHeight: '100%' }}
         underlineStyle={{ marginLeft: 16, marginRight: 16 }}
-        contentStyle={{ paddingTop: 0, paddingLeft: 0, marginTop: 26 }}
+        contentStyle={{ paddingTop: 0, paddingLeft: 0, marginTop: 26, flex: 1 }}
         onChangeText={onChange}
         value={value ?? undefined}
         onFocus={handleFocus}
