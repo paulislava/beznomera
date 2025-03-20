@@ -11,7 +11,6 @@ import { useSetTrue, useSetFalse } from '@/hooks/booleans';
 const Container = styled(View)`
   width: 100%;
   flex: 1;
-  height: 100%;
 `;
 
 const ErrorText = styled(Text)`
@@ -25,12 +24,11 @@ const StyledInput = styled(RawInput)`
   width: 100%;
   box-sizing: border-box;
   padding-right: 16px;
-  height: 100%;
 `;
 
 const InputContainer = styled(View)<{ $isRow?: boolean }>`
   flex-direction: ${({ $isRow }) => ($isRow ? 'row' : 'column')};
-  align-items: start;
+  align-items: center;
   padding-left: 16px;
   height: 100%;
 `;
@@ -43,7 +41,11 @@ const BeforeText = styled(Text)<{ $theme: ColorSchemeName }>`
   font-family: Roboto;
 `;
 
-const RenderInput = styled(NativeTextInput)``;
+const RenderInput = styled(NativeTextInput)`
+  flex: 1;
+
+  width: 100%;
+`;
 
 export const TextInput: React.FC<TextInputProps> = ({
   errors,
