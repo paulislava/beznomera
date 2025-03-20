@@ -47,6 +47,7 @@ export class TelegramUpdate {
       const tgMessage = await this.telegramService.sendMessage(
         `Вам ответили по автомобилю ${forwardedMessage.car.no}:\n${messageText}`,
         forwardedMessage.user,
+        forwardedMessage.sourceTelegramId,
       );
 
       const chatMessage = await this.chatMessageRepository.save(
@@ -57,6 +58,7 @@ export class TelegramUpdate {
           userId: forwardedMessage.user.id,
           telegramId: tgMessage.message_id,
           car: forwardedMessage.car,
+          sourceTelegramId: message.message_id,
         }),
       );
 
