@@ -5,19 +5,36 @@ import { isTextMessage } from '../../common/utils/telegram';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatMessage } from '../entities/chat/message.entity';
-import { MessageSource } from '@paulislava/shared/chat/chat.types';
+import { Car } from '../entities/car/car.entity';
 
 @Update()
 export class TelegramUpdate {
   constructor(
     @InjectRepository(ChatMessage)
     private readonly chatMessageRepository: Repository<ChatMessage>,
+    @InjectRepository(Car)
+    private readonly carRepository: Repository<Car>,
     private readonly telegramService: TelegramService,
   ) {}
 
   @Start()
   async onStart(@Ctx() ctx: Context) {
-    await ctx.reply('Добро пожаловать!');
+    const message = ctx.message;
+    if (isTextMessage(message) && message.text.startsWith('/start message:')) {
+      const code = message.text.replace('/start message:', '');
+      const car = await this.carRepository.findOne({
+        where: { code },
+        relations: ['owner'],
+      });
+
+      if (car) {
+        await ctx.reply(`Сообщение для водителя автомобиля ${car.no}:`);
+      } else {
+        await ctx.reply('Автомобиль не найден');
+      }
+    } else {
+      await ctx.reply('Добро пожаловать!');
+    }
   }
 
   @On('text')

@@ -9,11 +9,12 @@ import { TelegramService } from './telegram.service';
 import { TelegramUpdate } from './telegram.update';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatMessage } from '../entities/chat/message.entity';
+import { Car } from '../entities/car/car.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([ChatMessage]),
+    TypeOrmModule.forFeature([ChatMessage, Car]),
     ...(process.env.DISABLE_TELEGRAM === '1'
       ? []
       : [
