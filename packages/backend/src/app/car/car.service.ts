@@ -156,15 +156,13 @@ export class CarService {
     req: Request,
     user?: RequestUser,
   ) {
-    const { id, no, owner } = await this.carRepository.findOneOrFail({
+    const car = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner'],
     });
 
     await this.chatService.sendMessage(
-      no,
-      id,
-      owner,
+      car,
       {
         coords: coords
           ? {
@@ -176,9 +174,9 @@ export class CarService {
       },
       userAgent,
       ip,
+      user,
       res,
       req,
-      user,
     );
   }
 

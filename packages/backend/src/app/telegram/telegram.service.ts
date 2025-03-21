@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Ctx, InjectBot, On } from 'nestjs-telegraf';
-import { Context, Telegraf } from 'telegraf';
+import { InjectBot, On } from 'nestjs-telegraf';
+import { Telegraf } from 'telegraf';
 import { User } from '../entities/user/user.entity';
 import { LocationInfo } from '@paulislava/shared/car/car.types';
 import { ExtraLocation } from 'telegraf/typings/telegram-types';

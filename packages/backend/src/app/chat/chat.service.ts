@@ -10,7 +10,7 @@ import { Response, Request } from 'express';
 import { RequestUser } from '../users/user.types';
 import userAgentParser from 'useragent';
 import { ChatMessageData } from './chat.types';
-import { User } from '../entities/user/user.entity';
+import { Car } from '../entities/car/car.entity';
 
 @Injectable()
 export class ChatService {
@@ -24,75 +24,135 @@ export class ChatService {
     @Inject(ConfigService) private readonly configService: ConfigService,
   ) {}
 
-  async sendMessage(
-    carNo: string,
-    carId: number,
-    owner: User,
-    { coords, text }: ChatMessageData,
-    userAgent: string,
+  private async getOrCreateAnonymousId(
+    anonymousId: string | undefined,
+    userId: number | undefined,
     ip: string,
-    res: Response,
-    req: Request,
-    user?: RequestUser,
-  ) {
-    const userId = user?.userId;
-    const anonymousId = req.cookies[this.configService.auth.anonymousIdCookie];
+    userAgent: string,
+  ): Promise<string | undefined> {
+    if (anonymousId || userId) {
+      return anonymousId;
+    }
 
-    let newAnonymousId: string;
+    const newAnonymousUser = await this.anonymousUserRepository.save({
+      ip,
+      userAgent,
+    });
 
-    const getAnonymousId = async () => {
-      if (anonymousId || userId) {
-        return anonymousId;
-      }
+    return newAnonymousUser.id;
+  }
 
-      const newAnonymousUser = await this.anonymousUserRepository.save({
-        ip,
-        userAgent,
-      });
+  private async getOrCreateChat(
+    car: Car,
+    userId: number | undefined,
+    anonymousId: string | undefined,
+  ): Promise<Chat> {
+    const senderInfo: FindOptionsWhere<Chat> & DeepPartial<Chat> = userId
+      ? { sender: { id: userId } }
+      : { anonymousSender: { id: anonymousId } };
 
-      newAnonymousId = newAnonymousUser.id;
-      return newAnonymousId;
-    };
-
-    const getChat = async () => {
-      const senderInfo: FindOptionsWhere<Chat> & DeepPartial<Chat> = userId
-        ? { sender: { id: userId } }
-        : { anonymousSender: { id: await getAnonymousId() } };
-
-      const getExistingChat = async () => {
-        if (!anonymousId && !userId) {
-          return null;
-        }
-
-        return this.chatRepository.findOneBy({
-          reciever: owner,
-          ...senderInfo,
-        });
-      };
-
-      const chat = await getExistingChat();
-
-      if (chat) {
-        return chat;
-      }
-
+    if (!anonymousId && !userId) {
       return this.chatRepository.save({
-        reciever: owner,
+        reciever: car.owner,
         ...senderInfo,
       });
-    };
+    }
 
-    const chat = await getChat();
+    const existingChat = await this.chatRepository.findOneBy({
+      reciever: car.owner,
+      ...senderInfo,
+    });
 
+    if (existingChat) {
+      return existingChat;
+    }
+
+    return this.chatRepository.save({
+      reciever: car.owner,
+      ...senderInfo,
+    });
+  }
+
+  private async sendTelegramMessage(
+    car: Car,
+    text: string,
+    userAgent: string,
+    coords?: { latitude: number; longitude: number },
+  ) {
     const agentInfo = userAgentParser.parse(userAgent);
+    const tgText = `${car.no}: новое сообщение:\n${text}\n\nОтправлено из: ${agentInfo.family}, ${agentInfo.os.family}.\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
 
-    const tgText = `${carNo}: новое сообщение:\n${text}\n\nОтправлено из: ${agentInfo.family}, ${agentInfo.os.family}.\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
+    const tgMessage = await this.telegramService.sendMessage(tgText, car.owner);
 
-    const tgMessage = await this.telegramService.sendMessage(tgText, owner);
+    if (coords) {
+      await this.telegramService.sendLocation(coords, car.owner, {
+        reply_to_message_id: tgMessage.message_id,
+      });
+    }
+
+    return tgMessage;
+  }
+
+  async sendMessageWithUser(
+    car: Car,
+    { coords, text }: ChatMessageData,
+    userId: number,
+  ) {
+    const chat = await this.getOrCreateChat(car, userId, undefined);
+    
+    const tgMessage = await this.sendTelegramMessage(
+      car,
+      text,
+      'Unknown',
+      coords,
+    );
 
     await this.messagesRepository.save({
       chat,
-      car: { id: carId },
+      car,
+      text,
+      location: coords
+        ? {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+          }
+        : undefined,
+      userId,
+      telegramId: tgMessage.message_id,
+    });
+  }
+
+  async sendMessage(
+    car: Car,
+    { coords, text }: ChatMessageData,
+    userAgent: string,
+    ip: string,
+    user?: RequestUser,
+    res?: Response,
+    req?: Request,
+  ) {
+    const userId = user?.userId;
+    const anonymousId = req?.cookies[this.configService.auth.anonymousIdCookie];
+
+    const newAnonymousId = await this.getOrCreateAnonymousId(
+      anonymousId,
+      userId,
+      ip,
+      userAgent,
+    );
+
+    const chat = await this.getOrCreateChat(car, userId, newAnonymousId);
+    
+    const tgMessage = await this.sendTelegramMessage(
+      car,
+      text,
+      userAgent,
+      coords,
+    );
+
+    await this.messagesRepository.save({
+      chat,
+      car,
       text,
       location: coords
         ? {
@@ -104,24 +164,11 @@ export class ChatService {
       telegramId: tgMessage.message_id,
     });
 
-    if (coords) {
-      await this.telegramService.sendLocation(
-        {
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        },
-        owner,
-        {
-          reply_to_message_id: tgMessage.message_id,
-        },
-      );
-    }
-
     if (newAnonymousId) {
       const now = new Date();
       const expires = new Date(now.setDate(now.getDate() + 10000));
 
-      res.cookie(this.configService.auth.anonymousIdCookie, newAnonymousId, {
+      res?.cookie(this.configService.auth.anonymousIdCookie, newAnonymousId, {
         expires,
         httpOnly: true,
         secure: true,
@@ -130,7 +177,7 @@ export class ChatService {
       });
     }
 
-    res.send();
+    res?.send();
   }
 
   async getMessagesCount(carId: number): Promise<number> {

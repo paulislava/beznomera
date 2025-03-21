@@ -10,6 +10,7 @@ import { TelegramUpdate } from './telegram.update';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { Car } from '../entities/car/car.entity';
+import { StartScene } from './scenes/start.scene';
 
 @Module({
   imports: [
@@ -24,10 +25,11 @@ import { Car } from '../entities/car/car.entity';
             useFactory: (configService: ConfigService) => ({
               token: configService.telegram.token,
               middlewares: [session()],
+              include: [StartScene],
             }),
           }),
         ]),
   ],
-  providers: [Telegraf, TelegramService, TelegramUpdate],
+  providers: [Telegraf, TelegramService, TelegramUpdate, StartScene],
 })
 export class TelegramModule {}
