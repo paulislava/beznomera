@@ -4,14 +4,12 @@ import TelegramLoginButton, { TelegramUser } from 'telegram-login-button';
 import { Text, PageView } from '../components/Themed';
 import { authService } from '@/services';
 import withRouter, { WithRouterProps } from '@/utils/withRouter';
-import env, { isWeb } from '@/utils/env';
+import { isWeb, TELEGRAM_BOT_NAME } from '@/utils/env';
 import Button from '@/ui/Button/Button';
 import Head from 'expo-router/head';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 
 import { initDataRaw } from '@telegram-apps/sdk-react';
-
-const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');
 
 function LoginPage({ router }: WithRouterProps): React.ReactNode {
   const { to } = useLocalSearchParams<{ to: string }>();

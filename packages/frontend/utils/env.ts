@@ -7,3 +7,5 @@ function env(name: string, defaultValue: any) {
 export default env;
 
 export const isWeb = Platform.OS === 'web';
+
+export const TELEGRAM_BOT_NAME = env('TELEGRAM_BOT_NAME', 'beznomera_bot');

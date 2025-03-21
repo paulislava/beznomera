@@ -1,14 +1,14 @@
 import { Text, PageView } from '@/components/Themed';
 import { carService } from '@/services';
 import { CarInfo } from '@shared/car/car.types';
-import { useLocalSearchParams } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
-import { isWeb } from '@/utils/env';
+import { isWeb, TELEGRAM_BOT_NAME } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
 import Button from '@/ui/Button/Button';
 import TextInput from '@/ui/TextInput/TextInput';
@@ -21,6 +21,8 @@ import {
   Nickname
 } from '@/components/CarDetails';
 import { PRODUCTION_URL } from '@/constants/site';
+import { openLink } from '@/utils/link';
+
 const InputContainer = styled(View)`
   margin: 20px 0;
   width: 100%;
@@ -40,6 +42,10 @@ const ChatDriverPage = () => {
   const [info, setInfo] = useState<CarInfo | null>(null);
   const [called, setCalled] = useState(false);
   const [text, setText] = useState<string>('');
+
+  useFocusEffect(() => {
+    openLink(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=message:${encodeURIComponent(code)}`);
+  });
 
   useEffect(() => {
     carService
