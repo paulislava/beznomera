@@ -1,19 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
-import {
-  DeepPartial,
-  FindOptionsWhere,
-  Repository,
-  Not,
-  IsNull,
-} from 'typeorm';
+import { Repository } from 'typeorm';
 import {
   CarInfo,
   EditCarInfo,
   FullCarInfo,
   ShortCarInfo,
-  CarPlateBody,
   CarCallBody,
   CarMessageBody,
 } from '@paulislava/shared/car/car.types';
@@ -33,12 +26,9 @@ import {
 import { Chat } from '../entities/chat/chat.entity';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { AnonymousUser } from '../entities/user/anonymous-user.entity';
-import { MessageSource } from '@paulislava/shared/chat/chat.types';
-import userAgentParser from 'useragent';
 import { ConfigService } from '../config/config.service';
 import { Response, Request } from 'express';
 import { CarCreateDto } from './car.controller';
-import { User } from '../entities/user/user.entity';
 import { SubmissionError, ValidationCode } from '@paulislava/shared/errors';
 import { ChatService } from '../chat/chat.service';
 
@@ -52,9 +42,9 @@ export class CarService {
     @InjectRepository(Chat) private readonly chatRepository: Repository<Chat>,
     @InjectRepository(ChatMessage)
     private readonly messagesRepository: Repository<ChatMessage>,
-    @Inject(TelegramService) private readonly telegramService: TelegramService,
-    @Inject(ConfigService) private readonly configService: ConfigService,
-    @Inject(ChatService) private readonly chatService: ChatService,
+    private readonly telegramService: TelegramService,
+    private readonly configService: ConfigService,
+    private readonly chatService: ChatService,
   ) {}
 
   async getInfo(code: string): Promise<CarInfo> {

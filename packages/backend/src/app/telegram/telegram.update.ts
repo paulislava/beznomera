@@ -1,5 +1,5 @@
-import { Update, Ctx, On } from 'nestjs-telegraf';
-import { Context } from 'telegraf';
+import { Update, Ctx, On, Start } from 'nestjs-telegraf';
+import { Context, Scenes } from 'telegraf';
 import { TelegramService } from './telegram.service';
 import { isTextMessage } from '../../common/utils/telegram';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +16,19 @@ export class TelegramUpdate {
     private readonly carRepository: Repository<Car>,
     private readonly telegramService: TelegramService,
   ) {}
+
+  @Start()
+  async onStart(@Ctx() ctx: Scenes.SceneContext) {
+    const message = ctx.message;
+    if (isTextMessage(message) && message.text.startsWith('/start message:')) {
+      const code = message.text.replace('/start message:', '');
+      const car = await this.carRepository.findOne({
+        where: { code },
+        relations: ['owner'],
+      });
+      await ctx.scene.enter('message', { car });
+    }
+  }
 
   @On('text')
   async onMessage(@Ctx() ctx: Context) {

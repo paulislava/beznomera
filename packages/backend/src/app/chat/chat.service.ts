@@ -20,8 +20,8 @@ export class ChatService {
     private readonly messagesRepository: Repository<ChatMessage>,
     @InjectRepository(AnonymousUser)
     private readonly anonymousUserRepository: Repository<AnonymousUser>,
-    @Inject(TelegramService) private readonly telegramService: TelegramService,
-    @Inject(ConfigService) private readonly configService: ConfigService,
+    private readonly telegramService: TelegramService,
+    private readonly configService: ConfigService,
   ) {}
 
   private async getOrCreateAnonymousId(
@@ -76,11 +76,10 @@ export class ChatService {
   private async sendTelegramMessage(
     car: Car,
     text: string,
-    userAgent: string,
+    userAgentString?: string,
     coords?: { latitude: number; longitude: number },
   ) {
-    const agentInfo = userAgentParser.parse(userAgent);
-    const tgText = `${car.no}: новое сообщение:\n${text}\n\nОтправлено из: ${agentInfo.family}, ${agentInfo.os.family}.\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
+    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''}\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
 
     const tgMessage = await this.telegramService.sendMessage(tgText, car.owner);
 
@@ -97,13 +96,14 @@ export class ChatService {
     car: Car,
     { coords, text }: ChatMessageData,
     userId: number,
+    userAgentString?: string,
   ) {
     const chat = await this.getOrCreateChat(car, userId, undefined);
-    
+
     const tgMessage = await this.sendTelegramMessage(
       car,
       text,
-      'Unknown',
+      userAgentString,
       coords,
     );
 
@@ -142,11 +142,14 @@ export class ChatService {
     );
 
     const chat = await this.getOrCreateChat(car, userId, newAnonymousId);
-    
+
+    const agentInfo = userAgentParser.parse(userAgent);
+    const userAgentString = `${agentInfo.family}, ${agentInfo.os.family}`;
+
     const tgMessage = await this.sendTelegramMessage(
       car,
       text,
-      userAgent,
+      userAgentString,
       coords,
     );
 

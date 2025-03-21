@@ -1,21 +1,23 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { session, Telegraf } from 'telegraf';
 
 import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
+import { ChatModule } from '../chat/chat.module';
 
 import { TelegramService } from './telegram.service';
 import { TelegramUpdate } from './telegram.update';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { Car } from '../entities/car/car.entity';
-import { StartScene } from './scenes/start.scene';
-
+import { MessageScene } from './scenes/message.scene';
+import { User } from '../entities/user/user.entity';
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([ChatMessage, Car]),
+    forwardRef(() => ChatModule),
+    TypeOrmModule.forFeature([ChatMessage, Car, User]),
     ...(process.env.DISABLE_TELEGRAM === '1'
       ? []
       : [
@@ -25,11 +27,10 @@ import { StartScene } from './scenes/start.scene';
             useFactory: (configService: ConfigService) => ({
               token: configService.telegram.token,
               middlewares: [session()],
-              include: [StartScene],
             }),
           }),
         ]),
   ],
-  providers: [Telegraf, TelegramService, TelegramUpdate, StartScene],
+  providers: [Telegraf, MessageScene, TelegramService, TelegramUpdate],
 })
 export class TelegramModule {}
