@@ -58,6 +58,12 @@ export type EditCarInfo = CarInfoBase & {
 };
 export type LocationInfo = { latitude: number; longitude: number };
 export type CarCallBody = { coords?: LocationInfo };
-export type CarMessageBody = { coords?: LocationInfo; text: string };
+export interface CarMessageBody {
+  coords?: {
+    lat: number;
+    lng: number;
+  };
+  text: string;
+}
 
 export type CarPlateBody = ImageBody;

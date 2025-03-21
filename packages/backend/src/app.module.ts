@@ -13,6 +13,7 @@ import { CarModule } from './app/car/car.module';
 import { TelegramModule } from './app/telegram/telegram.module';
 import { FileModule } from './app/file/file.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ChatModule } from './app/chat/chat.module';
 
 @Module({
   imports: [
@@ -25,8 +26,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     MailModule,
     AuthModule,
     UserModule,
-    CarModule,
     TelegramModule,
+    ChatModule,
+    CarModule,
   ],
   controllers: [AppController],
   providers: [AppService],

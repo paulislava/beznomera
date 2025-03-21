@@ -40,6 +40,7 @@ import { Response, Request } from 'express';
 import { CarCreateDto } from './car.controller';
 import { User } from '../entities/user/user.entity';
 import { SubmissionError, ValidationCode } from '@paulislava/shared/errors';
+import { ChatService } from '../chat/chat.service';
 
 @Injectable()
 export class CarService {
@@ -53,6 +54,7 @@ export class CarService {
     private readonly messagesRepository: Repository<ChatMessage>,
     @Inject(TelegramService) private readonly telegramService: TelegramService,
     @Inject(ConfigService) private readonly configService: ConfigService,
+    @Inject(ChatService) private readonly chatService: ChatService,
   ) {}
 
   async getInfo(code: string): Promise<CarInfo> {
@@ -154,98 +156,30 @@ export class CarService {
     req: Request,
     user?: RequestUser,
   ) {
-    const userId = user?.userId;
-    const anonymousId = req.cookies[this.configService.auth.anonymousIdCookie];
-
     const { id, no, owner } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner'],
     });
 
-    let newAnonymousId: string;
-
-    const getAnonymousId = async () => {
-      if (anonymousId || userId) {
-        return anonymousId;
-      }
-
-      const newAnonymousUser = await this.anonymousUserRepository.save({
-        ip,
-        userAgent,
-      });
-
-      newAnonymousId = newAnonymousUser.id;
-      return newAnonymousId;
-    };
-
-    const getChat = async () => {
-      const senderInfo: FindOptionsWhere<Chat> & DeepPartial<Chat> = userId
-        ? { sender: { id: userId } }
-        : { anonymousSender: { id: await getAnonymousId() } };
-
-      const getExistingChat = async () => {
-        if (!anonymousId && !userId) {
-          return null;
-        }
-
-        return this.chatRepository.findOneBy({
-          reciever: { id: owner.id },
-          ...senderInfo,
-        });
-      };
-
-      const chat = await getExistingChat();
-
-      if (chat) {
-        return chat;
-      }
-
-      return this.chatRepository.save({
-        reciever: { id: owner.id },
-
-        ...senderInfo,
-      });
-    };
-
-    const chat = await getChat();
-
-    const agentInfo = userAgentParser.parse(userAgent);
-
-    const tgText = `${no}: новое сообщение:\n${text}\n\nОтправлено из: ${agentInfo.family}, ${agentInfo.os.family}.\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
-
-    const tgMessage = await this.telegramService.sendMessage(tgText, owner);
-
-    await this.messagesRepository.save(
-      this.messagesRepository.create({
-        chat,
-        car: { id },
+    await this.chatService.sendMessage(
+      no,
+      id,
+      owner,
+      {
+        coords: coords
+          ? {
+              latitude: coords.lat,
+              longitude: coords.lng,
+            }
+          : undefined,
         text,
-        location: coords,
-        userId,
-        telegramId: tgMessage.message_id,
-      }),
+      },
+      userAgent,
+      ip,
+      res,
+      req,
+      user,
     );
-
-    if (coords) {
-      await this.telegramService.sendLocation(coords, owner, {
-        reply_to_message_id: tgMessage.message_id,
-      });
-    }
-
-    if (newAnonymousId) {
-      const now = new Date();
-      const expires = new Date(now.setDate(now.getDate() + 10000));
-
-      res.cookie(this.configService.auth.anonymousIdCookie, newAnonymousId, {
-        expires,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        path: '/',
-      });
-    }
-
-    res.send();
   }
 
   async getFullInfo(id: number, user: RequestUser): Promise<FullCarInfo> {
@@ -258,17 +192,13 @@ export class CarService {
       throw new CarNotFoundException(id);
     }
 
-    const messagesCount = await this.messagesRepository.count({
-      where: { car: { id } },
-    });
-
-    const callsCount = await this.callRepository.count({
-      where: { car: { id } },
-    });
-
-    const chatsCount = await this.chatRepository.count({
-      where: { messages: { car: { id } } },
-    });
+    const [messagesCount, callsCount, chatsCount] = await Promise.all([
+      this.chatService.getMessagesCount(id),
+      this.callRepository.count({
+        where: { car: { id } },
+      }),
+      this.chatService.getChatsCount(id),
+    ]);
 
     return {
       ...car,

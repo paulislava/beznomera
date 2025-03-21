@@ -11,6 +11,7 @@ import { User } from '../entities/user/user.entity';
 import { Chat } from '../entities/chat/chat.entity';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { ConfigModule } from '../config/config.module';
+import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
@@ -24,8 +25,10 @@ import { ConfigModule } from '../config/config.module';
     ]),
     TelegramModule,
     ConfigModule,
+    ChatModule,
   ],
   controllers: [CarController],
   providers: [CarService, TelegramService],
+  exports: [CarService],
 })
 export class CarModule {}

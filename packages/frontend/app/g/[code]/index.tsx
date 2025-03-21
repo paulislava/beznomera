@@ -5,11 +5,11 @@ import { CarInfo } from '@shared/car/car.types';
 import { Link, useGlobalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ImageSourcePropType, ImageStyle, Platform, StyleProp, View } from 'react-native';
+import { ImageSourcePropType, ImageStyle, StyleProp, View } from 'react-native';
 import styled from 'styled-components/native';
 import Recaptcha, { RecaptchaRef } from 'react-native-recaptcha-that-works';
 import { handleEvent } from '@/utils/log';
-import { isWeb } from '@/utils/env';
+import { isWeb, TELEGRAM_BOT_NAME } from '@/utils/env';
 import { showResponseMessage } from '@/utils/messages';
 import {
   Nickname,
@@ -22,6 +22,7 @@ import {
   CarExternalImage
 } from '@/components/CarDetails';
 import { PRODUCTION_URL } from '@/constants/site';
+import { openLink } from '@/utils/link';
 
 const ButtonsContainer = styled(View)`
   display: flex;
@@ -68,8 +69,8 @@ const CallUserPage = () => {
               location
                 ? {
                     coords: {
-                      latitude: location.coords.latitude,
-                      longitude: location.coords.longitude
+                      lat: location.coords.latitude,
+                      lng: location.coords.longitude
                     }
                   }
                 : {},
@@ -120,6 +121,10 @@ const CallUserPage = () => {
           ],
     [info]
   );
+
+  const openChat = useCallback(() => {
+    openLink(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=message:${encodeURIComponent(code)}`);
+  }, [code]);
 
   return (
     <PageView fullHeight center>
@@ -196,7 +201,13 @@ const CallUserPage = () => {
               {called ? 'Запрос отправлен!' : 'Позвать водителя'}
             </Button>
             <Link href={`/g/${code}/chat`} asChild>
-              <Button fullWidth view='secondary' event='go_chat' eventParams={eventData}>
+              <Button
+                fullWidth
+                view='secondary'
+                onClick={openChat}
+                event='go_chat'
+                eventParams={eventData}
+              >
                 Отправить сообщение
               </Button>
             </Link>
