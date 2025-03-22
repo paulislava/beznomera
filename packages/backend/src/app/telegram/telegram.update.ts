@@ -20,8 +20,8 @@ export class TelegramUpdate {
   @Start()
   async onStart(@Ctx() ctx: Scenes.SceneContext) {
     const message = ctx.message;
-    if (isTextMessage(message) && message.text.startsWith('/start message:')) {
-      const code = message.text.replace('/start message:', '');
+    if (isTextMessage(message) && message.text.startsWith('/start msg_')) {
+      const code = message.text.replace('/start msg_', '');
       const car = await this.carRepository.findOne({
         where: { code },
         relations: ['owner'],

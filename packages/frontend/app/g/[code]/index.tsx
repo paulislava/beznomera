@@ -123,7 +123,7 @@ const CallUserPage = () => {
   );
 
   const openChat = useCallback(() => {
-    openLink(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=message:${encodeURIComponent(code)}`);
+    openLink(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=msg_${encodeURIComponent(code)}`);
   }, [code]);
 
   return (
