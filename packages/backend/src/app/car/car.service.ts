@@ -154,12 +154,7 @@ export class CarService {
     await this.chatService.sendMessage(
       car,
       {
-        coords: coords
-          ? {
-              latitude: coords.lat,
-              longitude: coords.lng,
-            }
-          : undefined,
+        coords,
         text,
       },
       userAgent,

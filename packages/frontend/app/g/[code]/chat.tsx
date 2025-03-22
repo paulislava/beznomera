@@ -68,8 +68,8 @@ const ChatDriverPage = () => {
           .sendMessage(
             {
               coords: location && {
-                lat: location.coords.latitude,
-                lng: location.coords.longitude
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
               },
               text
             },

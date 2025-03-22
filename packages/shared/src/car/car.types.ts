@@ -60,8 +60,8 @@ export type LocationInfo = { latitude: number; longitude: number };
 export type CarCallBody = { coords?: LocationInfo };
 export interface CarMessageBody {
   coords?: {
-    lat: number;
-    lng: number;
+    latitude: number;
+    longitude: number;
   };
   text: string;
 }
