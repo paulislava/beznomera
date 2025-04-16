@@ -27,6 +27,7 @@ import {
   LocationInfo,
   CarCallBody,
   CarMessageBody,
+  ModelInfo,
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -121,10 +122,14 @@ export class CarUpdateDto implements EditCarInfo {
   @Type(() => CreatableRgbColorDto)
   color: Creatable<ColorInfo, RgbColor>;
 
+  // @IsOptional()
+  // @ValidateNested()
+  // @Type(() => CreatableStringDto)
+  // brand: Creatable<BrandInfo, string>;
+
   @IsOptional()
-  @ValidateNested()
-  @Type(() => CreatableStringDto)
-  brand: Creatable<BrandInfo, string>;
+  @IsNumber()
+  brand: Maybe<number>;
 
   @IsOptional()
   @IsString()
@@ -257,5 +262,15 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<void> {
     await this.carService.delete(id, user);
+  }
+
+  @Get(CAR_API.backendRoutes.brands)
+  async brands(): Promise<BrandInfo[]> {
+    return this.carService.getBrands();
+  }
+
+  @Get(CAR_API.backendRoutes.models)
+  async models(): Promise<ModelInfo[]> {
+    return this.carService.getModels();
   }
 }

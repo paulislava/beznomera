@@ -7,18 +7,15 @@ import { useEffect, useRef } from 'react';
  * @param {Array<any>} dependencies
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function useUpdateEffect(
-    effect: () => void,
-    dependencies: any[]
-) {
-    const isInitialMount = useRef(true);
+export default function useUpdateEffect(effect: () => void, dependencies: any[]) {
+  const isInitialMount = useRef(true);
 
-    useEffect(() => {
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-        } else {
-            return effect();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, dependencies);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      return effect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, dependencies);
 }

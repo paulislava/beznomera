@@ -9,6 +9,11 @@ export type BrandInfo = {
   logoUrl: string | null;
 };
 
+export type ModelInfo = {
+  id: number;
+  title: string;
+};
+
 export type RgbColor = {
   r: number;
   g: number;
@@ -52,7 +57,7 @@ export type FullCarInfo = ShortCarInfo & {
 
 export type EditCarInfo = CarInfoBase & {
   color: Creatable<ColorInfo>;
-  brand: Creatable<BrandInfo>;
+  brand: Maybe<number>;
 
   code: string;
 };

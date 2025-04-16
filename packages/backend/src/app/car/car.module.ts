@@ -12,6 +12,8 @@ import { Chat } from '../entities/chat/chat.entity';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { ConfigModule } from '../config/config.module';
 import { ChatModule } from '../chat/chat.module';
+import { Brand } from '../entities/car/brand.entity';
+import { Model } from '../entities/car/model.entity';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { ChatModule } from '../chat/chat.module';
       Call,
       AnonymousUser,
       User,
+      Brand,
+      Model,
       Chat,
       ChatMessage,
     ]),

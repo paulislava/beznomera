@@ -6,7 +6,6 @@ import { Text } from '@/components/Themed';
 import { TextInputProps } from './TextInput.types';
 import { TextInput as NativeTextInput } from 'react-native';
 import { RenderProps } from 'react-native-paper/lib/typescript/components/TextInput/types';
-import { useSetTrue, useSetFalse } from '@/hooks/booleans';
 
 const Container = styled(View)`
   width: 100%;
@@ -52,6 +51,13 @@ export const TextInput: React.FC<TextInputProps> = ({
   onChange,
   value,
   beforeText,
+  onFocus,
+  onBlur,
+  placeholder,
+  readOnly,
+  rightContent,
+  placeholderAsValue,
+  activeLabel,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -69,9 +75,15 @@ export const TextInput: React.FC<TextInputProps> = ({
     [beforeText, isFocused]
   );
 
-  const handleFocus = useSetTrue(setIsFocused);
+  const handleFocus = useCallback(() => {
+    setIsFocused(true);
+    onFocus?.();
+  }, [onFocus]);
 
-  const handleBlur = useSetFalse(setIsFocused);
+  const handleBlur = useCallback(() => {
+    setIsFocused(false);
+    onBlur?.();
+  }, [onBlur]);
 
   return (
     <Container>
@@ -84,12 +96,15 @@ export const TextInput: React.FC<TextInputProps> = ({
         underlineStyle={{ marginLeft: 16, marginRight: 16 }}
         contentStyle={{ paddingTop: 0, paddingLeft: 0, marginTop: 26, flex: 1 }}
         onChangeText={onChange}
-        value={value ?? undefined}
+        value={value ?? (placeholderAsValue ? placeholder : undefined)}
         onFocus={handleFocus}
         onBlur={handleBlur}
         {...props}
         render={renderProps}
+        placeholder={placeholder}
+        readOnly={readOnly}
       />
+      {rightContent}
       {errors &&
         errors.length > 0 &&
         errors.map(error => <ErrorText key={error.code}>{error.message}</ErrorText>)}

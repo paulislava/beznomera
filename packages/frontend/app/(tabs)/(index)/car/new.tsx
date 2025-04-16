@@ -11,10 +11,14 @@ import { PRODUCTION_URL } from '@/constants/site';
 import { router } from 'expo-router';
 import { FORM_ERROR } from 'final-form';
 import { ResponseWithCode } from '@shared/responses';
+import { SelectField } from '@/ui/Select';
+import { SelectFormFieldProps } from '@/ui/Select/Select.types';
+import { getBrandsOptions } from '@/mappers/car.mapper';
 
 type Data = EditCarInfo;
 
 const Field = FormField as ComponentType<FormFieldProps<Data>>;
+const Select = SelectField as ComponentType<SelectFormFieldProps<Data>>;
 
 export default function CarCreateScreen(): JSX.Element {
   const onSubmit = useCallback((data: Data) => {
@@ -37,6 +41,7 @@ export default function CarCreateScreen(): JSX.Element {
         {({ handleSubmit, pristine, submitting }) => (
           <>
             <Field name='no' label='Гос. номер' />
+            <Select name='brand' label='Марка' loader={getBrandsOptions} />
             <Field name='model' label='Модель' />
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />

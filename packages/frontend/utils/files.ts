@@ -12,3 +12,7 @@ export const uploadFile = async (file: File, folder: FileFolder) => {
   formData.set(FILE_NAME_PARAM, file);
   return fileService.upload(formData, folder);
 };
+
+export const cdnIconUrl = (path: string) => {
+  return `${CDN_URL}/icons/${path}`;
+};

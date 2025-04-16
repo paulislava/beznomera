@@ -10,6 +10,7 @@ export type RawInputProps = {
   rightContent?: React.ReactNode;
   mask?: string;
   center?: boolean;
+  placeholder?: string;
   type?: RawInputType;
   errors?: SubmissionError[];
   maxRows?: number;
@@ -19,9 +20,15 @@ export type TextInputProps = RawInputProps &
   Partial<Pick<FieldRenderProps<string>, 'meta'>> & {
     errors?: SubmissionError[];
     onChange?: (value: string) => void;
+    onBlur?(): void;
+    onFocus?(): void;
     value?: Maybe<string>;
     multiline?: boolean;
     beforeText?: string;
+    readOnly?: boolean;
+    required?: boolean;
+    placeholderAsValue?: boolean;
+    activeLabel?: boolean;
   };
 
 export type FinalTextInputProps = RawInputProps & FieldRenderProps<string>;

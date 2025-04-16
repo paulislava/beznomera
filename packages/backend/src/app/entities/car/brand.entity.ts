@@ -1,5 +1,12 @@
 import { BrandInfo } from '@paulislava/shared/car/car.types';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Model } from './model.entity';
 
 @Entity()
 export class Brand extends BaseEntity implements BrandInfo {
@@ -17,4 +24,7 @@ export class Brand extends BaseEntity implements BrandInfo {
 
   @Column({ nullable: true })
   logoUrlColored: string | null;
+
+  @OneToMany(() => Model, (model) => model.brand)
+  models: Model[];
 }

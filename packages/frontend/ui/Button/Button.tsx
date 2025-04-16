@@ -16,7 +16,7 @@ interface ButtonProps {
   externalHref?: string;
   disabled?: boolean;
   view?: ButtonView;
-  onClick?(): void | Promise<void>;
+  onClick?(): any;
   event?: string;
   eventParams?: Record<string, string | number | undefined>;
   style?: StyleProp<ViewStyle>;

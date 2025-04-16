@@ -6,7 +6,9 @@ import {
   EditCarInfo,
   FullCarInfo,
   ShortCarInfo,
-  CarPlateBody
+  CarPlateBody,
+  BrandInfo,
+  ModelInfo
 } from './car.types';
 
 export interface CarApi {
@@ -21,6 +23,8 @@ export interface CarApi {
   sendPlate(body: CarPlateBody, id: number, ...args: any[]): Promise<void>;
   sendQR(body: CarPlateBody, id: number, ...args: any[]): Promise<void>;
   delete(id: number, ...args: any[]): Promise<void>;
+  brands(...args: any[]): Promise<BrandInfo[]>;
+  models(brandId: number, ...args: any[]): Promise<ModelInfo[]>;
 }
 
 export const CODE_PARAM = 'code';
@@ -58,6 +62,11 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   delete: {
     path: id => `${id || `:${ID_PARAM}`}`,
     method: 'DELETE'
+  },
+  brands: 'brands',
+  models: {
+    path: brandId => `${brandId || `:${ID_PARAM}`}/models`,
+    method: 'GET'
   }
 };
 

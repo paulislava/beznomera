@@ -8,32 +8,30 @@ import { useRef, useEffect, RefObject } from 'react';
  * @returns RefObject, который нужно присвоить элементу (компоненту) в параметре ref
  */
 export const useClickOutside = <T extends HTMLElement = HTMLDivElement>(
-    callback: () => void,
-    exceptions?: RefObject<T | undefined>[],
-    active?: boolean
+  callback: () => void,
+  exceptions?: RefObject<T | undefined>[],
+  active?: boolean
 ) => {
-    const domNode = useRef<T>(null);
+  const domNode = useRef<T>(null);
 
-    useEffect(() => {
-        const callbackHandler = (event: MouseEvent) => {
-            if (
-                !domNode.current?.contains(event.target as Element) &&
-                !exceptions?.some((elem) =>
-                    elem.current?.contains(event.target as Element)
-                )
-            ) {
-                callback();
-            }
-        };
+  useEffect(() => {
+    const callbackHandler = (event: MouseEvent) => {
+      if (
+        !domNode.current?.contains(event.target as Element) &&
+        !exceptions?.some(elem => elem.current?.contains(event.target as Element))
+      ) {
+        callback();
+      }
+    };
 
-        if (active) {
-            document.addEventListener('mousedown', callbackHandler);
-        }
+    if (active) {
+      document.addEventListener('mousedown', callbackHandler);
+    }
 
-        return () => {
-            document.removeEventListener('mousedown', callbackHandler);
-        };
-    }, [domNode, callback, exceptions, active]);
+    return () => {
+      document.removeEventListener('mousedown', callbackHandler);
+    };
+  }, [domNode, callback, exceptions, active]);
 
-    return domNode;
+  return domNode;
 };

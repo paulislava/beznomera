@@ -31,7 +31,9 @@ import { Response, Request } from 'express';
 import { CarCreateDto } from './car.controller';
 import { SubmissionError, ValidationCode } from '@paulislava/shared/errors';
 import { ChatService } from '../chat/chat.service';
-
+import { BrandInfo, ModelInfo } from '@paulislava/shared/car/car.types';
+import { Brand } from '../entities/car/brand.entity';
+import { Model } from '../entities/car/model.entity';
 @Injectable()
 export class CarService {
   constructor(
@@ -42,6 +44,10 @@ export class CarService {
     @InjectRepository(Chat) private readonly chatRepository: Repository<Chat>,
     @InjectRepository(ChatMessage)
     private readonly messagesRepository: Repository<ChatMessage>,
+    @InjectRepository(Brand)
+    private readonly brandRepository: Repository<Brand>,
+    @InjectRepository(Model)
+    private readonly modelRepository: Repository<Model>,
     private readonly telegramService: TelegramService,
     private readonly configService: ConfigService,
     private readonly chatService: ChatService,
@@ -211,10 +217,11 @@ export class CarService {
         value: car.color,
         newValue: car.rawColor,
       },
-      brand: {
-        value: car.brand,
-        newValue: car.brandRaw,
-      },
+      brand: car.brand?.id,
+      // brand: {
+      //   value: car.brand,
+      //   newValue: car.brandRaw,
+      // },
       year: car.year,
       imageRatio: car.imageRatio,
     };
@@ -240,11 +247,14 @@ export class CarService {
       color: data.color?.value && {
         id: data.color?.value.id,
       },
-      brand: data.brand?.value && {
-        id: data.brand?.value.id,
+      brand: data.brand && {
+        id: data.brand,
       },
+      // brand: data.brand?.value && {
+      //   id: data.brand?.value.id,
+      // },
       rawColor: data.color?.newValue,
-      brandRaw: data.brand?.newValue,
+      // brandRaw: data.brand?.newValue,
       year: data.year,
       imageRatio: data.imageRatio,
       imageUrl: data.imageUrl,
@@ -299,10 +309,13 @@ export class CarService {
       color: data.color?.value && {
         id: data.color.value.id,
       },
-      brand: data.brand?.value && {
-        id: data.brand?.value.id,
+      brand: data.brand && {
+        id: data.brand,
       },
-      brandRaw: data.brand?.newValue,
+      // brand: data.brand?.value && {
+      //   id: data.brand?.value.id,
+      // },
+      // brandRaw: data.brand?.newValue,
       rawColor: data.color?.newValue,
     });
 
@@ -354,5 +367,13 @@ export class CarService {
     }
 
     await car.remove();
+  }
+
+  async getBrands(): Promise<BrandInfo[]> {
+    return this.brandRepository.find();
+  }
+
+  async getModels(): Promise<ModelInfo[]> {
+    return this.modelRepository.find();
   }
 }
