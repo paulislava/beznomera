@@ -22,11 +22,11 @@
     "start:frontend:dev": "cd packages/frontend; npm start",
     "start:frontend:web": "cd packages/frontend; npm run web",
     "start:frontend:ios": "cd packages/frontend; npm run ios",
-    "uploadBase": "./scripts/uploadBase.sh",
-    "dumpBase": "./scripts/dumpBase.sh",
-    "refreshBase": "./scripts/refreshBase.sh",
-    "restoreBase": "./scripts/restoreBase.sh",
-    "clear": "docker-compose down -v database"
+    "db:upload": "./scripts/uploadBase.sh",
+    "db:dump": "./scripts/dumpBase.sh",
+    "db:refresh": "./scripts/refreshBase.sh",
+    "db:restore": "./scripts/restoreBase.sh",
+    "db:clear": "docker-compose down -v database"
   },
   "repository": {
     "type": "git",
