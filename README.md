@@ -21,7 +21,7 @@ docker run -it -p 80:80 beznomera:frontend
 sudo docker build --target backend --no-cache --rm -t beznomera:backend https://github.com/paulislava/beznomera.git
 
 # Запуск контейнера бэкенда
-sudo docker run -d -it --network host -v /home/admin/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
+sudo docker run -d -it --network host -v /home/user/web/beznomera.paulislava.space/config-backend.yaml:/config.yaml -e ROUTE_PREFIX=/api beznomera:backend
 
 # Сборка фронтенда
 sudo frontend_backend_url=/api telegram_bot_name=beznomera_bot docker build --no-cache --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
