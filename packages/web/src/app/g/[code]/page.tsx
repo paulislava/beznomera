@@ -1,12 +1,14 @@
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params }: { params: { code: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ code: string }> }): Promise<Metadata> {
+  const { code } = await params;
+
   return {
-    title: `Машина ${params.code}`,
-    description: `Информация о машине с кодом ${params.code}`,
+    title: `Машина ${code}`,
+    description: `Информация о машине с кодом ${code}`,
     openGraph: {
-      title: `Машина ${params.code}`,
-      description: `Информация о машине с кодом ${params.code}`,
+      title: `Машина ${code}`,
+      description: `Информация о машине с кодом ${code}`,
     }
   };
 }
