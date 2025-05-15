@@ -79,6 +79,27 @@ services:
         npm run wait
         npx concurrently --kill-others-on-fail "npm:start:frontend:${PLATFORM:-dev}"
 
+  web:
+    image: node:20.18-slim
+    environment:
+      - HOME=/tmp
+      - NODE_ENV=development
+      - NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}
+      - NEXT_PUBLIC_CDN_URL=${CDN_URL}
+      - WEB_PORT=${WEB_PORT:-3001}
+    volumes:
+      - .:/app
+    working_dir: /app
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - ${WEB_PORT:-3000}:${WEB_PORT:-3000}
+    command:
+      - sh
+      - -c
+      - |
+        npm run wait
+        cd packages/web && npm run dev
+
   # pg-admin:
   #   image: dpage/pgadmin4
   #   ports:

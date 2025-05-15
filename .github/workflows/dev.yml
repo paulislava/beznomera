@@ -40,11 +40,25 @@ jobs:
           docker run --name beznomera_frontend -it -d -p 4000:80 -v /home/user/web/beznomera.net/frontend.env:/.env beznomera:frontend
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_frontend) || true
 
+  build-web:
+    runs-on: self-hosted
+    steps:
+      - name: Build web Docker image
+        run: |
+          echo "Building web Docker image..."
+          docker build --target web --rm -f web.Dockerfile -t beznomera:web https://github.com/paulislava/beznomera.git
+          docker stop beznomera_web || true
+          docker rm -f beznomera_web || true
+
+          docker run --name beznomera_web -d -it --network host -v /home/user/web/beznomera.net/web.env:/.env beznomera:web
+          docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_web) || true
+
   clean:
     runs-on: self-hosted
     needs:
       - build-frontend
       - build-backend
+      - build-web
     steps:
       - name: Clean unused containers and volumes
         run: |
