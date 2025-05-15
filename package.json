@@ -15,6 +15,7 @@
     "lint:packages": "npmPkgJsonLint ./package.json ./packages/*/package.json",
     "build-shared": "cd packages/shared; npm run build",
     "build:backend": "cd packages/backend && npm run build",
+    "build:web": "cd packages/web && npm run build",
     "start:backend:nodemon": "nodemon --watch packages/backend --ignore packages/backend/dist --ignore packages/backend/build --ignore packages/backend/node_modules --ext ts,json,yaml,yml --exec 'tsc --build packages/backend && node --inspect=0.0.0.0 packages/backend/dist/main.js'",
     "start:backend:prod": "cd packages/backend; npm run build; npm run start:prod",
     "typeorm": "cd packages/backend; npm run typeorm",
@@ -22,6 +23,7 @@
     "start:frontend:dev": "cd packages/frontend; npm start",
     "start:frontend:web": "cd packages/frontend; npm run web",
     "start:frontend:ios": "cd packages/frontend; npm run ios",
+    
     "db:upload": "./scripts/uploadBase.sh",
     "db:dump": "./scripts/dumpBase.sh",
     "db:refresh": "./scripts/refreshBase.sh",
