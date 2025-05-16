@@ -11,7 +11,7 @@ COPY packages/shared/patches /app/packages/shared/patches
 
 RUN npm ci && \
     npm ci --prefix=packages/shared && \
-    npm ci --prefix=packages/web && \
+    npm ci --legacy-peer-deps --prefix=packages/web && \
     wait
 
 COPY packages/shared /app/packages/shared
