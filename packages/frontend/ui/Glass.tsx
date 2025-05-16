@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import styled from 'styled-components/native';
+import styled from 'styled-components';
 
 const Gradient = styled(LinearGradient)`
   position: absolute;

@@ -1,0 +1,19 @@
+# https://beznomera.net/robots.txt
+User-agent: *
+
+Allow: /$
+Allow: /g/
+
+Disallow: /
+
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.svg$
+
+Clean-param: from /
+
+# Sitemap: https://beznomera.net/sitemap.xml/
+
+Crawl-delay: 1 

@@ -50,7 +50,7 @@ jobs:
           docker stop beznomera_web || true
           docker rm -f beznomera_web || true
 
-          docker run --name beznomera_web -d -it --network host -v /home/user/web/beznomera.net/web.env:/.env beznomera:web
+          docker run --name beznomera_web -d -it -p 3001:3000 -v /home/user/web/beznomera.net/web.env:/.env beznomera:web
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_web) || true
 
   clean:

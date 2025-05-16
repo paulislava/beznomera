@@ -14,7 +14,6 @@ import {
 import Colors from '@/constants/Colors';
 import { CONTAINER_BLOCK_ID } from '@/helpers/constants';
 import styled, { css } from 'styled-components/native';
-import Svg, { Rect } from 'react-native-svg';
 
 type ThemeProps = {
   lightColor?: string;
