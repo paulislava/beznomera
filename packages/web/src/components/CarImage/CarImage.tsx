@@ -1,4 +1,3 @@
-
 import { RgbColor } from '@shared/car/car.types';
 import { createRef, FC } from 'react';
 
@@ -22,12 +21,8 @@ const StyledSvg = styled.svg`
 `;
 
 export const CarImage: FC<CarImageProps> = ({ color, className }) => {
-
-
   const leftWheelRef = createRef<SVGGElement>();
   const rightWheelRef = createRef<SVGGElement>();
-
-
 
   const { r, g, b } = color || redColor;
 
@@ -51,13 +46,7 @@ export const CarImage: FC<CarImageProps> = ({ color, className }) => {
   const lc1 = newColor(186, 0, 0);
 
   return (
-    <StyledSvg
-      width='991'
-      height='295'
-      viewBox='0 0 991 295'
-      fill='none'
-      className={className}
-    >
+    <StyledSvg width='991' height='295' viewBox='0 0 991 295' fill='none' className={className}>
       <path
         d='M324.43 252.13L323 262L681.36 247.02L666 243L325 256L324.43 252.13Z'
         fill='#231F1F'
