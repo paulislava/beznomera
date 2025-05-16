@@ -6,7 +6,7 @@
   "scripts": {
     "wait": "wait-port root:2000",
     "serve": "concurrently \"npm:serve:*\"",
-    "serve:update": "chokidar \"./package.json\" ./packages/*/package.json --debounce 2000 -c \"npm install --prefix \\$(dirname {path})\"",
+    "serve:update": "chokidar \"./package.json\" ./packages/*/package.json --debounce 2000 -c \"npm install --legacy-peer-deps --prefix \\$(dirname {path})\"",
     "serve:listen": "http-server -p 2000 --silent",
     "test": "jest --coverage",
     "build": "npm run build-shared && concurrently \"npm:build:*\"",
