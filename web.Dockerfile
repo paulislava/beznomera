@@ -27,9 +27,9 @@ ENV HOME=/app
 
 WORKDIR ${HOME}
 
-COPY --from=build-web ${HOME}/packages/web/next.config.js ./
+COPY ./packages/web/next.config.js ./
 COPY --from=build-web ${HOME}/packages/web/public ./public
-COPY --from=build-web ${HOME}/packages/web/package.json ./package.json
+COPY ./packages/web/package.json ./package.json
 COPY --from=build-web ${HOME}/packages/web/.next/static ./.next/static
 COPY --from=build-web ${HOME}/packages/web/.next/server ./.next/server
 COPY --from=build-web ${HOME}/packages/web/.next/standalone ./
