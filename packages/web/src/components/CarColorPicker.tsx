@@ -1,8 +1,8 @@
 import { styled } from 'styled-components';
 import webStyled from 'styled-components';
 import { CarImage } from '@/components/CarImage/CarImage';
-import { Creatable } from '@paulislava/shared/forms';
-import { ColorInfo, RgbColor } from '@paulislava/shared/car/car.types';
+import { Creatable } from '@shared/forms';
+import { ColorInfo, RgbColor } from '@shared/car/car.types';
 import { FieldRenderProps } from 'react-final-form';
 import React, { useCallback, useMemo } from 'react';
 import { isWeb } from '@/utils/env';

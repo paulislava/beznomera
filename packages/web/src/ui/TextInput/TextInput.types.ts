@@ -1,5 +1,5 @@
 import { HTMLInputTypeAttribute } from 'react';
-import { SubmissionError } from '@paulislava/shared/errors';
+import { SubmissionError } from '@shared/errors';
 import { TextInputLabelProp } from 'react-native-paper/lib/typescript/components/TextInput/types';
 import { FieldRenderProps } from 'react-final-form';
 

@@ -84,6 +84,7 @@
         "default": "array"
       }
     ],
+    "@typescript-eslint/no-unnecessary-type-constraint": "off",
     "@typescript-eslint/member-ordering": "error",
     "@typescript-eslint/typedef": [
       "warn",

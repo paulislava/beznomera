@@ -1,6 +1,6 @@
 import { CDN_URL } from '@/constants/site';
 import { fileService } from '@/services';
-import { FileFolder } from '@paulislava/shared/file/file.types';
+import { FileFolder } from '@shared/file/file.types';
 import { FILE_NAME_PARAM } from '@shared/file/file.api';
 
 export const cdnFileUrl = (path: string) => {
