@@ -27,12 +27,12 @@ ENV HOME=/app
 
 WORKDIR ${HOME}
 
-COPY --from=build-web ${HOME}/next.config.js ./
-COPY --from=build-web ${HOME}/public ./public
-COPY --from=build-web ${HOME}/package.json ./package.json
-COPY --from=build-web ${HOME}/.next/static ./.next/static
-COPY --from=build-web ${HOME}/.next/server ./.next/server
-COPY --from=build-web ${HOME}/.next/standalone ./
+COPY --from=build-web ${HOME}/packages/web/next.config.js ./
+COPY --from=build-web ${HOME}/packages/web/public ./public
+COPY --from=build-web ${HOME}/packages/web/package.json ./package.json
+COPY --from=build-web ${HOME}/packages/web/.next/static ./.next/static
+COPY --from=build-web ${HOME}/packages/web/.next/server ./.next/server
+COPY --from=build-web ${HOME}/packages/web/.next/standalone ./
 
 RUN chgrp -R 0 /app/.next && chmod -R g=u /app/.next
 
