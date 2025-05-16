@@ -25,11 +25,16 @@ FROM node:20.18-slim AS web
 
 WORKDIR /app
 
+COPY --from=build ${HOME}/next.config.js ./
 COPY --from=build-web /app/packages/web/.next /app/.next
 COPY --from=build-web /app/packages/web/public /app/public
+COPY --from=build ${HOME}/.next/static ./.next/static
+COPY --from=build ${HOME}/.next/server ./.next/server
+COPY --from=build ${HOME}/.next/standalone ./
 COPY --from=build-web /app/packages/web/package.json /app/package.json
 COPY --from=build-web /app/packages/web/node_modules /app/node_modules
-COPY --from=build-web /app/packages/shared /app/node_modules/@paulislava/shared
+
+RUN chgrp -R 0 /app/.next && chmod -R g=u /app/.next
 
 ENV NODE_ENV=production \
     PORT=3000 \
@@ -37,5 +42,4 @@ ENV NODE_ENV=production \
     BACKEND_URL=https://beznomera.net/api
 
 EXPOSE 3000
-
-CMD ["npm", "start"]
+CMD [ "node", "server.js" ]

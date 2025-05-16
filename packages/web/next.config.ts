@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       '@shared': path.join(__dirname, '../shared/src')
     }
-  }
+  },
+  output: 'standalone'
 };
 
 export default nextConfig;
