@@ -53,6 +53,14 @@ export class CarService {
     private readonly chatService: ChatService,
   ) {}
 
+  async getList(): Promise<string[]> {
+    const cars = await this.carRepository.find({
+      select: ['code'],
+    });
+
+    return cars.map((car) => car.code);
+  }
+
   async getInfo(code: string): Promise<CarInfo> {
     const {
       id,
@@ -134,7 +142,7 @@ export class CarService {
     }
   }
 
-  async list({ userId }: RequestUser): Promise<ShortCarInfo[]> {
+  async userList({ userId }: RequestUser): Promise<ShortCarInfo[]> {
     const cars = await this.carRepository.find({
       where: { owner: { id: userId } },
       relations: ['owner', 'brand', 'color'],

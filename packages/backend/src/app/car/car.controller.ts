@@ -72,6 +72,8 @@ export class CreatableDto<T> {
   value: Maybe<T>;
 }
 
+
+
 export class CreatableStringDto<T>
   extends CreatableDto<T>
   implements Creatable<T, string>
@@ -158,6 +160,7 @@ export class CarController implements CarApi {
   info(@Param(CODE_PARAM) code: string): Promise<CarInfo> {
     return this.carService.getInfo(code);
   }
+  
 
   @Post(CAR_API.backendRoutes.call)
   async call(
@@ -171,10 +174,15 @@ export class CarController implements CarApi {
     return this.carService.call(code, body, agent, ip);
   }
 
-  @Get(CAR_API.backendRoutes.list)
+  @Get(CAR_API.backendRoutes.my)
   @UseGuards(JwtAuthGuard)
-  list(@CurrentUser() user): Promise<ShortCarInfo[]> {
-    return this.carService.list(user);
+  my(@CurrentUser() user): Promise<ShortCarInfo[]> {
+    return this.carService.userList(user);
+  }
+
+  @Get(CAR_API.backendRoutes.list)
+  list(): Promise<string[]> {
+    return this.carService.getList();
   }
 
   @Post(CAR_API.backendRoutes.sendMessage)

@@ -14,7 +14,8 @@ import {
 export interface CarApi {
   info(code: string, ...args: any[]): Promise<CarInfo>;
   call(body: CarCallBody, code: string, ...args: any[]): Promise<void>;
-  list(...args: any[]): Promise<ShortCarInfo[]>;
+  list(...args: any[]): Promise<string[]>;
+  my(...args: any[]): Promise<ShortCarInfo[]>;
   sendMessage(body: CarMessageBody, code: string, ...args: any[]): Promise<void>;
   fullInfo(id: number, ...args: any[]): Promise<FullCarInfo>;
   infoForUpdate(id: number, ...args: any[]): Promise<EditCarInfo>;
@@ -37,7 +38,8 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
     path: code => `${code || `:${CODE_PARAM}`}/call`,
     method: 'POST'
   },
-  list: 'list',
+  my: 'my',
+  list: '',
   sendMessage: {
     path: code => `${code || `:${CODE_PARAM}`}/message`,
     method: 'POST'

@@ -17,7 +17,8 @@ RUN npm ci && \
 COPY packages/shared /app/packages/shared
 COPY packages/web /app/packages/web
 
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    BACKEND_URL=https://beznomera.net/api
 RUN npm run build:web
 
 FROM node:20.18-slim AS web
@@ -32,7 +33,8 @@ COPY --from=build-web /app/packages/shared /app/node_modules/@paulislava/shared
 
 ENV NODE_ENV=production \
     PORT=3000 \
-    NEXT_TELEMETRY_DISABLED=1
+    NEXT_TELEMETRY_DISABLED=1 \
+    BACKEND_URL=https://beznomera.net/api
 
 EXPOSE 3000
 

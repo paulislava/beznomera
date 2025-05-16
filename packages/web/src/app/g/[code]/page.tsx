@@ -26,6 +26,14 @@ export async function generateMetadata({
   };
 }
 
+export async function generateStaticParams() {
+  const codes = await carService.list();
+
+  return codes.map(code => ({
+    code
+  }));
+}
+
 export default async function Page({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const info = await carService.info(code);

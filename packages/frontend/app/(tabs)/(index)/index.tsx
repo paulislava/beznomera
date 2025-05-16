@@ -51,7 +51,7 @@ const AddButton = styled(Button)`
 function CarsList() {
   useNeedAuth();
 
-  const cars = useAPI(carService.list);
+  const cars = useAPI(carService.my);
 
   return (
     <PageView fullHeight>
