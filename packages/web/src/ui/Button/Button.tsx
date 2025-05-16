@@ -12,7 +12,7 @@ type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
 
 interface ButtonProps {
   children?: React.ReactNode;
-  externalHref?: string;
+  href?: string;
   disabled?: boolean;
   view?: ButtonView;
   onClick?(): any;
@@ -54,7 +54,7 @@ const StyledPressable = styled.button<{
   $theme: ColorSchemeName;
   $fullWidth?: boolean;
 }>`
-position: relative;
+  position: relative;
   cursor: pointer;
   border-radius: 35px;
   overflow: hidden;
@@ -83,6 +83,7 @@ position: relative;
   ${({ disabled }) =>
     disabled &&
     css`
+      cursor: inherit;
       background: gray;
     `}
 `;
@@ -126,7 +127,7 @@ export const Button = forwardRef<any, ButtonProps>(
   (
     {
       children,
-      externalHref,
+      href: externalHref,
       onClick,
       disabled,
       view = 'primary',

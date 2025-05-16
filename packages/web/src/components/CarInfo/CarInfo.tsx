@@ -107,7 +107,7 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
         {info.owner.tel && (
           <Button
             fullWidth
-            externalHref={`tel:${info.owner.tel}`}
+            href={`tel:${info.owner.tel}`}
             view='glass'
             event='tel_call'
             eventParams={eventData}
@@ -136,6 +136,9 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
             Отправить сообщение
           </Button>
         </Link>
+        <Button href='/' view='glass' event='go_create_qr' eventParams={eventData}>
+          Создать свой QR-код
+        </Button>
       </ButtonsColumn>
     </>
 
