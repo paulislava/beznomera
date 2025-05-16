@@ -1,7 +1,8 @@
 import { authService } from '@/services';
-import { useFocusEffect, usePathname, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { initData } from '@telegram-apps/sdk-react';
+import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 
 interface UseNeedAuthProps {
   onAuth?(): void | Promise<void>;
@@ -13,7 +14,7 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  useFocusEffect(() => {
+  useEffect(() => {
     const successAuth = () => {
       setRequested(true);
 
@@ -24,8 +25,10 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
     const errorAuth = () => {
       setRequested(true);
       setAuthorized(false);
-      router.replace(`/login`);
-      router.setParams({ to: pathname });
+      const params = new URLSearchParams();
+      params.set('to', pathname);
+
+      router.replace(`/login?${params.toString()}`);
     };
 
     authService
@@ -40,12 +43,14 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
           errorAuth();
         }
       });
-  });
+  }, [pathname, props, router]);
 
   useEffect(() => {
     if (!authorized && requested) {
-      router.replace(`/login`);
-      router.setParams({ to: pathname });
+      const params = new URLSearchParams();
+      params.set('to', pathname);
+
+      router.replace(`/login?${params.toString()}`);
     }
   }, [authorized, pathname, requested, router]);
 

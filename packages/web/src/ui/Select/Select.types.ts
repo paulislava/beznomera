@@ -1,6 +1,5 @@
 import { FieldRenderProps } from 'react-final-form';
 import { ValidatorsProps } from '../FormField/FormField.types';
-import { PopupChildrenRenderProps } from 'components/Popup';
 
 export type OptionProps<Value = string, Data = any> = {
   label?: string;
@@ -18,10 +17,10 @@ export type OptionsGenerator<
   Data = ExtractPromisedElement<Func>
 > = ProxyFunction<Func, Promise<OptionProps<OptionValue, Data>[]>>;
 
-export type AddPopupContentFunc<OptionValue = string> = (
-  props: PopupChildrenRenderProps,
-  addOrSetOption: (option: OptionProps<OptionValue>) => void
-) => React.ReactNode;
+// export type AddPopupContentFunc<OptionValue = string> = (
+//   props: PopupChildrenRenderProps,
+//   addOrSetOption: (option: OptionProps<OptionValue>) => void
+// ) => React.ReactNode;
 
 export type SelectLoaderFunc<OptionValue> = () => Promise<OptionProps<OptionValue>[]>;
 
@@ -35,7 +34,7 @@ export type SelectRawProps<OptionValue = string> = {
   keepSearch?: boolean;
   onSearch?(value?: string): Promise<OptionProps<OptionValue>[]>;
   addButtonContent?: React.ReactNode;
-  addPopupContent?: AddPopupContentFunc<OptionValue>;
+  // addPopupContent?: AddPopupContentFunc<OptionValue>;
   loader?: SelectLoaderFunc<OptionValue>;
   getLabel?(value: OptionValue): string;
   defaultOption?: OptionProps<OptionValue>;

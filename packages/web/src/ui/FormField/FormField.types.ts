@@ -1,6 +1,6 @@
 import { FieldRenderProps } from 'react-final-form';
 import { FileFieldProps, FileType } from '@/ui/FileButton/FileButton.types';
-import { TextInputProps, RawInputType } from '@/ui/TextInput/TextInput.types';
+import { InputProps, RawInputType } from '@/ui/Input/Input.types';
 
 export type ValidatorsProps = {
   validators?: ((value: unknown) => string | undefined)[];
@@ -18,11 +18,11 @@ type RawFormFieldProps<T> = Omit<Partial<HTMLInputElement>, 'children' | 'type'>
     validate?: undefined;
 
     fileType?: FileType;
-  } & Pick<TextInputProps, 'center' | 'label' | 'rightContent' | 'beforeText'>;
+  } & Pick<InputProps, 'center' | 'label' | 'rightContent'>;
 
 export type FormFieldProps<T> = RawFormFieldProps<T> &
   (
     | ({ type: 'file' } & Pick<FileFieldProps, 'onChange' | 'fileType'>)
-    | ({ type: 'textarea' } & Pick<TextInputProps, 'maxRows'>)
+    | ({ type: 'textarea' } & Pick<InputProps, 'maxRows'>)
     | { fileType?: undefined; maxRows?: undefined; onChange?: undefined }
   );

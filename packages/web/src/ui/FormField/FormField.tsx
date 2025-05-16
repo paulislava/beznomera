@@ -1,6 +1,6 @@
 import { Field, useFormState } from 'react-final-form';
 
-import { FinalTextInput } from '../TextInput';
+import { FinalInput } from '../Input/FinalInput';
 import styled from 'styled-components';
 import { FormFieldProps } from './FormField.types';
 import { useValidators } from '@/hooks/useValidators';
@@ -42,7 +42,7 @@ function FormField<T = any>({
     required
   });
 
-  const finalComponent = FinalTextInput;
+  const finalComponent = FinalInput;
   let finalMask: string | undefined;
 
   // if (type === 'file') {

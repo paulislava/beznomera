@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import { inputContainerMixin } from 'ui/Input/Input.styled';
+import { inputContainerMixin } from '@/ui/Input/Input.styled';
 
-export const Container = styled.label`
+export const Container = styled.label<{ height?: number }>`
   ${inputContainerMixin}
   align-items: center;
   gap: 10px;

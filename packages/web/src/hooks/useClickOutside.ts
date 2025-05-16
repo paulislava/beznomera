@@ -9,7 +9,7 @@ import { useRef, useEffect, RefObject } from 'react';
  */
 export const useClickOutside = <T extends HTMLElement = HTMLDivElement>(
   callback: () => void,
-  exceptions?: RefObject<T | undefined>[],
+  exceptions?: RefObject<T | undefined | null>[],
   active?: boolean
 ) => {
   const domNode = useRef<T>(null);

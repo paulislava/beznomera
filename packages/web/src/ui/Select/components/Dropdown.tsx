@@ -16,7 +16,7 @@ export function Dropdown<OptionValue>({
   value,
   onChange,
   comparer
-}: DropdownProps<OptionValue>): JSX.Element {
+}: DropdownProps<OptionValue>) {
   const compareOptions = useCallback(
     (a: OptionProps<OptionValue>, b: OptionProps<OptionValue>) =>
       comparer
@@ -49,7 +49,7 @@ export function DropdownMultiple<OptionValue>({
   value,
   onChange,
   comparer
-}: DropdownMultipleProps<OptionValue>): JSX.Element {
+}: DropdownMultipleProps<OptionValue>) {
   const compareOptions = useCallback(
     (a: OptionProps<OptionValue>, b: OptionProps<OptionValue>) =>
       comparer

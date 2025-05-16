@@ -287,6 +287,8 @@ export function RawSelect<OptionValue>({
   return (
     <S.Container ref={containerRef}>
       <S.Input
+        name={input?.name}
+        onBlur={input?.onBlur}
         onFocus={onFocus}
         value={searchValue}
         placeholder={preparedPlaceholder}

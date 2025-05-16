@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
-import { TextInput } from '../TextInput';
+import { Input as RawInput } from '../Input';
 import { cdnIconUrl } from '@/utils/files';
+
 export const Container = styled.div`
   position: relative;
   z-index: 1;
@@ -132,7 +133,7 @@ export const MultipleDropdownItem = styled(DropdownItem)<SActiveProps>`
 
 type InputProps = SOpenProps & { $fillPlaceholder?: boolean };
 
-export const Input = styled(TextInput)<InputProps>`
+export const Input = styled(RawInput)<InputProps>`
   cursor: pointer !important;
 
   ${({ $fillPlaceholder }) =>

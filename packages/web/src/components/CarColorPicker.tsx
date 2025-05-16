@@ -5,7 +5,6 @@ import { Creatable } from '@shared/forms';
 import { ColorInfo, RgbColor } from '@shared/car/car.types';
 import { FieldRenderProps } from 'react-final-form';
 import React, { useCallback, useMemo } from 'react';
-import { isWeb } from '@/utils/env';
 
 const StyledCarImage = styled(CarImage)`
   width: 100%;
@@ -55,15 +54,9 @@ export const CarColorPicker = ({ input: { value, onChange } }: CarColorPickerPro
   );
 
   return (
-    <>
-      {isWeb && (
-        <>
-          <Label>
-            <input type='color' value={hexValue} onChange={handleChange} />
-            <StyledCarImage color={value?.newValue ?? value?.value?.value} animated={false} />
-          </Label>
-        </>
-      )}
-    </>
+    <Label>
+      <input type='color' value={hexValue} onChange={handleChange} />
+      <StyledCarImage color={value?.newValue ?? value?.value?.value} animated={false} />
+    </Label>
   );
 };

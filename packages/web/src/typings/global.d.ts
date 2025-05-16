@@ -73,4 +73,10 @@ type MapRequired<T> = {
   [P in keyof T]-?: NonNullable<T[P]>;
 };
 
+type MakeOptional<T> = {
+  [P in keyof T]?: T[P];
+};
+
+type MakeOptionalProps<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
 type ColorSchemeName = 'light' | 'dark' | null | undefined;

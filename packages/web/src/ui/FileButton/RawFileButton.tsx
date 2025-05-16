@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { LoadFileIcon } from 'ui/Menu/assets/ItemsIcons';
 import * as S from './FileButton.styled';
 import { FileInputButtonProps } from './FileButton.types';
 import { FILE_ACCEPT_VALUES } from './constants';
@@ -32,7 +31,6 @@ export const RawFileButton: React.FC<FileInputButtonProps> = ({ onChange, value,
 
   return (
     <S.Container>
-      <LoadFileIcon />
       <S.FilenameContainer>
         <S.Filename>{fileName ? fileName : value ? 'Файл загружен' : 'Выберите файл'}</S.Filename>
         {fileName ? '✅' : value ? '📌' : ''}

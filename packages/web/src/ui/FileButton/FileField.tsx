@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { FileButton } from './FileButton';
-import * as S from 'ui/Input/Input.styled';
+import * as S from '@/ui/Input/Input.styled';
 import { FileFieldProps } from './FileButton.types';
 
 export const FileField: FC<FileFieldProps> = ({ input, label, fileType, onChange }) => {

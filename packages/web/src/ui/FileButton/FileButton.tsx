@@ -1,8 +1,9 @@
 import { FC, useCallback, useContext } from 'react';
 import RawFileButton from './RawFileButton';
-import { uploadFile } from 'api/file/file';
 import { FileButtonProps } from './FileButton.types';
-import { FormContext } from 'ui/FormContainer/FormContainer';
+import { FormContext } from '@/ui/FormContainer/FormContainer';
+import { uploadFile } from '@/utils/files';
+import { FileFolder } from '@shared/file/file.types';
 
 export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, ...rawProps }) => {
   const { loadingFiles } = useContext(FormContext);
@@ -13,23 +14,15 @@ export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, .
         onChange?.(file);
 
         loadingFiles.push(
-          new Promise((resolve, reject) => {
-            uploadFile(file)(
-              ({ data }) => {
-                if (data) {
-                  onUpload(data);
-
-                  resolve(data);
-                } else {
-                  reject('Error while uploading file!');
-                }
-              },
-              err => {
-                onError?.(err);
-                reject(err);
-              }
-            );
-          })
+          uploadFile(file, FileFolder.Temp)
+            .then(data => {
+              onUpload?.(data);
+              return data;
+            })
+            .catch(err => {
+              onError?.(err);
+              throw err;
+            })
         );
       }
     },

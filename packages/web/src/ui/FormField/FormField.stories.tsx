@@ -3,18 +3,17 @@ import type { Meta, StoryObj } from '@storybook/react';
 import FormField from './FormField';
 
 import { FormFieldProps, TypeValue } from './FormField.types';
-import { AuthFormData } from 'api/auth/auth.types';
 const meta = {
   title: 'Example/FormField',
 
-  component: FormField<AuthFormData>,
+  component: FormField<any>,
   parameters: {
     layout: 'centered'
   }
 } satisfies Meta<
-  Omit<FormFieldProps<AuthFormData>, 'type'> & {
+  Omit<FormFieldProps<any>, 'type'> & {
     type?: TypeValue;
-    name: Paths<AuthFormData>;
+    name: Paths<any>;
   }
 >;
 
