@@ -42,7 +42,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
         queryParams ? `?${new URLSearchParams(queryParams).toString()}` : ''
       }`,
       {
-        credentials: 'include',
+        credentials: 'include',asd
         ...options
       }
     );

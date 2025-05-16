@@ -3,6 +3,10 @@ import type { NextConfig } from 'next';
 import path from 'path';
 
 const nextConfig: NextConfig = {
+  experimental: {
+    cpus: 1,
+    workerThreads: false
+  },
   images: {
     remotePatterns: [new URL(`${CDN_URL}/**`)]
   },
