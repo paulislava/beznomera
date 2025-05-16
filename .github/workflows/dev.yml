@@ -42,6 +42,8 @@ jobs:
 
   build-web:
     runs-on: self-hosted
+    needs:
+      - build-backend
     steps:
       - name: Build web Docker image
         run: |
@@ -63,4 +65,4 @@ jobs:
       - name: Clean unused containers and volumes
         run: |
           echo "Deleting unused containers, volumes..."
-          docker image prune -f
+          docker system prune -a -f
