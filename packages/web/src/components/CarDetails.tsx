@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { CarImage } from './CarImage/CarImage';
 import { TextL } from './Themed';
 import Image from 'next/image';
- 
 
 export const CarModel = styled(TextL)`
   font-weight: 100;

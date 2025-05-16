@@ -114,7 +114,7 @@ const LoadingContainer = styled.div`
   align-items: center;
 `;
 
-const StyledLink = styled(ExternalLink) <{ $fullWidth?: boolean }>`
+const StyledLink = styled(ExternalLink)<{ $fullWidth?: boolean }>`
   ${({ $fullWidth }) =>
     $fullWidth &&
     css`

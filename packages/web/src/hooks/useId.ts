@@ -3,31 +3,29 @@ import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 
 export const useId = () => {
-    const value = useParams()[ID_PARAM];
+  const value = useParams()[ID_PARAM];
 
-    if (!value) {
-        throw new Error(`ID wasn't provided in URL`);
-    }
+  if (!value) {
+    throw new Error(`ID wasn't provided in URL`);
+  }
 
-    return value;
+  return value;
 };
 
 export const useNumberId = () => {
-    const value = useId();
+  const value = useId();
 
-    return Number.parseInt(value);
+  return Number.parseInt(value);
 };
 
 export function useWithId<ReturnType>(callback: (id: string) => ReturnType) {
-    const id = useId();
+  const id = useId();
 
-    return useCallback(() => callback(id), [callback, id]);
+  return useCallback(() => callback(id), [callback, id]);
 }
 
-export function useWithNumberId<ReturnType>(
-    callback: (id: number) => ReturnType
-) {
-    const id = useNumberId();
+export function useWithNumberId<ReturnType>(callback: (id: number) => ReturnType) {
+  const id = useNumberId();
 
-    return useCallback(() => callback(id), [callback, id]);
+  return useCallback(() => callback(id), [callback, id]);
 }

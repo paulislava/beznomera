@@ -5,4 +5,3 @@ declare global {
     Telegram: Telegram;
   }
 }
-

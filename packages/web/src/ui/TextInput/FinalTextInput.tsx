@@ -10,7 +10,7 @@ export const FinalTextInput: React.FC<FinalTextInputProps> = ({
 }) => {
   const finalErrors = useMemo(
     () => (meta.touched && !meta.dirtySinceLastSubmit ? errors : []),
-    [meta.touched, meta.dirtySinceLastSubmit, errors, meta.error]
+    [meta.touched, meta.dirtySinceLastSubmit, errors]
   );
 
   return (

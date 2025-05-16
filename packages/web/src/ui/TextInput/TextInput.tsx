@@ -1,8 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { TextInput as RawInput } from 'react-native-paper';
-import { ColorSchemeName, useColorScheme, View } from 'react-native';
 import styled from 'styled-components';
-import { Text } from '@/components/Themed';
 import { TextInputProps } from './TextInput.types';
 import { TextInput as NativeTextInput } from 'react-native';
 import { RenderProps } from 'react-native-paper/lib/typescript/components/TextInput/types';
@@ -57,7 +55,6 @@ export const TextInput: React.FC<TextInputProps> = ({
   readOnly,
   rightContent,
   placeholderAsValue,
-  activeLabel,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -72,7 +69,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         <RenderInput {...inputProps} />
       </InputContainer>
     ),
-    [beforeText, isFocused]
+    [beforeText, isFocused, theme]
   );
 
   const handleFocus = useCallback(() => {

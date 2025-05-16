@@ -47,7 +47,7 @@ const useNeedAuth = (props?: UseNeedAuthProps) => {
       router.replace(`/login`);
       router.setParams({ to: pathname });
     }
-  }, [authorized, requested]);
+  }, [authorized, pathname, requested, router]);
 
   return authorized;
 };

@@ -9,13 +9,13 @@ import { useEffect, useRef } from 'react';
  * @param {Function} effect - эффект callback
  */
 export const useEffectOnce = (effect: () => void) => {
-    const isEffectCalled = useRef(false);
+  const isEffectCalled = useRef(false);
 
-    useEffect(() => {
-        if (!isEffectCalled.current) {
-            isEffectCalled.current = true;
-            effect();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+  useEffect(() => {
+    if (!isEffectCalled.current) {
+      isEffectCalled.current = true;
+      effect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 };

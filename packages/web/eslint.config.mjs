@@ -15,7 +15,12 @@ const eslintConfig = [
     ignores: ['node_modules', '.next']
   },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
-  eslintPluginPrettierRecommended
+  eslintPluginPrettierRecommended,
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  }
 ];
 
 export default eslintConfig;

@@ -2,8 +2,8 @@ import { useSetFalse } from '@/hooks/booleans';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import useUpdateEffect from '@/hooks/useUpdateEffect';
-import { useState, useEffect, useRef, useMemo, useCallback, ChangeEvent } from 'react';
-import { FieldInputProps, FieldMetaState } from 'react-final-form';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { FieldMetaState } from 'react-final-form';
 import { DropdownMultiple, Dropdown } from './components/Dropdown';
 import * as S from './Select.styled';
 import { SelectProps, OptionProps } from './Select.types';
@@ -111,8 +111,8 @@ export function RawSelect<OptionValue>({
       ? finalOptions.length > 0
         ? finalOptions.filter(opt => value.some(val => opt.value == val))
         : defaultOption
-        ? [defaultOption]
-        : undefined
+          ? [defaultOption]
+          : undefined
       : finalOptions.find(opt => opt.value == value) || defaultOption;
   }, [defaultOption, filteredOptions, getLabel, options, value]);
 
@@ -207,7 +207,7 @@ export function RawSelect<OptionValue>({
     } else if (!loading) {
       setIsOpen(true);
     }
-  }, [input, loading, searchValue]);
+  }, [loading]);
 
   const onDropdownChange = useCallback(
     (newOptions: OneOrMany<OptionProps<OptionValue>>) => {
@@ -264,7 +264,7 @@ export function RawSelect<OptionValue>({
       if (Array.isArray(valueWithOption)) {
         return valueWithOption.map(({ label, value }) => label || value).join(', ');
       } else {
-        return valueWithOption ? valueWithOption.label ?? String(valueWithOption.value) : null;
+        return valueWithOption ? (valueWithOption.label ?? String(valueWithOption.value)) : null;
       }
     };
 

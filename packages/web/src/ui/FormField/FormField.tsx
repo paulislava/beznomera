@@ -7,8 +7,7 @@ import { useValidators } from '@/hooks/useValidators';
 // import { FileField } from '@/ui/FileButton/FileField';
 import { useMemo } from 'react';
 import { inputPlaceholders } from './constants';
-import { normalizeFunc, parseFunc } from './FormField.utils';
-import { View } from 'react-native';
+import { parseFunc } from './FormField.utils';
 
 // Контейнер для поля и кнопки
 const Wrapper = styled.div`
@@ -28,7 +27,7 @@ const Wrapper = styled.div`
  * @param {FormFieldProps<T>} props - Пропсы поля.
  * @returns {JSX.Element} - Отображение поля в форме.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 function FormField<T = any>({
   required,
   validators: rawValidators,

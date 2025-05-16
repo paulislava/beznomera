@@ -2,7 +2,11 @@ import { carService } from '@/services';
 import { Metadata } from 'next';
 import { CarInfoPage } from '@/components/CarInfo';
 
-export async function generateMetadata({ params }: { params: Promise<{ code: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ code: string }>;
+}): Promise<Metadata> {
   const { code } = await params;
 
   const info = await carService.info(code);
@@ -17,22 +21,18 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
     description,
     openGraph: {
       title,
-      description,
+      description
     }
   };
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ code: string }>
-}) {
+export default async function Page({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const info = await carService.info(code);
 
   return (
-    <div className="center-container">
-     <CarInfoPage info={info} code={code} />
+    <div className='center-container'>
+      <CarInfoPage info={info} code={code} />
     </div>
   );
 }

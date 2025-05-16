@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export const required = (value: unknown) =>
   (Array.isArray(value) && value.length > 0) || (!Array.isArray(value) && value)
     ? undefined

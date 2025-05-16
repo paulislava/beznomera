@@ -1,4 +1,3 @@
-
 import styled from 'styled-components';
 
 const Gradient = styled.div`
@@ -11,7 +10,5 @@ const Gradient = styled.div`
 `;
 
 export const Glass = () => {
-  return (
-    <Gradient />
-  );
+  return <Gradient />;
 };

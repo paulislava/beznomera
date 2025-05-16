@@ -1,22 +1,23 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
 import StyledComponentsRegistry from '@/lib/registry';
 
-import "./globals.css";
-import { CDN_URL, PRODUCTION_URL } from "@/constants/site";
+import './globals.css';
+import { CDN_URL, PRODUCTION_URL } from '@/constants/site';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin']
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin']
 });
 
 const title = 'BEZNOMERA';
-const description = 'Соцсеть для водителей. Интегрировано с Telegram. Анонимность, скорость, удобство.';
+const description =
+  'Соцсеть для водителей. Интегрировано с Telegram. Анонимность, скорость, удобство.';
 
 export const metadata: Metadata = {
   title,
@@ -27,9 +28,11 @@ export const metadata: Metadata = {
     url: PRODUCTION_URL,
     title,
     description,
-    images: [{
-      url: 'https://cdn.beznomera.net/og-image.png'
-    }]
+    images: [
+      {
+        url: 'https://cdn.beznomera.net/og-image.png'
+      }
+    ]
   },
   twitter: {
     card: 'summary_large_image',
@@ -53,20 +56,18 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#090633',
+  themeColor: '#090633'
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <StyledComponentsRegistry>
-          {children}
-        </StyledComponentsRegistry>
+        <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
       </body>
     </html>
   );

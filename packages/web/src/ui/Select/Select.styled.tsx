@@ -16,7 +16,9 @@ export const DropdownBase = styled.div`
   background: #2d303e;
   border: 1px solid rgb(57, 60, 73);
   /* shadow-m */
-  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.08), 0px 15px 35px -5px rgba(17, 24, 38, 0.15),
+  box-shadow:
+    0px 5px 15px 0px rgba(0, 0, 0, 0.08),
+    0px 15px 35px -5px rgba(17, 24, 38, 0.15),
     0px 0px 0px 1px rgba(152, 161, 179, 0.1);
   border-radius: 8px;
 
@@ -48,14 +50,14 @@ export const Dropdown = styled(DropdownBase)<{
           margin-bottom: 6px;
         `
       : $position === 'bottom'
-      ? css`
-          top: 100%;
-          margin-top: 6px;
-          margin-bottom: 0;
-        `
-      : css`
-          visibility: hidden;
-        `}
+        ? css`
+            top: 100%;
+            margin-top: 6px;
+            margin-bottom: 0;
+          `
+        : css`
+            visibility: hidden;
+          `}
 `;
 
 const dropdownItemMixin = css`

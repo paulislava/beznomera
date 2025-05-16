@@ -91,7 +91,7 @@ const SvgContainer = styled.svg`
 `;
 
 export function PageView(props: ViewProps) {
-  const {  fullHeight, center, children, ...otherProps } = props;
+  const { fullHeight, center, children, ...otherProps } = props;
   const theme = useColorScheme();
 
   return (
@@ -102,11 +102,7 @@ export function PageView(props: ViewProps) {
         </SvgContainer>
       )}
       <ScrollableContainer>
-        <StyledViewContainer
-          $fullHeight={fullHeight}
-          $center={center}
-          {...otherProps}
-        >
+        <StyledViewContainer $fullHeight={fullHeight} $center={center} {...otherProps}>
           {children}
         </StyledViewContainer>
       </ScrollableContainer>

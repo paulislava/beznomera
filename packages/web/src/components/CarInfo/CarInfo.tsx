@@ -39,11 +39,11 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
             .call(
               location
                 ? {
-                  coords: {
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude
+                    coords: {
+                      latitude: location.coords.latitude,
+                      longitude: location.coords.longitude
+                    }
                   }
-                }
                 : {},
 
               code
@@ -68,8 +68,6 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
     [code, eventData]
   );
 
-
-
   const openChat = useCallback(() => {
     window.open(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=msg_${encodeURIComponent(code)}`);
   }, [code]);
@@ -85,7 +83,9 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
       {info.brand && (
         <ModelRow>
           <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
-          {info.brand.logoUrl && <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} height={21.5} width={100} />}
+          {info.brand.logoUrl && (
+            <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} height={21.5} width={100} />
+          )}
           <CarModel>{info.model}</CarModel>
         </ModelRow>
       )}
@@ -141,7 +141,5 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
         </Button>
       </ButtonsColumn>
     </>
-
   );
 };
-

@@ -36,7 +36,8 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
     const route = this.api.simpleRoutes[path](...(pathSegments ?? []));
 
     const res = await fetch(
-      `${BACKEND_URL}${this.basePath}${route ? `/${route}` : ''}${queryParams ? `?${new URLSearchParams(queryParams).toString()}` : ''
+      `${BACKEND_URL}${this.basePath}${route ? `/${route}` : ''}${
+        queryParams ? `?${new URLSearchParams(queryParams).toString()}` : ''
       }`,
       {
         credentials: 'include',

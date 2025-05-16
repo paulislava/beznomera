@@ -12,8 +12,12 @@ const LoadingContainer = styled.div`
   animation: spin 1s linear infinite;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -31,22 +35,22 @@ type RawLoadingProps = LoadingProps & {
   color: string;
 };
 
-const ActivityIndicator = styled.div<{ $size: LoadingProps['size'], $color: string }>`
+const ActivityIndicator = styled.div<{ $size: LoadingProps['size']; $color: string }>`
   ${({ $size }) => {
-      const width = (() => {
-        switch ($size) {
-          case 'small':
-            return 20;
-          case 'large':
-            return 40;
-          default:
-            return $size ?? 20;
-        }
-      })();
+    const width = (() => {
+      switch ($size) {
+        case 'small':
+          return 20;
+        case 'large':
+          return 40;
+        default:
+          return $size ?? 20;
+      }
+    })();
 
-      return css`
-        width: ${width}px;
-        height: ${width}px;
+    return css`
+      width: ${width}px;
+      height: ${width}px;
     `;
   }}
 

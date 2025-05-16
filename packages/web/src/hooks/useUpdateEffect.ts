@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef } from 'react';
 
 /**
@@ -6,7 +5,7 @@ import { useEffect, useRef } from 'react';
  * @param {Function} effect
  * @param {Array<any>} dependencies
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export default function useUpdateEffect(effect: () => void, dependencies: any[]) {
   const isInitialMount = useRef(true);
 

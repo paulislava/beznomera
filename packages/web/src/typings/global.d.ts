@@ -1,4 +1,3 @@
-
 type ChildrenProps = {
   children?: React.ReactNode;
 };
@@ -10,15 +9,15 @@ type OneAndMany<T> = T & T[];
 
 type Paths<T> = T extends object
   ? T extends (infer E)[]
-      ? Paths<E>
-      : {
-            [K in keyof T]: `${Exclude<K, symbol>}${'' | `.${Paths<T[K]>}`}`;
-        }[keyof T]
+    ? Paths<E>
+    : {
+        [K in keyof T]: `${Exclude<K, symbol>}${'' | `.${Paths<T[K]>}`}`;
+      }[keyof T]
   : never;
 
 type Leaves<T> = T extends object
   ? {
-        [K in keyof T]: `${Exclude<K, symbol>}${Leaves<T[K]> extends never ? '' : `.${Leaves<T[K]>}`}`;
+      [K in keyof T]: `${Exclude<K, symbol>}${Leaves<T[K]> extends never ? '' : `.${Leaves<T[K]>}`}`;
     }[keyof T]
   : never;
 
@@ -38,8 +37,8 @@ type ValidatePath<T, K extends string> = K extends keyof T
   ? K
   : K extends `${infer K0}.${infer KR}`
     ? K0 extends keyof T
-        ? `${K0}.${ValidatePath<T[K0], KR>}`
-        : Extract<keyof T, string>
+      ? `${K0}.${ValidatePath<T[K0], KR>}`
+      : Extract<keyof T, string>
     : Extract<keyof T, string>;
 
 // Доработать для вложенных свойств
@@ -47,8 +46,8 @@ type DeepIdx<T, K extends Paths<T>> = K extends keyof T
   ? T[K]
   : K extends `${infer K0 extends string}.${infer KR extends string}`
     ? K0 extends keyof T
-        ? DeepIdx<NonNullable<T[K0]>, KR>
-        : never
+      ? DeepIdx<NonNullable<T[K0]>, KR>
+      : never
     : never;
 
 type OneOrMany<T> = T | T[];
@@ -65,9 +64,7 @@ type ClassNameProps = {
 
 type AwaitedResult<T> = Awaited<ReturnType<T>>;
 type ArrElement<ArrType> =
-  NonNullable<ArrType> extends readonly (infer ElementType)[]
-      ? ElementType
-      : never;
+  NonNullable<ArrType> extends readonly (infer ElementType)[] ? ElementType : never;
 
 type ExtractPromised<T> = Awaited<ReturnType<T>>;
 type ExtractPromisedElement<T> = ArrElement<ExtractPromised<T>>;

@@ -9,5 +9,4 @@ const locale = {
   messages
 };
 
-
 export default locale;
