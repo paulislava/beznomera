@@ -3,7 +3,9 @@ import { ResponseCode } from '@shared/errors';
 import { ResponseWithCode } from '@shared/responses';
 import { isClient } from './env';
 
-export const BACKEND_URL = isClient ? process.env.NEXT_PUBLIC_BACKEND_URL : process.env.BACKEND_URL;
+export const BACKEND_URL = isClient
+  ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? '/api')
+  : process.env.BACKEND_URL;
 
 if (!BACKEND_URL) {
   throw new Error(`BACKEND_URL is not defined`);
