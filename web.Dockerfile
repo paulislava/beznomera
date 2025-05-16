@@ -23,16 +23,16 @@ RUN npm run build:web
 
 FROM node:20.18-slim AS web
 
-WORKDIR /app
+ENV HOME=/app
 
-COPY --from=build ${HOME}/next.config.js ./
-COPY --from=build-web /app/packages/web/.next /app/.next
-COPY --from=build-web /app/packages/web/public /app/public
-COPY --from=build ${HOME}/.next/static ./.next/static
-COPY --from=build ${HOME}/.next/server ./.next/server
-COPY --from=build ${HOME}/.next/standalone ./
-COPY --from=build-web /app/packages/web/package.json /app/package.json
-COPY --from=build-web /app/packages/web/node_modules /app/node_modules
+WORKDIR ${HOME}
+
+COPY --from=build-web ${HOME}/next.config.js ./
+COPY --from=build-web ${HOME}/public ./public
+COPY --from=build-web ${HOME}/package.json ./package.json
+COPY --from=build-web ${HOME}/.next/static ./.next/static
+COPY --from=build-web ${HOME}/.next/server ./.next/server
+COPY --from=build-web ${HOME}/.next/standalone ./
 
 RUN chgrp -R 0 /app/.next && chmod -R g=u /app/.next
 
