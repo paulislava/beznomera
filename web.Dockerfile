@@ -5,6 +5,7 @@ WORKDIR /app
 COPY .eslintignore /app
 COPY .prettierignore /app
 COPY *.json /app/
+COPY packages/web/next.config.js /app/packages/web/
 COPY packages/shared/*.json /app/packages/shared/
 COPY packages/web/*.json /app/packages/web/
 COPY packages/shared/patches /app/packages/shared/patches
@@ -27,9 +28,9 @@ ENV HOME=/app
 
 WORKDIR ${HOME}
 
-COPY ./packages/web/next.config.js ./
+COPY --from=build-web ${HOME}/packages/web/next.config.js ./
 COPY --from=build-web ${HOME}/packages/web/public ./public
-COPY ./packages/web/package.json ./package.json
+COPY --from=build-web ${HOME}/packages/web/package.json ./package.json
 COPY --from=build-web ${HOME}/packages/web/.next/static ./.next/static
 COPY --from=build-web ${HOME}/packages/web/.next/server ./.next/server
 COPY --from=build-web ${HOME}/packages/web/.next/standalone ./
