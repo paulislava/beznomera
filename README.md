@@ -32,3 +32,33 @@ sudo docker run -it -d -p 4000:80 beznomera:frontend
 # Запуск postgres
 
 docker run -d --name postgres -p 5432:5432 -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=somepassword postgres:16.1
+
+## Мониторинг пайплайна
+
+### Автоматическое отслеживание
+После каждого push автоматически запускается мониторинг GitHub Actions пайплайна с озвучиванием уведомлений.
+
+### Ручной запуск мониторинга
+```bash
+# Быстрый запуск
+./scripts/monitor-pipeline.sh
+
+# Полный контроль параметров
+./scripts/pipeline-monitor.sh paulislava beznomera dev.yml
+
+# Тестирование уведомлений
+./scripts/test-monitor.sh
+```
+
+### Уведомления
+- "Отслеживание пайплайна начато" - при запуске
+- "НАЗВАНИЕ_ДЖОБЫ успешно завершена" - при успехе
+- "НАЗВАНИЕ_ДЖОБЫ завершена с ошибкой" - при ошибке
+- "Весь пайплайн успешно завершен" - при успешном завершении
+
+### Требования
+- GitHub CLI (gh) установлен и авторизован
+- Команда `say` доступна (встроена в macOS)
+- Права на чтение GitHub Actions API
+
+Подробная документация: [scripts/README.md](scripts/README.md)
