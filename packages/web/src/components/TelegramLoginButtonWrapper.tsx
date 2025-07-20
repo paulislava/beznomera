@@ -16,7 +16,7 @@ const TelegramLoginButton = dynamic(
 );
 
 export const TelegramLoginButtonWrapper: React.FC<TelegramLoginButtonWrapperProps> = ({
-  botName,``
+  botName,
   dataOnauth
 }) => {
   return (

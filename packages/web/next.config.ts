@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   env: {
     NEXT_PUBLIC_TELEGRAM_BOT_NAME: process.env.TELEGRAM_BOT_NAME,
-    NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_URL,
+    NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_PUBLIC_URL,
     NEXT_PUBLIC_CDN_URL: process.env.CDN_URL
   }
 };
