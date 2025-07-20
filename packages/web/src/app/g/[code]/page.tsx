@@ -26,7 +26,7 @@ export async function generateMetadata({
         description
       }
     };
-  } catch (error) {
+  } catch {
     return {
       title: 'Ссылка не действительна',
       description: 'Ссылка на автомобиль не действительна или устарела'
@@ -40,14 +40,14 @@ export async function generateStaticParams() {
     return codes.map(code => ({
       code
     }));
-  } catch (error) {
+  } catch {
     return [];
   }
 }
 
 export default async function Page({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  
+
   try {
     const info = await carService.info(code);
 
@@ -56,7 +56,7 @@ export default async function Page({ params }: { params: Promise<{ code: string 
         <CarInfoPage info={info} code={code} />
       </div>
     );
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

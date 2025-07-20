@@ -7,10 +7,12 @@
 ## Структура файлов
 
 ### Страницы аутентификации
+
 - `/auth` - основная страница входа с telegram-login-button
 - `/auth/callback` - страница обработки возврата (упрощена)
 
 ### Компоненты и хуки
+
 - `@/components/AuthGuard` - компонент для защиты маршрутов
 - `@/components/TelegramLoginButtonWrapper` - обертка для telegram-login-button
 - `@/hooks/useAuth` - хук для проверки авторизации
@@ -25,9 +27,7 @@ import { AuthGuard } from '@/components/AuthGuard';
 export default function ProtectedPage() {
   return (
     <AuthGuard>
-      <div>
-        {/* Контент, доступный только авторизованным пользователям */}
-      </div>
+      <div>{/* Контент, доступный только авторизованным пользователям */}</div>
     </AuthGuard>
   );
 }
@@ -146,4 +146,4 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 
 ### Telegram Login Button
 
-Используется официальная кнопка входа через Telegram, которая обеспечивает безопасную авторизацию и соответствует дизайн-гайдам Telegram. 
+Используется официальная кнопка входа через Telegram, которая обеспечивает безопасную авторизацию и соответствует дизайн-гайдам Telegram.

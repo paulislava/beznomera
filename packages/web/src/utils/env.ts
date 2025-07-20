@@ -3,11 +3,11 @@ function env(name: string, defaultValue: string): string {
   const envName = isClient ? `NEXT_PUBLIC_${name}` : name;
 
   const value = process.env[envName];
-  
+
   if (!value && !defaultValue) {
     console.warn(`Environment variable ${envName} is not set and no default value provided`);
   }
-  
+
   return (value as string) || defaultValue;
 }
 

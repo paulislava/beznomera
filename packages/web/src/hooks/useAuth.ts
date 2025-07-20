@@ -23,10 +23,10 @@ export const useAuth = (props?: UseAuthProps) => {
         setRequested(true);
         setLoading(false);
         props?.onAuth?.();
-      } catch (error) {
+      } catch {
         // Проверяем, есть ли данные от Telegram Web App
         const initData = initDataRaw();
-        
+
         if (initData) {
           try {
             await authService.authTelegramWebApp({ data: initData });
@@ -39,11 +39,11 @@ export const useAuth = (props?: UseAuthProps) => {
             console.error('Web App auth error:', webAppError);
           }
         }
-        
+
         setAuthorized(false);
         setRequested(true);
         setLoading(false);
-        
+
         if (props?.redirectToAuth !== false) {
           router.replace(`/auth?to=${encodeURIComponent(pathname)}`);
         }
@@ -58,4 +58,4 @@ export const useAuth = (props?: UseAuthProps) => {
     requested,
     loading
   };
-}; 
+};

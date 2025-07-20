@@ -1,11 +1,12 @@
+
 :root {
-  --background: linear-gradient(150deg, #0026EB80 2%, #FFFFFF 54%);
+  --background: linear-gradient(150deg, #0026eb80 2%, #ffffff 54%);
   --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: linear-gradient(to bottom, #090633  0%, #05031C 45%, #000000 100%);
+    --background: linear-gradient(to bottom, #090633 0%, #05031c 45%, #000000 100%);
     --foreground: #ededed;
   }
 }

@@ -10,21 +10,15 @@ interface TelegramLoginButtonWrapperProps {
 }
 
 // Динамический импорт для TelegramLoginButton
-const TelegramLoginButton = dynamic(
-  () => import('telegram-login-button'),
-  { ssr: false }
-);
+const TelegramLoginButton = dynamic(() => import('telegram-login-button'), { ssr: false });
 
 export const TelegramLoginButtonWrapper: React.FC<TelegramLoginButtonWrapperProps> = ({
   botName,
   dataOnauth
 }) => {
   return (
-    <div className="flex justify-center">
-      <TelegramLoginButton 
-        botName={botName} 
-        dataOnauth={dataOnauth}
-      />
+    <div className='flex justify-center'>
+      <TelegramLoginButton botName={botName} dataOnauth={dataOnauth} />
     </div>
   );
-}; 
+};
