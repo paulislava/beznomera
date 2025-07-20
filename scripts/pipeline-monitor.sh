@@ -88,32 +88,8 @@ monitor_pipeline() {
     
     echo -e "${BLUE}📊 Отслеживаем workflow run: $latest_run${NC}"
     
-    # Отслеживаем статус workflow
-    while true; do
-        local workflow_status=$(get_workflow_status "$latest_run")
-        local workflow_conclusion=$(get_workflow_conclusion "$latest_run")
-        
-        if [[ "$workflow_status" == "completed" ]]; then
-            if [[ "$workflow_conclusion" == "success" ]]; then
-                echo -e "${GREEN}🎉 Весь пайплайн успешно завершен!${NC}"
-                say_message "Весь пайплайн успешно завершен"
-                break
-            else
-                echo -e "${RED}💥 Пайплайн завершен с ошибками${NC}"
-                say_message "Пайплайн завершен с ошибками"
-                break
-            fi
-        elif [[ "$workflow_status" == "in_progress" ]]; then
-            echo -e "${YELLOW}⏳ Пайплайн выполняется...${NC}"
-        elif [[ "$workflow_status" == "queued" ]]; then
-            echo -e "${BLUE}⏸️  Пайплайн в очереди...${NC}"
-        fi
-        
-        sleep 15
-    done
-    
-    # Отслеживаем отдельные джобы
-    echo -e "${BLUE}📋 Отслеживаем отдельные джобы...${NC}"
+    # Получаем и отслеживаем джобы параллельно с workflow
+    echo -e "${BLUE}📋 Получаем список джоб...${NC}"
     
     local jobs=$(get_jobs "$latest_run")
     local job_ids=()
@@ -137,7 +113,32 @@ monitor_pipeline() {
         pids+=($!)
     done
     
-    # Ждем завершения всех процессов мониторинга
+    # Отслеживаем статус workflow параллельно с джобами
+    while true; do
+        local workflow_status=$(get_workflow_status "$latest_run")
+        local workflow_conclusion=$(get_workflow_conclusion "$latest_run")
+        
+        if [[ "$workflow_status" == "completed" ]]; then
+            if [[ "$workflow_conclusion" == "success" ]]; then
+                echo -e "${GREEN}🎉 Весь пайплайн успешно завершен!${NC}"
+                say_message "Весь пайплайн успешно завершен"
+                break
+            else
+                echo -e "${RED}💥 Пайплайн завершен с ошибками${NC}"
+                say_message "Пайплайн завершен с ошибками"
+                break
+            fi
+        elif [[ "$workflow_status" == "in_progress" ]]; then
+            echo -e "${YELLOW}⏳ Пайплайн выполняется...${NC}"
+        elif [[ "$workflow_status" == "queued" ]]; then
+            echo -e "${BLUE}⏸️  Пайплайн в очереди...${NC}"
+        fi
+        
+        sleep 15
+    done
+    
+    # Ждем завершения всех процессов мониторинга джоб
+    echo -e "${BLUE}⏳ Ожидаем завершения мониторинга джоб...${NC}"
     for pid in "${pids[@]}"; do
         wait "$pid"
     done
