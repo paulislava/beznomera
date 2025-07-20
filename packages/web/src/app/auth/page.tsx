@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/services';
 import { TELEGRAM_BOT_NAME } from '@/utils/env';
@@ -8,7 +8,7 @@ import { initDataRaw } from '@telegram-apps/sdk-react';
 import type { TelegramUser } from 'telegram-login-button';
 import { TelegramLoginButtonWrapper } from '@/components/TelegramLoginButtonWrapper';
 
-export default function AuthPage() {
+function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const to = searchParams.get('to') || '/';
@@ -66,5 +66,13 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      <AuthPageContent />
+    </Suspense>
   );
 }

@@ -5,10 +5,11 @@ import { isClient } from './env';
 
 export const BACKEND_URL = isClient
   ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? '/api')
-  : process.env.BACKEND_URL;
+  : (process.env.BACKEND_URL ?? 'http://localhost:3001');
 
-if (!BACKEND_URL) {
-  throw new Error(`BACKEND_URL is not defined`);
+// Проверяем только в клиентской части
+if (isClient && !process.env.NEXT_PUBLIC_BACKEND_URL) {
+  console.warn('NEXT_PUBLIC_BACKEND_URL is not defined, using default /api');
 }
 
 class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {

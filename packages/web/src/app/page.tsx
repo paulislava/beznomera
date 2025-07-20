@@ -14,7 +14,9 @@ export default function Home() {
           <div className='mb-8'>
             <TailwindTest />
           </div>
-          <Button>Click me</Button>
+          <Button color='primary' type='button'>
+            Click me
+          </Button>
         </main>
       </div>
     </AuthGuard>
