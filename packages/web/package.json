@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@telegram-apps/sdk-react": "^3.2.4",
+    "@telegram-apps/sdk-react": "^3.3.6",
     "final-form": "^4.20.10",
     "next": "15.3.2",
     "react": "^19.0.0",
@@ -17,7 +17,8 @@
     "react-final-form": "^6.5.9",
     "react-imask": "^7.6.1",
     "react-textarea-autosize": "^8.5.9",
-    "styled-components": "^6.1.18"
+    "styled-components": "^6.1.18",
+    "telegram-login-button": "^0.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

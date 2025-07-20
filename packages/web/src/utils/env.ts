@@ -1,7 +1,10 @@
-function env(name: string, defaultValue: unknown) {
+function env(name: string, defaultValue: string): string {
   const isClient = typeof window !== 'undefined';
   const envName = isClient ? `NEXT_PUBLIC_${name}` : name;
-  return process.env[envName] || defaultValue;
+
+  console.log(envName, process.env);
+  console.log(isClient);
+  return (process.env[envName] as string) || defaultValue;
 }
 
 export default env;
