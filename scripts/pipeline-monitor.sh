@@ -146,6 +146,7 @@ monitor_pipeline() {
     echo -e "${GREEN}✅ Мониторинг пайплайна завершен${NC}"
 }
 
+
 # Проверяем наличие gh CLI
 if ! command -v gh &> /dev/null; then
     echo -e "${RED}❌ GitHub CLI (gh) не установлен${NC}"
