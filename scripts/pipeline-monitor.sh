@@ -24,6 +24,13 @@ say_message() {
     say "$message" 2>/dev/null || echo "say command not available"
 }
 
+# Функция для получения ошибок workflow
+get_workflow_errors() {
+    local run_id="$1"
+    local errors=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id --jq '.message' 2>/dev/null || echo "")
+    echo "$errors"
+}
+
 # Функция для получения статуса workflow run
 get_workflow_status() {
     local run_id="$1"
@@ -43,6 +50,14 @@ get_jobs() {
     local run_id="$1"
     local jobs=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs --jq '.jobs[] | {id: .id, name: .name, status: .status, conclusion: .conclusion}' 2>/dev/null || echo "")
     echo "$jobs"
+}
+
+# Функция для получения ошибок из джобы
+get_job_errors() {
+    local run_id="$1"
+    local job_id="$2"
+    local errors=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id/logs --jq '.message' 2>/dev/null || echo "")
+    echo "$errors"
 }
 
 # Функция для ожидания создания workflow run
@@ -121,6 +136,14 @@ monitor_job() {
                 break
             else
                 echo -e "${RED}❌ $job_name завершена с ошибкой${NC}"
+                
+                # Получаем и выводим ошибки из джобы
+                local job_errors=$(get_job_errors "$run_id" "$job_id")
+                if [[ -n "$job_errors" ]]; then
+                    echo -e "${RED}🔍 Ошибка в джобе $job_name:${NC}"
+                    echo -e "${RED}$job_errors${NC}"
+                fi
+                
                 say_message "$job_name завершена с ошибкой"
                 break
             fi
@@ -225,6 +248,13 @@ monitor_pipeline() {
                 else
                     echo -e "${RED}💥 Пайплайн завершен с ошибками${NC}"
                     say_message "Пайплайн завершен с ошибками"
+                    
+                    # Получаем и выводим ошибки workflow
+                    local workflow_errors=$(get_workflow_errors "$latest_run")
+                    if [[ -n "$workflow_errors" ]]; then
+                        echo -e "${RED}🔍 Ошибки в workflow:${NC}"
+                        echo -e "${RED}$workflow_errors${NC}"
+                    fi
                     break
                 fi
             elif [[ "$workflow_status" == "in_progress" ]]; then
