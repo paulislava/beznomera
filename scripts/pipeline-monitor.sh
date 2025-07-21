@@ -27,19 +27,75 @@ say_message() {
 # Функция для получения статуса workflow run
 get_workflow_status() {
     local run_id="$1"
-    gh api repos/$OWNER/$REPO/actions/runs/$run_id --jq '.status'
+    local status=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id --jq '.status' 2>/dev/null || echo "error")
+    echo "$status"
 }
 
 # Функция для получения результата workflow run
 get_workflow_conclusion() {
     local run_id="$1"
-    gh api repos/$OWNER/$REPO/actions/runs/$run_id --jq '.conclusion'
+    local conclusion=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id --jq '.conclusion' 2>/dev/null || echo "error")
+    echo "$conclusion"
 }
 
 # Функция для получения списка джобов
 get_jobs() {
     local run_id="$1"
-    gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs --jq '.jobs[] | {id: .id, name: .name, status: .status, conclusion: .conclusion}'
+    local jobs=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs --jq '.jobs[] | {id: .id, name: .name, status: .status, conclusion: .conclusion}' 2>/dev/null || echo "")
+    echo "$jobs"
+}
+
+# Функция для ожидания создания workflow run
+wait_for_workflow_run() {
+    local temp_file="$1"
+    local max_attempts=30
+    local attempt=1
+    
+    echo -e "${BLUE}⏳ Ожидаем создания workflow run...${NC}"
+    
+    while [[ $attempt -le $max_attempts ]]; do
+        local latest_run=$(gh api repos/$OWNER/$REPO/actions/workflows/$WORKFLOW_ID/runs --jq '.workflow_runs[0].id' 2>/dev/null || echo "")
+        
+        if [[ -n "$latest_run" && "$latest_run" != "null" ]]; then
+            echo -e "${GREEN}✅ Workflow run найден: $latest_run${NC}"
+            echo "$latest_run" > "$temp_file"
+            return 0
+        fi
+        
+        echo -e "${YELLOW}⏳ Попытка $attempt/$max_attempts: workflow run еще не создан...${NC}"
+        sleep 10
+        ((attempt++))
+    done
+    
+    echo -e "${RED}❌ Не удалось найти workflow run после $max_attempts попыток${NC}"
+    return 1
+}
+
+# Функция для ожидания появления джоб
+wait_for_jobs() {
+    local run_id="$1"
+    local temp_file="$2"
+    local max_attempts=20
+    local attempt=1
+    
+    echo -e "${BLUE}⏳ Ожидаем появления джоб...${NC}"
+    
+    while [[ $attempt -le $max_attempts ]]; do
+        local jobs=$(get_jobs "$run_id")
+        
+        if [[ -n "$jobs" ]]; then
+            echo -e "${GREEN}✅ Джобы найдены${NC}"
+            echo "$jobs" > "$temp_file"
+            return 0
+        fi
+        
+        echo -e "${YELLOW}⏳ Попытка $attempt/$max_attempts: джобы еще не созданы...${NC}"
+        sleep 5
+        ((attempt++))
+    done
+    
+    echo -e "${RED}❌ Не удалось найти джобы после $max_attempts попыток${NC}"
+    return 1
 }
 
 # Функция для отслеживания джобы
@@ -49,8 +105,14 @@ monitor_job() {
     local job_name="$3"
     
     while true; do
-        local job_status=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id --jq '.status')
-        local job_conclusion=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id --jq '.conclusion')
+        local job_status=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id --jq '.status' 2>/dev/null || echo "error")
+        local job_conclusion=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id --jq '.conclusion' 2>/dev/null || echo "error")
+        
+        if [[ "$job_status" == "error" ]]; then
+            echo -e "${YELLOW}⚠️  Ошибка получения статуса джобы $job_name, повторяем...${NC}"
+            sleep 5
+            continue
+        fi
         
         if [[ "$job_status" == "completed" ]]; then
             if [[ "$job_conclusion" == "success" ]]; then
@@ -77,71 +139,109 @@ monitor_pipeline() {
     echo -e "${BLUE}🚀 Начинаем отслеживание пайплайна...${NC}"
     say_message "Отслеживание пайплайна начато"
     
-    # Получаем последний workflow run
-    local latest_run=$(gh api repos/$OWNER/$REPO/actions/workflows/$WORKFLOW_ID/runs --jq '.workflow_runs[0].id')
+    # Ожидаем создания workflow run
+    local temp_workflow_file=$(mktemp)
+    wait_for_workflow_run "$temp_workflow_file"
+    if [[ $? -ne 0 ]]; then
+        echo -e "${RED}❌ Не удалось найти workflow run${NC}"
+        say_message "Не удалось найти workflow run"
+        rm -f "$temp_workflow_file"
+        exit 1
+    fi
+    
+    local latest_run=$(cat "$temp_workflow_file" 2>/dev/null || echo "")
+    rm -f "$temp_workflow_file"
     
     if [[ -z "$latest_run" ]]; then
-        echo -e "${RED}❌ Не удалось найти последний workflow run${NC}"
-        say_message "Не удалось найти последний workflow run"
+        echo -e "${RED}❌ Не удалось получить ID workflow run${NC}"
+        say_message "Не удалось получить ID workflow run"
         exit 1
     fi
     
     echo -e "${BLUE}📊 Отслеживаем workflow run: $latest_run${NC}"
     
-    # Получаем и отслеживаем джобы параллельно с workflow
-    echo -e "${BLUE}📋 Получаем список джоб...${NC}"
+    # Ожидаем появления джоб
+    local temp_jobs_file=$(mktemp)
+    wait_for_jobs "$latest_run" "$temp_jobs_file"
+    if [[ $? -ne 0 ]]; then
+        echo -e "${RED}❌ Не удалось найти джобы${NC}"
+        say_message "Не удалось найти джобы"
+        rm -f "$temp_jobs_file"
+        exit 1
+    fi
     
-    local jobs=$(get_jobs "$latest_run")
+    local jobs=$(cat "$temp_jobs_file" 2>/dev/null || echo "")
+    rm -f "$temp_jobs_file"
+    
+    if [[ -z "$jobs" ]]; then
+        echo -e "${RED}❌ Не удалось получить список джоб${NC}"
+        say_message "Не удалось получить список джоб"
+        exit 1
+    fi
+    
+    # Парсим джобы
     local job_ids=()
     local job_names=()
     
-    # Парсим джобы
     while IFS= read -r job; do
-        local job_id=$(echo "$job" | jq -r '.id')
-        local job_name=$(echo "$job" | jq -r '.name')
-        
-        job_ids+=("$job_id")
-        job_names+=("$job_name")
-        
-        echo -e "${BLUE}📝 Джоба: $job_name (ID: $job_id)${NC}"
+        if [[ -n "$job" ]]; then
+            local job_id=$(echo "$job" | jq -r '.id' 2>/dev/null || echo "")
+            local job_name=$(echo "$job" | jq -r '.name' 2>/dev/null || echo "")
+            
+            if [[ -n "$job_id" && "$job_id" != "null" && -n "$job_name" ]]; then
+                job_ids+=("$job_id")
+                job_names+=("$job_name")
+                echo -e "${BLUE}📝 Джоба: $job_name (ID: $job_id)${NC}"
+            fi
+        fi
     done <<< "$jobs"
     
-    # Запускаем мониторинг каждой джобы в фоне
-    local pids=()
-    for i in "${!job_ids[@]}"; do
-        monitor_job "$latest_run" "${job_ids[$i]}" "${job_names[$i]}" &
-        pids+=($!)
-    done
-    
-    # Отслеживаем статус workflow параллельно с джобами
-    while true; do
-        local workflow_status=$(get_workflow_status "$latest_run")
-        local workflow_conclusion=$(get_workflow_conclusion "$latest_run")
+    if [[ ${#job_ids[@]} -eq 0 ]]; then
+        echo -e "${YELLOW}⚠️  Не найдено активных джоб${NC}"
+    else
+        # Запускаем мониторинг каждой джобы в фоне
+        local pids=()
+        for i in "${!job_ids[@]}"; do
+            monitor_job "$latest_run" "${job_ids[$i]}" "${job_names[$i]}" &
+            pids+=($!)
+        done
         
-        if [[ "$workflow_status" == "completed" ]]; then
-            if [[ "$workflow_conclusion" == "success" ]]; then
-                echo -e "${GREEN}🎉 Весь пайплайн успешно завершен!${NC}"
-                say_message "Весь пайплайн успешно завершен"
-                break
-            else
-                echo -e "${RED}💥 Пайплайн завершен с ошибками${NC}"
-                say_message "Пайплайн завершен с ошибками"
-                break
+        # Отслеживаем статус workflow параллельно с джобами
+        while true; do
+            local workflow_status=$(get_workflow_status "$latest_run")
+            local workflow_conclusion=$(get_workflow_conclusion "$latest_run")
+            
+            if [[ "$workflow_status" == "error" ]]; then
+                echo -e "${YELLOW}⚠️  Ошибка получения статуса workflow, повторяем...${NC}"
+                sleep 5
+                continue
             fi
-        elif [[ "$workflow_status" == "in_progress" ]]; then
-            echo -e "${YELLOW}⏳ Пайплайн выполняется...${NC}"
-        elif [[ "$workflow_status" == "queued" ]]; then
-            echo -e "${BLUE}⏸️  Пайплайн в очереди...${NC}"
-        fi
+            
+            if [[ "$workflow_status" == "completed" ]]; then
+                if [[ "$workflow_conclusion" == "success" ]]; then
+                    echo -e "${GREEN}🎉 Весь пайплайн успешно завершен!${NC}"
+                    say_message "Весь пайплайн успешно завершен"
+                    break
+                else
+                    echo -e "${RED}💥 Пайплайн завершен с ошибками${NC}"
+                    say_message "Пайплайн завершен с ошибками"
+                    break
+                fi
+            elif [[ "$workflow_status" == "in_progress" ]]; then
+                echo -e "${YELLOW}⏳ Пайплайн выполняется...${NC}"
+            elif [[ "$workflow_status" == "queued" ]]; then
+                echo -e "${BLUE}⏸️  Пайплайн в очереди...${NC}"
+            fi
+            
+            sleep 15
+        done
         
-        sleep 15
-    done
-    
-    # Ждем завершения всех процессов мониторинга джоб
-    echo -e "${BLUE}⏳ Ожидаем завершения мониторинга джоб...${NC}"
-    for pid in "${pids[@]}"; do
-        wait "$pid"
-    done
+        # Ждем завершения всех процессов мониторинга джоб
+        echo -e "${BLUE}⏳ Ожидаем завершения мониторинга джоб...${NC}"
+        for pid in "${pids[@]}"; do
+            wait "$pid" 2>/dev/null || true
+        done
+    fi
     
     echo -e "${GREEN}✅ Мониторинг пайплайна завершен${NC}"
 }
