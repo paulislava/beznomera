@@ -47,7 +47,7 @@ import userAgentParser from 'useragent';
 import { Response, Request } from 'express';
 import { Creatable } from '@paulislava/shared/forms';
 import { ImageBody } from '@paulislava/shared/core.types';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 import { ApiClientAuthGuard } from '../auth/api-auth.guard';
 
 class LocationDto implements LocationInfo {

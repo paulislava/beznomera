@@ -13,7 +13,7 @@ import { AuthCode } from '../entities/auth-code.entity';
 import { User } from '../entities/user/user.entity';
 import { UserDraft } from '../entities/user/user-draft.entity';
 import { UserCore } from '../entities/user/user-core.entity';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 import { AdminUser } from '../entities/admin-user.entity';
 
 import { AuthMode } from './auth.types';

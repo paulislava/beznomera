@@ -9,7 +9,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 import { CurrentUser } from './user.decorator';
 import { UserService } from './user.service';
-import { RequestUser } from './user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 
 @Controller(USER_API.path)
 @UseGuards(JwtAuthGuard)

@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository, Not } from 'typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { ConfigService } from '../config/config.service';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 import { FileFolder } from '@paulislava/shared/file/file.types';
 
 import { TEMP_FILE_LIFETIME } from './file.constant';

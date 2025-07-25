@@ -14,7 +14,7 @@ import {
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 import { Agent } from 'useragent';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore cannot find module?

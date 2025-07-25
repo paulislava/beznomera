@@ -11,7 +11,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 import { FileFolder, FileInfo } from '@paulislava/shared/file/file.types';
 
 import { WrongMimetypeException } from './file.exceptions';

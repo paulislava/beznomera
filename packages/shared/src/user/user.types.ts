@@ -19,3 +19,8 @@ export interface UserProfile {
   nickname?: string;
   tel?: string;
 }
+
+export interface RequestUser {
+  userId: number;
+  telegramID: number;
+}

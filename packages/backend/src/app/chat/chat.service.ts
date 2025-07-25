@@ -7,7 +7,7 @@ import { AnonymousUser } from '../entities/user/anonymous-user.entity';
 import { TelegramService } from '../telegram/telegram.service';
 import { ConfigService } from '../config/config.service';
 import { Response, Request } from 'express';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 import userAgentParser from 'useragent';
 import { ChatMessageData } from './chat.types';
 import { Car } from '../entities/car/car.entity';

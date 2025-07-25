@@ -5,7 +5,7 @@ import { User } from '../entities/user/user.entity';
 import { LocationInfo } from '@paulislava/shared/car/car.types';
 import { ExtraLocation } from 'telegraf/typings/telegram-types';
 import { Buffer } from 'buffer';
-import { RequestUser } from '../users/user.types';
+import { RequestUser } from '@paulislava/shared/user/user.types';
 
 @Injectable()
 export class TelegramService {

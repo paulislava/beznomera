@@ -27,8 +27,6 @@ export async function POST(request: NextRequest) {
     // Получаем куки из ответа backend
     const token = await response.text();
 
-    console.log(token);
-
     if (token) {
       // Создаем ответ с кукой
       const nextResponse = NextResponse.json({ success: true });
@@ -37,7 +35,7 @@ export async function POST(request: NextRequest) {
       nextResponse.cookies.set(AUTH_COOKIE_NAME, token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'none',
+        sameSite: 'lax',
         path: '/',
         expires: new Date(Date.now() + AUTH_TOKEN_EXPIRATION_TIME)
       });

@@ -3,6 +3,7 @@ import { ResponseCode } from '@shared/errors';
 import { ResponseWithCode } from '@shared/responses';
 import { isClient } from './env';
 import React from 'react';
+import { AUTH_USER_TOKEN_HEADER } from '@shared/auth/auth.api';
 
 export const BACKEND_URL = isClient
   ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? '/api')
@@ -17,8 +18,9 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   private readonly basePath: string;
   private readonly api: APIInfo<T>;
   private readonly apiToken: string;
+  private readonly userToken: string;
 
-  constructor(api: APIInfo<T>) {
+  constructor(api: APIInfo<T>, userToken?: string) {
     if (!api) {
       throw new Error(`api is not defined`);
     }
@@ -26,6 +28,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
     this.api = api;
     this.basePath = api.path.startsWith('/') ? api.path : `/${api.path}`;
     this.apiToken = process.env.BACKEND_API_TOKEN ?? '';
+    this.userToken = userToken ?? '';
   }
 
   async fetch<Path extends keyof T>({
@@ -41,6 +44,16 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   }): Promise<Response> {
     const route = this.api.simpleRoutes[path](...(pathSegments ?? []));
 
+    const headers: Record<string, unknown> = { ...(options?.headers ?? {}) };
+
+    if (this.apiToken) {
+      headers['Authorization'] = `Bearer ${this.apiToken}`;
+    }
+
+    if (this.userToken) {
+      headers[AUTH_USER_TOKEN_HEADER] = this.userToken;
+    }
+
     const res = await fetch(
       `${BACKEND_URL}${this.basePath}${route ? `/${route}` : ''}${
         queryParams ? `?${new URLSearchParams(queryParams).toString()}` : ''
@@ -51,10 +64,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
           revalidate: 60 * 60
         },
         ...options,
-        headers: {
-          ...options?.headers,
-          Authorization: `Bearer ${this.apiToken}`
-        }
+        headers: headers as HeadersInit
       }
     );
 
@@ -133,9 +143,10 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
 
 export function createApiService<T extends { [K in keyof T]: (...args: any[]) => any }>(
   api: APIInfo<T>,
+  userToken?: string,
   methods?: (service: ApiService<T>) => Partial<T>
 ): T {
-  const service = new ApiService<T>(api);
+  const service = new ApiService<T>(api, userToken);
 
   const rawMethods = methods?.(service);
 

@@ -29,3 +29,4 @@ export default AUTH_API;
 export type { Telegram, WebAppInitData, WebAppUser } from '@twa-dev/types';
 
 export const AUTH_TOKEN_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 30; // 30 days
+export const AUTH_USER_TOKEN_HEADER = 'x-user-token';
