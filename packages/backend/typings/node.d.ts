@@ -7,5 +7,6 @@ declare namespace NodeJS {
     ROUTE_PREFIX: string | undefined;
     DISABLE_TELEGRAM?: string;
     CDN_URL: string;
+    BACKEND_API_TOKEN: string;
   }
 }

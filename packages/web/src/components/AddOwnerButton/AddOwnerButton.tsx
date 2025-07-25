@@ -26,7 +26,7 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
 
     try {
       const result = await requestContactPromise();
-      const contactRaw = result?.contact;
+      const contactRaw = result?.parsed?.contact;
       if (!contactRaw) {
         alert('Не удалось получить контакт');
         return;
@@ -35,12 +35,12 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
         id: contactRaw.user_id,
         first_name: contactRaw.first_name,
         last_name: contactRaw.last_name,
-        username: contactRaw.username,
-        phone_number: contactRaw.phone_number,
+        username: contactRaw.username?.toString(),
+        phone_number: contactRaw.phone_number
       };
       const body: AddOwnerBody = {
         contact,
-        carId,
+        carId
       };
       await carService.addOwner(body);
       handleEvent('add_owner_success', { carId, ...eventData });
@@ -66,4 +66,4 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
       {isLoading ? 'Добавление...' : 'Добавить владельца'}
     </Button>
   );
-}; 
+};

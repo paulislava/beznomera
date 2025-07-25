@@ -9,8 +9,7 @@ export default async function CarPage({ params }: PromiseParams<{ id: string }>)
   if (!idNumber) return notFound();
 
   try {
-    const info = await carService.fullInfo(idNumber);
-    console.log(info);
+    const info = await carService.fullInfoApi(idNumber);
     return (
       <div className='center-container'>
         <CarInfoPage info={info} code={info.code} />

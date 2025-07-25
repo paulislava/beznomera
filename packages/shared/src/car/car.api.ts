@@ -19,6 +19,7 @@ export interface CarApi {
   my(...args: any[]): Promise<ShortCarInfo[]>;
   sendMessage(body: CarMessageBody, code: string, ...args: any[]): Promise<void>;
   fullInfo(id: number, ...args: any[]): Promise<FullCarInfo>;
+  fullInfoApi(id: number, ...args: any[]): Promise<FullCarInfo>;
   infoForUpdate(id: number, ...args: any[]): Promise<EditCarInfo>;
   update(body: EditCarInfo, id: number, ...args: any[]): Promise<void>;
   create(body: EditCarInfo, ...args: any[]): Promise<{ id: number }>;
@@ -36,6 +37,7 @@ export const ID_PARAM = 'id';
 const CAR_ROUTES: APIRoutes<CarApi> = {
   info: code => `${code || `:${CODE_PARAM}`}/info`,
   fullInfo: id => `${id || `:${ID_PARAM}`}/full-info`,
+  fullInfoApi: id => `${id || `:${ID_PARAM}`}/full-info-api`, 
   call: {
     path: code => `${code || `:${CODE_PARAM}`}/call`,
     method: 'POST'

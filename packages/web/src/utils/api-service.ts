@@ -16,6 +16,7 @@ if (isClient && !process.env.NEXT_PUBLIC_BACKEND_URL) {
 class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   private readonly basePath: string;
   private readonly api: APIInfo<T>;
+  private readonly apiToken: string;
 
   constructor(api: APIInfo<T>) {
     if (!api) {
@@ -24,6 +25,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
 
     this.api = api;
     this.basePath = api.path.startsWith('/') ? api.path : `/${api.path}`;
+    this.apiToken = process.env.BACKEND_API_TOKEN ?? '';
   }
 
   async fetch<Path extends keyof T>({
@@ -45,7 +47,14 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
       }`,
       {
         credentials: 'include',
-        ...options
+        next: {
+          revalidate: 60 * 60
+        },
+        ...options,
+        headers: {
+          ...options?.headers,
+          Authorization: `Bearer ${this.apiToken}`
+        }
       }
     );
 

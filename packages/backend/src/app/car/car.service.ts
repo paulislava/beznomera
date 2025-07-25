@@ -182,9 +182,9 @@ export class CarService {
     );
   }
 
-  async getFullInfo(id: number, user: RequestUser): Promise<FullCarInfo> {
+  async getFullInfo(id: number, user?: RequestUser): Promise<FullCarInfo> {
     const car = await this.carRepository.findOne({
-      where: { id, owner: { id: user.userId } },
+      where: { id, owner: user ? { id: user.userId } : undefined },
       relations: ['owner', 'brand', 'color'],
     });
 

@@ -48,6 +48,7 @@ import { Response, Request } from 'express';
 import { Creatable } from '@paulislava/shared/forms';
 import { ImageBody } from '@paulislava/shared/core.types';
 import { RequestUser } from '../users/user.types';
+import { ApiClientAuthGuard } from '../auth/api-auth.guard';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -239,6 +240,14 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<FullCarInfo> {
     return this.carService.getFullInfo(id, user);
+  }
+
+  @Get(CAR_API.backendRoutes.fullInfoApi)
+  @UseGuards(ApiClientAuthGuard)
+  fullInfoApi(
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+  ): Promise<FullCarInfo> {
+    return this.carService.getFullInfo(id);
   }
 
   @Get(CAR_API.backendRoutes.infoForUpdate)
