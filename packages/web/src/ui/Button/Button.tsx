@@ -62,8 +62,8 @@ const StyledPressable = styled(RawButton)<{
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
 
   /* Явно убираем все границы по умолчанию */
-  border: none !important;
-  outline: none !important;
+  border: none;
+  outline: none;
 
   ${({ $view, $theme }) => {
     const config = getViewConfig($view);
