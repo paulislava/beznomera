@@ -5,7 +5,8 @@ import path from 'path';
 const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
-    workerThreads: false
+    workerThreads: false,
+    authInterrupts: true
   },
   images: {
     remotePatterns: [new URL(`${CDN_URL}/**`)]

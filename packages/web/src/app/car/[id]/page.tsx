@@ -1,31 +1,24 @@
-import { notFound, forbidden } from 'next/navigation';
+import { forbidden, notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { CarInfoPage } from '@/components/CarInfo';
 import { AddOwnerButton } from '@/components/AddOwnerButton';
-import { NextRequest } from 'next/server';
+import { getUserFromRequest } from '@/utils/auth';
 
-type PromiseParams<T> = { params: Promise<T>; request: NextRequest };
-
-export default async function CarPage(props: PromiseParams<{ id: string }>) {
-  const { params, request } = props;
-
+export default async function CarPage({ params }: PromiseParams<{ id: string }>) {
   const { id } = await params;
   const idNumber = Number(id);
+  if (!idNumber) return notFound();
 
-  // console.log(props);
-
-  const user = request.user;
+  const user = await getUserFromRequest();
 
   if (!user) {
     return forbidden();
   }
 
-  if (!idNumber) return notFound();
-
   try {
     const info = await carService.fullInfoApi(idNumber);
 
-    if (info.owner.id !== user.userId) {
+    if (info.owner.id !== user?.userId) {
       return notFound();
     }
 
