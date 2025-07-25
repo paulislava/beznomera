@@ -50,5 +50,6 @@ export const CarExternalImage = styled(Image)<{
   margin: 40px auto;
   width: calc(100% - 40px);
   max-width: 400px;
+  object-fit: contain;
   aspect-ratio: ${({ $aspectRatio }) => $aspectRatio ?? 400 / 142};
 `;
