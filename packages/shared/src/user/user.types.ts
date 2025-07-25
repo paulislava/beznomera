@@ -18,6 +18,7 @@ export interface UserProfile {
   avatarUrl?: string;
   nickname?: string;
   tel?: string;
+  id?: number;
 }
 
 export interface RequestUser {

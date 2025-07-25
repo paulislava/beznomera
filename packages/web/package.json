@@ -11,8 +11,10 @@
   "dependencies": {
     "@heroui/react": "2.8.1",
     "@telegram-apps/sdk-react": "^3.3.6",
+    "@types/jsonwebtoken": "9.0.10",
     "final-form": "^4.20.10",
     "framer-motion": "12.23.6",
+    "jsonwebtoken": "9.0.2",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

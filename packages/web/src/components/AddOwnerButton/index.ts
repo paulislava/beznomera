@@ -1,1 +1,1 @@
-export * from './AddOwnerButton'; 
+export * from './AddOwnerButton';
