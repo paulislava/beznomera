@@ -2,6 +2,7 @@ import { APIInfo } from '@shared/api-routes';
 import { ResponseCode } from '@shared/errors';
 import { ResponseWithCode } from '@shared/responses';
 import { isClient } from './env';
+import React from 'react';
 
 export const BACKEND_URL = isClient
   ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? '/api')
@@ -162,14 +163,28 @@ export function createApiService<T extends { [K in keyof T]: (...args: any[]) =>
   return { ...rawMethods, ...readyMethods } as T;
 }
 
-// export function useAPI<T>(func: () => Promise<T>) {
-//   const [value, setValue] = useState<T>();
+// Хук для работы с API в React компонентах
+export function useAPI<T>(func: () => Promise<T>) {
+  const [value, setValue] = React.useState<T>();
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<Error | null>(null);
 
-//   const callbackFunction = useCallback(() => {
-//     func().then(setValue);
-//   }, [func]);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const result = await func();
+        setValue(result);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//   useEffect(callbackFunction, [callbackFunction]);
+    fetchData();
+  }, [func]);
 
-//   return value;
-// }
+  return { value, loading, error };
+}

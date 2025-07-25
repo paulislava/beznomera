@@ -7,6 +7,7 @@ const Gradient = styled.div`
   top: 0;
   right: 0;
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(30px);
 `;
 
 export const Glass = () => {
