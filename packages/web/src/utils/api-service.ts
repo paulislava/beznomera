@@ -6,7 +6,7 @@ import React from 'react';
 
 export const BACKEND_URL = isClient
   ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? '/api')
-  : (process.env.BACKEND_URL ?? 'http://localhost:3001');
+  : (process.env.BACKEND_URL ?? 'http://localhost:3000');
 
 // Проверяем только в клиентской части
 if (isClient && !process.env.NEXT_PUBLIC_BACKEND_URL) {

@@ -45,8 +45,8 @@ export class AuthController implements AuthApi {
   async authTelegram(
     @Body() data: AuthTelegramDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<void> {
-    await this.authService.authTelegram(data, res);
+  ): Promise<string> {
+    return await this.authService.authTelegram(data, res);
   }
 
   @Get(AUTH_API.backendRoutes.checkAuthorized)
@@ -58,7 +58,7 @@ export class AuthController implements AuthApi {
   async authTelegramWebApp(
     @Body() { data }: AuthTelegramWebAppData,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<void> {
-    await this.authService.authTelegramWebApp(data, res);
+  ): Promise<string> {
+    return await this.authService.authTelegramWebApp(data, res);
   }
 }

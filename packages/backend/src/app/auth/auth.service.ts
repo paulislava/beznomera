@@ -28,7 +28,7 @@ import { randomDigitsString } from '~/common/utils/randomDigitsString';
 import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
 import { createHash, createHmac } from 'crypto';
 import querystring from 'querystring';
-import { WebAppUser } from '@paulislava/shared/auth/auth.api';
+import { AUTH_TOKEN_EXPIRATION_TIME, WebAppUser } from '@paulislava/shared/auth/auth.api';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +45,7 @@ export class AuthService {
     private readonly userDraftRepository: Repository<UserDraft>,
     @InjectRepository(AdminUser)
     private readonly adminUserRepository: Repository<AdminUser>,
-  ) {}
+  ) { }
 
   @Transactional()
   async authFinish(
@@ -53,11 +53,11 @@ export class AuthService {
     identifier: string,
     code: string,
     res: Response,
-  ): Promise<void> {
+  ): Promise<string> {
     const authCode = await this.authCheck(authMode, identifier, code);
     const user = await this.getOrCreateUserByAuthCode(authCode);
 
-    this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
+    return this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
   }
 
   @Transactional()
@@ -100,7 +100,7 @@ export class AuthService {
     }
   }
 
-  async authTelegram(data: AuthTelegramData, res: Response): Promise<void> {
+  async authTelegram(data: AuthTelegramData, res: Response): Promise<string> {
     this.checkTelegramData(data);
 
     const findUser = await this.userRepository.findOne({
@@ -110,7 +110,7 @@ export class AuthService {
     });
 
     if (findUser) {
-      this.saveAuthCookie(
+      return this.saveAuthCookie(
         { userId: findUser.id, telegramID: findUser.telegramID },
         res,
       );
@@ -127,10 +127,10 @@ export class AuthService {
       }),
     );
 
-    this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
+    return this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
   }
 
-  async authTelegramWebApp(data: string, res: Response): Promise<void> {
+  async authTelegramWebApp(data: string, res: Response): Promise<string> {
     const userData = this.checkTelegramWebAppData(data);
 
     if (!userData.id) {
@@ -144,11 +144,10 @@ export class AuthService {
     });
 
     if (findUser) {
-      this.saveAuthCookie(
+      return this.saveAuthCookie(
         { userId: findUser.id, telegramID: findUser.telegramID },
         res,
       );
-      return;
     }
 
     const user = await this.userRepository.save(
@@ -160,7 +159,7 @@ export class AuthService {
       }),
     );
 
-    this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
+    return this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
   }
 
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
@@ -193,10 +192,10 @@ export class AuthService {
   }
 
   private saveAuthCookie(requestUser: RequestUser, res: Response) {
-    const now = new Date();
-    const expires = new Date(now.setDate(now.getDate() + 30));
 
-    const token = this.jwtService.sign(requestUser, { expiresIn: '30d' });
+    const expires = new Date(Date.now() + AUTH_TOKEN_EXPIRATION_TIME);
+
+    const token = this.jwtService.sign(requestUser, { expiresIn: AUTH_TOKEN_EXPIRATION_TIME });
     res.cookie(this.configService.auth.jwtCookie, token, {
       expires,
       httpOnly: true,
@@ -204,6 +203,8 @@ export class AuthService {
       sameSite: 'none',
       path: '/',
     });
+
+    return token;
   }
 
   private comparePassword(password: string, passwordHash: string): boolean {
