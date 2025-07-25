@@ -5,9 +5,7 @@ import { notFound } from 'next/navigation';
 
 export async function generateMetadata({
   params
-}: {
-  params: Promise<{ code: string }>;
-}): Promise<Metadata> {
+}: PromiseParams<{ code: string }>): Promise<Metadata> {
   const { code } = await params;
 
   try {
@@ -45,7 +43,7 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function Page({ params }: { params: Promise<{ code: string }> }) {
+export default async function Page({ params }: PromiseParams<{ code: string }>) {
   const { code } = await params;
 
   try {

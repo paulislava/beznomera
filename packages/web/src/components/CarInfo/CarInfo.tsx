@@ -21,6 +21,8 @@ import {
 } from '@/components/CarDetails';
 import { ButtonsColumn } from '@/ui/Styled';
 import Link from 'next/link';
+import { isTelegramWebApp } from '@/utils/telegram';
+import { AddOwnerButton } from '@/components/AddOwnerButton';
 
 interface CarInfoProps {
   info: CarInfo;
@@ -136,6 +138,7 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
             Отправить сообщение
           </Button>
         </Link>
+        {isTelegramWebApp && <AddOwnerButton carId={info.id} eventData={eventData} />}
         <Button href='/' view='glass' event='go_create_qr' eventParams={eventData}>
           Создать свой QR-код
         </Button>

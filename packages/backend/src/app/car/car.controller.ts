@@ -28,6 +28,8 @@ import {
   CarCallBody,
   CarMessageBody,
   ModelInfo,
+  AddOwnerBody,
+  TelegramContact,
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -37,6 +39,8 @@ import {
   IsOptional,
   IsString,
   ValidateNested,
+  IsNotEmpty,
+  IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
@@ -152,6 +156,28 @@ export class CarUpdateDto implements EditCarInfo {
 
 export class CarCreateDto extends CarUpdateDto {}
 
+export class TelegramContactDto implements TelegramContact {
+  @IsNotEmpty()
+  id: number;
+
+  @IsNotEmpty()
+  first_name: string;
+
+  last_name?: string;
+  username?: string;
+
+  @IsNotEmpty()
+  phone_number: string;
+}
+
+export class AddOwnerDto implements AddOwnerBody {
+  @IsObject()
+  contact: TelegramContactDto;
+
+  @IsNotEmpty()
+  carId: number;
+}
+
 @Controller(CAR_API.path)
 export class CarController implements CarApi {
   constructor(private readonly carService: CarService) {}
@@ -261,6 +287,15 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<void> {
     await this.carService.sendQR(image, id, user);
+  }
+
+  @Post(':id/add-owner')
+  @UseGuards(JwtAuthGuard)
+  async addOwner(
+    @Body() body: AddOwnerDto,
+    @CurrentUser() user: RequestUser
+  ): Promise<void> {
+    return this.carService.addOwner(body, user.userId);
   }
 
   @Delete(CAR_API.backendRoutes.delete)

@@ -3,7 +3,8 @@ import {
   miniApp,
   initData,
   expandViewport,
-  requestFullscreen
+  requestFullscreen,
+  requestContactPromise
 } from '@telegram-apps/sdk-react';
 
 export let isTelegramWebApp = false;
@@ -21,3 +22,5 @@ export const initWebApp = async () => {
     console.error(error);
   }
 };
+
+export { requestContactPromise };

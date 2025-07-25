@@ -8,7 +8,8 @@ import {
   ShortCarInfo,
   CarPlateBody,
   BrandInfo,
-  ModelInfo
+  ModelInfo,
+  AddOwnerBody
 } from './car.types';
 
 export interface CarApi {
@@ -26,6 +27,7 @@ export interface CarApi {
   delete(id: number, ...args: any[]): Promise<void>;
   brands(...args: any[]): Promise<BrandInfo[]>;
   models(brandId: number, ...args: any[]): Promise<ModelInfo[]>;
+  addOwner(body: AddOwnerBody, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -69,6 +71,10 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   models: {
     path: brandId => `${brandId || `:${ID_PARAM}`}/models`,
     method: 'GET'
+  },
+  addOwner: {
+    path: ':id/add-owner',
+    method: 'POST'
   }
 };
 

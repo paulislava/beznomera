@@ -9,6 +9,8 @@ import {
   ShortCarInfo,
   CarCallBody,
   CarMessageBody,
+  AddOwnerBody,
+  TelegramContact,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
@@ -34,6 +36,7 @@ import { ChatService } from '../chat/chat.service';
 import { BrandInfo, ModelInfo } from '@paulislava/shared/car/car.types';
 import { Brand } from '../entities/car/brand.entity';
 import { Model } from '../entities/car/model.entity';
+import { User } from '../entities/user/user.entity';
 @Injectable()
 export class CarService {
   constructor(
@@ -202,6 +205,12 @@ export class CarService {
       messagesCount,
       callsCount,
       chatsCount,
+      owner: {
+        firstName: car.owner.firstName,
+        lastName: car.owner.lastName,
+        nickname: car.owner.nickname,
+        tel: car.owner.tel,
+      },
     };
   }
 
@@ -383,5 +392,36 @@ export class CarService {
 
   async getModels(): Promise<ModelInfo[]> {
     return this.modelRepository.find();
+  }
+
+  async addOwner(body: AddOwnerBody, userId: number): Promise<void> {
+    const car = await this.carRepository.findOneOrFail({
+      where: { id: body.carId },
+      relations: ['owner'],
+    });
+
+    // Проверяем, что пользователь является владельцем автомобиля
+    if (car.owner.id !== userId) {
+      throw new Error('Только владелец автомобиля может добавлять других владельцев');
+    }
+
+    // Ищем или создаем пользователя по Telegram ID
+    const userRepo = this.carRepository.manager.getRepository(User);
+    let newOwner = await userRepo.findOne({ where: { telegramID: body.contact.id } });
+
+    if (!newOwner) {
+      newOwner = userRepo.create({
+        firstName: body.contact.first_name,
+        lastName: body.contact.last_name,
+        nickname: body.contact.username,
+        telegramID: body.contact.id,
+        tel: body.contact.phone_number,
+      });
+      newOwner = await userRepo.save(newOwner);
+    }
+
+    // Обновляем владельца автомобиля
+    car.owner = newOwner;
+    await this.carRepository.save(car);
   }
 }
