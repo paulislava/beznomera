@@ -24,7 +24,10 @@ export const ModelRow = styled.div`
   width: 100%;
 `;
 
-export const BrandLogo = styled(Image)`
+export const BrandLogo = styled(Image).attrs({
+  width: 100,
+  height: 21.5
+})`
   margin: 0 10px;
   width: 100px;
   height: 21.5px;

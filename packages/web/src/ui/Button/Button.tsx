@@ -7,6 +7,7 @@ import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
 import { useColorScheme } from '@/components/useColorScheme';
 import { RawLoading } from '@/components/Loading';
+import { Button as RawButton } from '@heroui/react';
 
 type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
 
@@ -49,7 +50,7 @@ const viewConfigs: Record<ButtonView, ViewConfig> = {
 
 const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
 
-const StyledPressable = styled.button<{
+const StyledPressable = styled(RawButton)<{
   $view: ButtonView;
   $theme: ColorSchemeName;
   $fullWidth?: boolean;
@@ -59,6 +60,10 @@ const StyledPressable = styled.button<{
   border-radius: 35px;
   overflow: hidden;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
+
+  /* Явно убираем все границы по умолчанию */
+  border: none !important;
+  outline: none !important;
 
   ${({ $view, $theme }) => {
     const config = getViewConfig($view);
@@ -70,7 +75,7 @@ const StyledPressable = styled.button<{
       ${$view === 'glass' &&
       css`
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
       `}
     `;

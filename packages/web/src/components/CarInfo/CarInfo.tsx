@@ -85,9 +85,7 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
       {info.brand && (
         <ModelRow>
           <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
-          {info.brand.logoUrl && (
-            <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} height={21.5} width={100} />
-          )}
+          {info.brand.logoUrl && <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} />}
           <CarModel>{info.model}</CarModel>
         </ModelRow>
       )}
