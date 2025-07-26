@@ -37,6 +37,6 @@ body {
   justify-content: center;
   align-items: center;
   flex-flow: column;
-  min-height: 100vh;
+  flex: 1;
   width: 100%;
 }

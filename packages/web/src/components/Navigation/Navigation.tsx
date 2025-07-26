@@ -59,7 +59,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const showBackButton = pathname !== '/';
 
   return (
-    <div className='min-h-screen'>
+    <div className='min-h-screen flex flex-col'>
       <StyledNavbar isBordered maxWidth='xl' position='sticky'>
         <NavbarContent>
           <NavbarMenuToggle aria-label='Открыть меню' className='sm:hidden' />
@@ -104,23 +104,10 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
               </Link>
             </NavbarMenuItem>
           ))}
-          {showBackButton && (
-            <NavbarMenuItem>
-              <Button
-                variant='flat'
-                color='default'
-                size='sm'
-                onPress={handleGoBack}
-                className='w-full'
-              >
-                ← Назад
-              </Button>
-            </NavbarMenuItem>
-          )}
         </NavbarMenu>
       </StyledNavbar>
 
-      <main className='flex-1'>{children}</main>
+      <main className='flex-1 flex flex-col'>{children}</main>
     </div>
   );
 };
