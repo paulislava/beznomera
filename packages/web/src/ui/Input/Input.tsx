@@ -29,7 +29,8 @@ export const Input: FC<InputProps> = ({
   onlyInput,
   height,
   onFocus,
-  onBlur
+  onBlur,
+  value
 }) => {
   const extractedProps = {
     required,
@@ -40,7 +41,8 @@ export const Input: FC<InputProps> = ({
     name,
     onChange,
     onFocus,
-    onBlur
+    onBlur,
+    value
   };
 
   const onInput = useCallback(
@@ -53,11 +55,12 @@ export const Input: FC<InputProps> = ({
   );
   return (
     <S.Container>
-      {!onlyInput && <S.Label>{label}</S.Label>}
       <S.InputRow>
         <S.InputContainer className={className}>
           {type === 'textarea' ? (
             <S.Textarea
+              label={!onlyInput && label}
+              variant='faded'
               placeholder={placeholder || label?.toString()}
               {...extractedProps}
               maxRows={maxRows}
@@ -72,6 +75,8 @@ export const Input: FC<InputProps> = ({
               autoComplete={autoComplete ? undefined : 'off'}
               onInput={onInput}
               height={height}
+              type={type}
+              label={!onlyInput && label}
             />
           )}
         </S.InputContainer>

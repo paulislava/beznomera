@@ -1,8 +1,7 @@
 import { IMaskInput } from 'react-imask';
 import styled, { css } from 'styled-components';
 import { themeable } from '@/themes/utils';
-import infoIcon from 'assets/info.svg';
-import TextareaAutosize from 'react-textarea-autosize';
+import { Textarea as HeroTextarea, Input as HeroInput } from '@heroui/input';
 
 export const inputContainerMixin = css<{ height?: number }>`
   /* Base / Dark Line */
@@ -59,7 +58,7 @@ export const Meta = styled.div`
   color: #ff0000;
 
   &::before {
-    content: url(${infoIcon});
+    content: 'ℹ';
   }
 `;
 
@@ -78,24 +77,21 @@ export const InputContainer = styled.div`
   cursor: text;
 `;
 
-export const Textarea = styled(TextareaAutosize)<{ height?: number }>`
-  ${inputContainerMixin}
-  resize: none;
+export const Textarea = styled(HeroTextarea)`
+  backdrop-filter: blur(10px);
 `;
 
-export const Input = styled(IMaskInput)<{
+export const Input = styled(HeroInput)<{
   $center?: boolean;
   height?: number;
 }>`
-  ${inputContainerMixin}
-
   ${({ $center }) =>
     $center &&
     css`
       text-align: center;
     `}
 
-    &::-webkit-inner-spin-button,
+  &::-webkit-inner-spin-button,
     &::-webkit-calendar-picker-indicator {
     display: none;
     -webkit-appearance: none;

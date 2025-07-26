@@ -1,3 +1,5 @@
+import { heroui } from '@heroui/react';
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,6 +8,7 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}'
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -18,7 +21,7 @@ module.exports = {
       }
     }
   },
-  plugins: [require('./src/themes/hero.ts')],
+  plugins: [heroui()],
   corePlugins: {
     preflight: false // Отключаем preflight для совместимости с существующими стилями
   }

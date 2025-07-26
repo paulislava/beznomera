@@ -4,11 +4,9 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: linear-gradient(to bottom, #090633 0%, #05031c 45%, #000000 100%);
-    --foreground: #ededed;
-  }
+.dark {
+  --background: linear-gradient(to bottom, #090633 0%, #05031c 45%, #000000 100%);
+  --foreground: #ededed;
 }
 
 html,
@@ -38,10 +36,8 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.dark {
+  color-scheme: dark;
 }
 
 .center-container {
@@ -51,4 +47,16 @@ a {
   flex-flow: column;
   min-height: 100vh;
   width: 100%;
+}
+
+textarea, input {
+  border: none;
+  overflow: auto;
+  outline: none;
+
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+
+  resize: none; /*remove the resize handle on the bottom right*/
 }

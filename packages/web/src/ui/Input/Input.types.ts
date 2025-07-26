@@ -1,7 +1,6 @@
-import { HTMLInputTypeAttribute } from 'react';
 import { SubmissionError } from '@shared/errors';
 import { FieldInputProps, FieldRenderProps } from 'react-final-form';
-export type RawInputType = HTMLInputTypeAttribute | 'textarea';
+export type RawInputType = 'text' | 'search' | 'url' | 'tel' | 'email' | 'password' | (string & {});
 
 export type RawInputProps = {
   label?: React.ReactNode;
@@ -15,6 +14,7 @@ export type RawInputProps = {
   onClick?(): void;
   onlyInput?: boolean;
   height?: number;
+  value?: string;
 };
 
 export type InputProps = MakeOptionalProps<FieldInputProps<any>, 'name' | 'onBlur' | 'onFocus'> &

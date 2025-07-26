@@ -22,6 +22,7 @@ interface ButtonProps {
   className?: string;
   noFollowNoIndex?: boolean;
   fullWidth?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 type ViewConfig = {
@@ -140,7 +141,8 @@ export const Button = forwardRef<any, ButtonProps>(
       eventParams,
       className,
       noFollowNoIndex,
-      fullWidth
+      fullWidth,
+      type = 'button'
     },
     ref
   ) => {
@@ -177,6 +179,7 @@ export const Button = forwardRef<any, ButtonProps>(
         disabled={disabled}
         className={className}
         onClick={handleClick}
+        type={type}
       >
         {view === 'glass' && <Glass />}
         <StyledText $visible={!isLoading}>{children}</StyledText>

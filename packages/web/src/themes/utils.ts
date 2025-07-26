@@ -10,10 +10,7 @@ export const themeable =
   (param: Leaves<ThemeValues>) =>
   ({ theme }: ThemeProps) =>
     param.includes('.')
-      ? param
-          .split('.')
-
-          .reduce<{ [key: string]: any }>((acc, key) => acc[key], theme)
+      ? param.split('.').reduce<{ [key: string]: any }>((acc, key) => acc[key], theme)
       : theme[param as keyof ThemeValues];
 
 /**
