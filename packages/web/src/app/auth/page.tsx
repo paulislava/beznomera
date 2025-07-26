@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/services';
 import { TELEGRAM_BOT_NAME } from '@/utils/env';
@@ -69,5 +69,9 @@ function AuthPageContent() {
 }
 
 export default function AuthPage() {
-  return <AuthPageContent />;
+  return (
+    <Suspense fallback={<div>Загрузка...</div>}>
+      <AuthPageContent />
+    </Suspense>
+  );
 }
