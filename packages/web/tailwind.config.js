@@ -21,8 +21,5 @@ module.exports = {
       }
     }
   },
-  plugins: [heroui()],
-  corePlugins: {
-    preflight: false // Отключаем preflight для совместимости с существующими стилями
-  }
+  plugins: [heroui()]
 };

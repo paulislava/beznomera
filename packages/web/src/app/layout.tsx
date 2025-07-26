@@ -4,9 +4,9 @@ import Script from 'next/script';
 import StyledComponentsRegistry from '@/lib/registry';
 
 import './globals.css';
-import './tailwind.css';
 import { CDN_URL, PRODUCTION_URL } from '@/constants/site';
 import { ProvidersContainer } from '@/components/ProvidersContainer/ProvidersContainer';
+import { Navigation } from '@/components/Navigation';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -71,7 +71,9 @@ export default function RootLayout({
     <html lang='ru'>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <StyledComponentsRegistry>
-          <ProvidersContainer>{children}</ProvidersContainer>
+          <ProvidersContainer>
+            <Navigation>{children}</Navigation>
+          </ProvidersContainer>
         </StyledComponentsRegistry>
 
         <Script
