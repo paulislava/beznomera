@@ -55,16 +55,12 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  if (isTelegramApp) {
-    return <>{children}</>;
-  }
-
   const menuItems = [
     { name: 'Мои авто', href: '/', requiresAuth: true },
     { name: 'Добавить авто', href: '/car/new', requiresAuth: true }
   ];
 
-  const filteredMenuItems = menuItems.filter(item => !item.requiresAuth);
+  const filteredMenuItems = menuItems;
 
   const handleGoBack = () => {
     router.back();
@@ -79,56 +75,58 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   return (
     <div className='min-h-screen flex flex-col'>
-      <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
-        <NavbarContent>
-          <NavbarMenuToggle
-            aria-label='Открыть меню'
-            className='sm:hidden'
-            onPress={handleMenuToggle}
-          />
-          <NavbarBrand>
-            <Link href='/' className='font-bold text-inherit'>
-              BEZNOMERA
-            </Link>
-          </NavbarBrand>
-        </NavbarContent>
-
-        <NavbarContent className='hidden sm:flex gap-4' justify='center'>
-          {filteredMenuItems.map(item => (
-            <NavbarItem key={item.href} isActive={pathname === item.href}>
-              <Link
-                href={item.href}
-                className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
-              >
-                {item.name}
+      {!isTelegramApp && (
+        <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
+          <NavbarContent>
+            <NavbarMenuToggle
+              aria-label='Открыть меню'
+              className='sm:hidden'
+              onPress={handleMenuToggle}
+            />
+            <NavbarBrand>
+              <Link href='/' className='font-bold text-inherit'>
+                BEZNOMERA
               </Link>
-            </NavbarItem>
-          ))}
-        </NavbarContent>
-
-        {showBackButton && (
-          <NavbarContent justify='end'>
-            <NavbarItem>
-              <Button variant='flat' color='default' size='sm' onPress={handleGoBack}>
-                ← Назад
-              </Button>
-            </NavbarItem>
+            </NavbarBrand>
           </NavbarContent>
-        )}
 
-        <NavbarMenu>
-          {filteredMenuItems.map(item => (
-            <NavbarMenuItem key={item.href}>
-              <Link
-                href={item.href}
-                className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
-              >
-                {item.name}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </NavbarMenu>
-      </StyledNavbar>
+          <NavbarContent className='hidden sm:flex gap-4' justify='center'>
+            {filteredMenuItems.map(item => (
+              <NavbarItem key={item.href} isActive={pathname === item.href}>
+                <Link
+                  href={item.href}
+                  className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
+                >
+                  {item.name}
+                </Link>
+              </NavbarItem>
+            ))}
+          </NavbarContent>
+
+          {showBackButton && (
+            <NavbarContent justify='end'>
+              <NavbarItem>
+                <Button variant='flat' color='default' size='sm' onPress={handleGoBack}>
+                  ← Назад
+                </Button>
+              </NavbarItem>
+            </NavbarContent>
+          )}
+
+          <NavbarMenu>
+            {filteredMenuItems.map(item => (
+              <NavbarMenuItem key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
+                >
+                  {item.name}
+                </Link>
+              </NavbarMenuItem>
+            ))}
+          </NavbarMenu>
+        </StyledNavbar>
+      )}
 
       <PageContainer>{children}</PageContainer>
     </div>
