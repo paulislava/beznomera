@@ -31,11 +31,12 @@ const ImageContainer = styled.div`
 interface CarEditFormProps {
   initialData: EditCarInfo;
   carId: number;
+  revalidatePages?: (carId: number, code: string) => Promise<void>;
 }
 
 const Field = FormField<EditCarInfo>;
 
-export function CarEditForm({ initialData, carId }: CarEditFormProps) {
+export function CarEditForm({ initialData, carId, revalidatePages }: CarEditFormProps) {
   const router = useRouter();
 
   const onSubmit = useCallback(
@@ -44,13 +45,19 @@ export function CarEditForm({ initialData, carId }: CarEditFormProps) {
         await carService.update(data, carId);
         showSuccessMessage('Успех!', 'Автомобиль успешно обновлен');
         form.restart(data);
+
+        // Ревалидируем страницы через серверное действие
+        if (revalidatePages) {
+          await revalidatePages(carId, data.code);
+        }
+
         router.push(`/car/${carId}`);
       } catch (error) {
         console.error('Ошибка при обновлении автомобиля:', error);
         showErrorMessage('Ошибка!', 'Ошибка при обновлении автомобиля');
       }
     },
-    [carId, router]
+    [carId, router, revalidatePages]
   );
 
   return (
@@ -63,7 +70,7 @@ export function CarEditForm({ initialData, carId }: CarEditFormProps) {
             <Field name='model' label='Модель' />
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />
-            <Field name='imageRatio' type='number' label='Соотношение сторон' />
+            <Field name='imageRatio' type='number' step='0.01' label='Соотношение сторон' />
             <Field name='imageUrl' type='url' label='Ссылка на изображение' />
             <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
 

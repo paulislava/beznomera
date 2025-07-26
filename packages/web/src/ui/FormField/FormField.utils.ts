@@ -9,9 +9,8 @@ const cleanSnils = (snils: string) => {
 };
 
 const cleanNumber = (number: string) => {
-  const value = number ? number.replace(/[^\d]/g, '') : '';
-
-  return value ? parseInt(value) : undefined;
+  const value = number ? number.replace(/[^\d.]/g, '') : '';
+  return value ? parseFloat(value) : undefined;
 };
 
 export const parseFunc = (type: TypeValue) => {

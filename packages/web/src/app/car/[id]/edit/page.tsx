@@ -2,6 +2,17 @@ import { forbidden, notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { CarEditForm } from '@/components/CarEditForm/CarEditForm';
+import { revalidatePath } from 'next/cache';
+
+// Серверное действие для ревалидации страниц
+async function revalidateCarPages(carId: number, code: string) {
+  'use server';
+  revalidatePath(`/car/${carId}/edit`);
+  console.log('revalidated /car/${carId}/edit');
+  revalidatePath(`/car/${carId}`);
+  revalidatePath(`/g/${code}`);
+  revalidatePath(`/g/${code}/chat`);
+}
 
 export default async function CarEditPage({ params }: PromiseParams<{ id: string }>) {
   const { id } = await params;
@@ -22,7 +33,7 @@ export default async function CarEditPage({ params }: PromiseParams<{ id: string
       return notFound();
     }
 
-    return <CarEditForm initialData={info} carId={idNumber} />;
+    return <CarEditForm initialData={info} carId={idNumber} revalidatePages={revalidateCarPages} />;
   } catch (e) {
     console.error(e);
     return notFound();
