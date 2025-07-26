@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useState } from 'react';
 
 import styled, { css } from 'styled-components';
 import { ExternalLink } from '../../components/ExternalLink';
@@ -6,7 +6,6 @@ import { ExternalLink } from '../../components/ExternalLink';
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
 import { useColorScheme } from '@/components/useColorScheme';
-import { RawLoading } from '@/components/Loading';
 import { Button as RawButton } from '@heroui/react';
 
 type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
@@ -94,7 +93,7 @@ const StyledPressable = styled(RawButton)<{
     `}
 `;
 
-const StyledText = styled.div<{ $visible: boolean }>`
+const StyledText = styled.div`
   color: inherit;
   font-size: 17px;
 
@@ -102,22 +101,6 @@ const StyledText = styled.div<{ $visible: boolean }>`
 
   padding: 15px 25px;
   font-weight: 100;
-
-  ${({ $visible }) =>
-    !$visible &&
-    css`
-      visibility: hidden;
-    `}
-`;
-
-const LoadingContainer = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  justify-content: center;
-  align-items: center;
 `;
 
 const StyledLink = styled(ExternalLink)<{ $fullWidth?: boolean }>`
@@ -168,8 +151,6 @@ export const Button = forwardRef<any, ButtonProps>(
       }
     }, [onClick, event, eventParams, isLoading]);
 
-    const viewConfig = useMemo(() => getViewConfig(view), [view]);
-
     const content = (
       <StyledPressable
         $theme={theme}
@@ -180,22 +161,10 @@ export const Button = forwardRef<any, ButtonProps>(
         className={className}
         onClick={handleClick}
         type={type}
+        isLoading={isLoading}
       >
         {view === 'glass' && <Glass />}
-        <StyledText $visible={!isLoading}>{children}</StyledText>
-
-        {isLoading && (
-          <LoadingContainer>
-            <RawLoading
-              size={25}
-              color={
-                typeof viewConfig.color === 'string'
-                  ? viewConfig.color
-                  : viewConfig.color[theme ?? 'dark']
-              }
-            />
-          </LoadingContainer>
-        )}
+        <StyledText>{children}</StyledText>
       </StyledPressable>
     );
 

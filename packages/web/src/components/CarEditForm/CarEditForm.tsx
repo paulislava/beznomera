@@ -13,15 +13,7 @@ import { PRODUCTION_URL } from '@/constants/site';
 import { FormApi } from 'final-form';
 import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-`;
+import { ButtonsRow } from '@/ui/Styled';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -89,9 +81,11 @@ export function CarEditForm({ initialData, carId }: CarEditFormProps) {
               <Field name='color' component={CarColorPicker} />
             )}
 
-            <Button onClick={handleSubmit} disabled={pristine || submitting}>
-              {submitting ? 'Сохранение...' : 'Сохранить'}
-            </Button>
+            <ButtonsRow>
+              <Button onClick={handleSubmit} disabled={pristine || submitting}>
+                Сохранить
+              </Button>
+            </ButtonsRow>
           </>
         )}
       </Form>
