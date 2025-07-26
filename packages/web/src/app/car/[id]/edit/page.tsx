@@ -14,6 +14,17 @@ async function revalidateCarPages(carId: number, code: string) {
   revalidatePath(`/g/${code}/chat`);
 }
 
+export async function generateStaticParams() {
+  try {
+    const cars = await carService.list();
+    return cars.map(car => ({
+      id: car.id
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function CarEditPage({ params }: PromiseParams<{ id: string }>) {
   const { id } = await params;
   const idNumber = Number(id);

@@ -11,6 +11,7 @@ import {
   CarMessageBody,
   AddOwnerBody,
   EditCarInfoApi,
+  ShortCarInfoApi,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
@@ -56,12 +57,32 @@ export class CarService {
     private readonly chatService: ChatService,
   ) {}
 
-  async getList(): Promise<string[]> {
+  async getList(): Promise<ShortCarInfoApi[]> {
     const cars = await this.carRepository.find({
-      select: ['code'],
+      relations: ['owner', 'brand', 'color'],
     });
 
-    return cars.map((car) => car.code);
+    return cars.map((car) => ({
+    
+        id: car.id,
+        no: car.no,
+        brand: car.brand,
+        brandRaw: car.brandRaw,
+        model: car.model,
+        year: car.year,
+        version: car.version,
+        color: car.color,
+        rawColor: car.rawColor,
+        imageUrl: car.imageUrl,
+          imageRatio: car.imageRatio,
+        owner: {
+          firstName: car.owner.firstName,
+          lastName: car.owner.lastName,
+          nickname: car.owner.nickname,
+          tel: car.owner.tel,
+        },
+        code: car.code,
+    }));
   }
 
   async getInfo(code: string): Promise<CarInfo> {

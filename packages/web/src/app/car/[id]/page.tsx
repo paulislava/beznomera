@@ -3,6 +3,17 @@ import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
 
+export async function generateStaticParams() {
+  try {
+    const cars = await carService.list();
+    return cars.map(car => ({
+      id: car.id
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function CarPage({ params }: PromiseParams<{ id: string }>) {
   const { id } = await params;
   const idNumber = Number(id);

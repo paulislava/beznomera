@@ -31,6 +31,7 @@ import {
   AddOwnerBody,
   TelegramContact,
   EditCarInfoApi,
+  ShortCarInfoApi,
   } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -210,7 +211,7 @@ export class CarController implements CarApi {
   }
 
   @Get(CAR_API.backendRoutes.list)
-  list(): Promise<string[]> {
+  list(): Promise<ShortCarInfoApi[]> {
     return this.carService.getList();
   }
 

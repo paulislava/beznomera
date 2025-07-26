@@ -34,9 +34,9 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   try {
-    const codes = await carService.list();
-    return codes.map(code => ({
-      code
+    const cars = await carService.list();
+    return cars.map(car => ({
+      code: car.code
     }));
   } catch {
     return [];

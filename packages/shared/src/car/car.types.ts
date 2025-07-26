@@ -44,6 +44,10 @@ export type ShortCarInfo = CarInfoBase & {
   imageUrl: Maybe<string>;
 };
 
+export type ShortCarInfoApi = ShortCarInfo & {
+  code: string;
+};
+
 export type CarInfo = ShortCarInfo & {
   owner: UserProfile;
 };
