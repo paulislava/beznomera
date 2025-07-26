@@ -119,6 +119,11 @@ monitor_job() {
     local job_id="$2"
     local job_name="$3"
     
+    echo -e "${BLUE}🔊 Начинаем мониторинг джобы: $job_name${NC}"
+    say_message "Начинаем отслеживание джобы $job_name"
+    
+    local prev_job_status=""
+    
     while true; do
         local job_status=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id --jq '.status' 2>/dev/null || echo "error")
         local job_conclusion=$(gh api repos/$OWNER/$REPO/actions/runs/$run_id/jobs/$job_id --jq '.conclusion' 2>/dev/null || echo "error")
@@ -132,7 +137,7 @@ monitor_job() {
         if [[ "$job_status" == "completed" ]]; then
             if [[ "$job_conclusion" == "success" ]]; then
                 echo -e "${GREEN}✅ $job_name успешно завершена${NC}"
-                say_message "$job_name успешно завершена"
+                say_message "Джоба $job_name успешно завершена"
                 break
             else
                 echo -e "${RED}❌ $job_name завершена с ошибкой${NC}"
@@ -144,15 +149,20 @@ monitor_job() {
                     echo -e "${RED}$job_errors${NC}"
                 fi
                 
-                say_message "$job_name завершена с ошибкой"
+                say_message "Джоба $job_name завершена с ошибкой"
                 break
             fi
         elif [[ "$job_status" == "in_progress" ]]; then
             echo -e "${YELLOW}⏳ $job_name выполняется...${NC}"
+            # Добавляем голосовое уведомление только при первом обнаружении выполнения
+            if [[ "$job_status" != "$prev_job_status" ]]; then
+                say_message "Джоба $job_name начала выполняться"
+            fi
         elif [[ "$job_status" == "queued" ]]; then
             echo -e "${BLUE}⏸️  $job_name в очереди...${NC}"
         fi
         
+        prev_job_status="$job_status"
         sleep 10
     done
 }
@@ -243,11 +253,11 @@ monitor_pipeline() {
             if [[ "$workflow_status" == "completed" ]]; then
                 if [[ "$workflow_conclusion" == "success" ]]; then
                     echo -e "${GREEN}🎉 Весь пайплайн успешно завершен!${NC}"
-                    say_message "Весь пайплайн успешно завершен"
+                    say_message "Весь пайплайн успешно завершен. Все джобы выполнены без ошибок"
                     break
                 else
                     echo -e "${RED}💥 Пайплайн завершен с ошибками${NC}"
-                    say_message "Пайплайн завершен с ошибками"
+                    say_message "Пайплайн завершен с ошибками. Проверьте логи для деталей"
                     
                     # Получаем и выводим ошибки workflow
                     local workflow_errors=$(get_workflow_errors "$latest_run")
