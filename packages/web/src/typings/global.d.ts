@@ -81,4 +81,4 @@ type MakeOptionalProps<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 type ColorSchemeName = 'light' | 'dark' | null | undefined;
 
-type PromiseParams<T> = { params: Promise<T>; request: NextRequest };
+type PromiseParams<T> = { params: Promise<T> };
