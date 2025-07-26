@@ -24,7 +24,7 @@ export default async function CarQRPage({ params }: PromiseParams<{ id: string }
 
     return (
       <PageContainer>
-        <QRCode code={info.code} />
+        <QRCode />
       </PageContainer>
     );
   } catch (e) {
