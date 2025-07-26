@@ -1,4 +1,4 @@
-import { forbidden, notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
@@ -11,7 +11,7 @@ export default async function CarPage({ params }: PromiseParams<{ id: string }>)
   const user = await getUserFromRequest();
 
   if (!user) {
-    return forbidden();
+    return redirect('/auth?redirect=/car/' + idNumber);
   }
 
   try {

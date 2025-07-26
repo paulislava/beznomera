@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'packages/backend/**'
+      - 'packages/web/**'
+      - 'packages/frontend/**'
+      - '!packages/**'
 
 # Добавляем конфигурацию concurrency
 concurrency:
@@ -13,6 +18,7 @@ concurrency:
 jobs:
   build-backend:
     runs-on: self-hosted
+    if: contains(toJSON(github.event.commits.*.modified), 'packages/backend') || contains(toJSON(github.event.commits.*.added), 'packages/backend') || contains(toJSON(github.event.commits.*.removed), 'packages/backend') || contains(toJSON(github.event.commits.*.modified), 'packages/') == false || contains(toJSON(github.event.commits.*.added), 'packages/') == false || contains(toJSON(github.event.commits.*.removed), 'packages/') == false
     steps:
       - name: Build backend Docker image
         run: |
@@ -26,6 +32,7 @@ jobs:
 
   build-frontend:
     runs-on: self-hosted
+    if: contains(toJSON(github.event.commits.*.modified), 'packages/frontend') || contains(toJSON(github.event.commits.*.added), 'packages/frontend') || contains(toJSON(github.event.commits.*.removed), 'packages/frontend') || contains(toJSON(github.event.commits.*.modified), 'packages/') == false || contains(toJSON(github.event.commits.*.added), 'packages/') == false || contains(toJSON(github.event.commits.*.removed), 'packages/') == false
     steps:
       - name: Build frontend Docker image
         run: |
@@ -44,6 +51,7 @@ jobs:
     runs-on: self-hosted
     needs:
       - build-backend
+    if: contains(toJSON(github.event.commits.*.modified), 'packages/web') || contains(toJSON(github.event.commits.*.added), 'packages/web') || contains(toJSON(github.event.commits.*.removed), 'packages/web') || contains(toJSON(github.event.commits.*.modified), 'packages/') == false || contains(toJSON(github.event.commits.*.added), 'packages/') == false || contains(toJSON(github.event.commits.*.removed), 'packages/') == false
     steps:
       - name: Build web Docker image
         run: |
@@ -61,6 +69,7 @@ jobs:
       - build-frontend
       - build-backend
       - build-web
+    if: always()
     steps:
       - name: Clean unused containers and volumes
         run: |

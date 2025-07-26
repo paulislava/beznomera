@@ -14,7 +14,6 @@ import {
   Button
 } from '@heroui/react';
 import { useTelegramApp } from '@/hooks/useTelegramApp';
-import { useAuth } from '@/hooks/useAuth';
 import styled from 'styled-components';
 import { PageContainer } from '@/ui/Styled';
 
@@ -32,7 +31,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { isTelegramApp, isLoading } = useTelegramApp();
-  const { authorized } = useAuth();
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -66,9 +64,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     { name: 'Добавить авто', href: '/car/new', requiresAuth: true }
   ];
 
-  const filteredMenuItems = menuItems.filter(
-    item => !item.requiresAuth || (item.requiresAuth && authorized)
-  );
+  const filteredMenuItems = menuItems.filter(item => !item.requiresAuth);
 
   const handleGoBack = () => {
     router.back();
