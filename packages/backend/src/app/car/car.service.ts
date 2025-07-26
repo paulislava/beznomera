@@ -10,7 +10,7 @@ import {
   CarCallBody,
   CarMessageBody,
   AddOwnerBody,
-  TelegramContact,
+  EditCarInfoApi,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
@@ -215,10 +215,10 @@ export class CarService {
     };
   }
 
-  async getInfoForUpdate(id: number, user: RequestUser): Promise<EditCarInfo> {
+  async getInfoForUpdate(id: number, user?: RequestUser): Promise<EditCarInfoApi> {
     const car = await this.carRepository.findOne({
-      where: { id, owner: { id: user.userId } },
-      relations: ['brand', 'color'],
+      where: { id, owner: user ? { id: user.userId } : undefined   },
+      relations: ['brand', 'color', 'owner'],
     });
 
     if (!car) {
@@ -242,6 +242,7 @@ export class CarService {
       // },
       year: car.year,
       imageRatio: car.imageRatio,
+      ownerId: car.owner.id,
     };
   }
 

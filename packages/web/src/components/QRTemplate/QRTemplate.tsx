@@ -8,7 +8,7 @@ const StyledSvg = styled.svg`
 `;
 
 type QRTemplateProps = {
-  svgRef: RefObject<SVGSVGElement>;
+  svgRef: RefObject<SVGSVGElement | null>;
 };
 
 export const QRTemplate: FC<QRTemplateProps> = ({ svgRef }) => {

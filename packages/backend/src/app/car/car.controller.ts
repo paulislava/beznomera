@@ -30,7 +30,8 @@ import {
   ModelInfo,
   AddOwnerBody,
   TelegramContact,
-} from '@paulislava/shared/car/car.types';
+  EditCarInfoApi,
+  } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -258,6 +259,14 @@ export class CarController implements CarApi {
     @CurrentUser() user,
   ): Promise<EditCarInfo> {
     return this.carService.getInfoForUpdate(id, user);
+  }
+
+  @Get(CAR_API.backendRoutes.infoForUpdateApi)
+  @UseGuards(ApiClientAuthGuard)
+  infoForUpdateApi(
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+  ): Promise<EditCarInfoApi> {
+    return this.carService.getInfoForUpdate(id);
   }
 
   @Post(CAR_API.backendRoutes.update)

@@ -62,6 +62,11 @@ export type EditCarInfo = CarInfoBase & {
 
   code: string;
 };
+
+export type EditCarInfoApi = EditCarInfo & {
+  ownerId: number;
+};
+
 export type LocationInfo = { latitude: number; longitude: number };
 export type CarCallBody = { coords?: LocationInfo };
 export interface CarMessageBody {

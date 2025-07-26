@@ -61,7 +61,7 @@ export const Input: FC<InputProps> = ({
             <S.Textarea
               label={!onlyInput && label}
               variant='faded'
-              placeholder={placeholder || label?.toString()}
+              placeholder={placeholder}
               {...extractedProps}
               maxRows={maxRows}
             />
@@ -69,7 +69,7 @@ export const Input: FC<InputProps> = ({
             <S.Input
               $center={center}
               mask={mask}
-              placeholder={placeholder || label?.toString()}
+              placeholder={placeholder}
               {...extractedProps}
               onClick={onClick}
               autoComplete={autoComplete ? undefined : 'off'}
