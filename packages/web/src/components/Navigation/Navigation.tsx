@@ -34,6 +34,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const { isTelegramApp, isLoading } = useTelegramApp();
   const { authorized } = useAuth();
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Отслеживаем изменения пути
   useEffect(() => {
@@ -44,6 +45,11 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       }
       return prev;
     });
+  }, [pathname]);
+
+  // Закрываем меню при изменении пути
+  useEffect(() => {
+    setIsMenuOpen(false);
   }, [pathname]);
 
   // Если это Telegram Mini App, не показываем навигацию
@@ -68,14 +74,22 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     router.back();
   };
 
+  const handleMenuToggle = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   // Показываем кнопку "Назад" только если есть история навигации и мы не на главной странице
   const showBackButton = navigationHistory.length > 1 && pathname !== '/';
 
   return (
     <div className='min-h-screen flex flex-col'>
-      <StyledNavbar isBordered maxWidth='xl' position='sticky'>
+      <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
         <NavbarContent>
-          <NavbarMenuToggle aria-label='Открыть меню' className='sm:hidden' />
+          <NavbarMenuToggle
+            aria-label='Открыть меню'
+            className='sm:hidden'
+            onPress={handleMenuToggle}
+          />
           <NavbarBrand>
             <Link href='/' className='font-bold text-inherit'>
               BEZNOMERA
