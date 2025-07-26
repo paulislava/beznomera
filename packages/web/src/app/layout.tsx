@@ -92,8 +92,7 @@ export default function RootLayout({
               ym(99937060, "init", {
                 clickmap: true,
                 trackLinks: true,
-                accurateTrackBounce: true,
-                webvisor: true
+                accurateTrackBounce: true
               });
             `
           }}
