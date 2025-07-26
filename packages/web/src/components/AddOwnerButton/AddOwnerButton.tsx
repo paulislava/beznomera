@@ -4,7 +4,7 @@ import React, { useCallback, useState } from 'react';
 import Button from '@/ui/Button/Button';
 import { requestContactPromise } from '@/utils/telegram';
 import { carService } from '@/services';
-import { showResponseMessage } from '@/utils/messages';
+import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { handleEvent } from '@/utils/log';
 import type { TelegramContact, AddOwnerBody } from '@shared/car/car.types';
 
@@ -18,7 +18,7 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
 
   const handleAddOwner = useCallback(async () => {
     if (!window.Telegram?.WebApp) {
-      alert('Эта функция доступна только в Telegram Web App');
+      showErrorMessage('Ошибка', 'Эта функция доступна только в Telegram Web App');
       return;
     }
 
@@ -28,7 +28,7 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
       const result = await requestContactPromise();
       const contactRaw = result?.parsed?.contact;
       if (!contactRaw) {
-        alert('Не удалось получить контакт');
+        showErrorMessage('Ошибка', 'Не удалось получить контакт');
         return;
       }
       const contact: TelegramContact = {
@@ -44,7 +44,7 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
       };
       await carService.addOwner(body);
       handleEvent('add_owner_success', { carId, ...eventData });
-      alert('Владелец успешно добавлен!');
+      showSuccessMessage('Успех', 'Владелец успешно добавлен!');
     } catch (error: any) {
       console.error('Failed to add owner:', error);
       handleEvent('add_owner_error', { carId, error, ...eventData });

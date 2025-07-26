@@ -7,6 +7,7 @@ import { TELEGRAM_BOT_NAME } from '@/utils/env';
 import { initDataRaw } from '@telegram-apps/sdk-react';
 import type { TelegramUser } from 'telegram-login-button';
 import { TelegramLoginButtonWrapper } from '@/components/TelegramLoginButtonWrapper';
+import { showErrorMessage } from '@/utils/messages';
 
 function AuthPageContent() {
   const router = useRouter();
@@ -21,7 +22,7 @@ function AuthPageContent() {
           router.replace(to);
         })
         .catch((error: Error) => {
-          alert('Произошла ошибка при входе. Повторите попытку');
+          showErrorMessage('Ошибка входа', 'Произошла ошибка при входе. Повторите попытку');
           console.error(error);
         });
     },
@@ -39,7 +40,7 @@ function AuthPageContent() {
           router.replace(to);
         })
         .catch((error: Error) => {
-          alert('Произошла ошибка при входе. Повторите попытку.');
+          showErrorMessage('Ошибка входа', 'Произошла ошибка при входе. Повторите попытку.');
           console.error(error);
         });
     }

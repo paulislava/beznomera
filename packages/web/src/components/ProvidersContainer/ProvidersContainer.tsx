@@ -1,16 +1,19 @@
 'use client';
 
 import React from 'react';
-import { HeroUIProvider } from '@heroui/react';
+import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { ThemeProvider } from '@/context/Theme/Theme.context';
-import { ThemeSync } from '@/components/ThemeSync/ThemeSync';
+import { useThemeSync } from '@/hooks/useTheme';
 
 export const ProvidersContainer = ({ children }: { children: React.ReactNode }) => {
+  useThemeSync();
+
   return (
     <ThemeProvider>
-      <ThemeSync>
-        <HeroUIProvider>{children}</HeroUIProvider>
-      </ThemeSync>
+      <HeroUIProvider>
+        <ToastProvider placement='top-center' />
+        {children}
+      </HeroUIProvider>
     </ThemeProvider>
   );
 };

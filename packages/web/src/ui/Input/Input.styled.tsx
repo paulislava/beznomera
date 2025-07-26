@@ -1,4 +1,3 @@
-import { IMaskInput } from 'react-imask';
 import styled, { css } from 'styled-components';
 import { themeable } from '@/themes/utils';
 import { Textarea as HeroTextarea, Input as HeroInput } from '@heroui/input';

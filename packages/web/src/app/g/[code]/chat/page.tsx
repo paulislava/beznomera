@@ -5,7 +5,7 @@ import { CarInfo, CarMessageBody } from '@shared/car/car.types';
 import { useParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { handleEvent } from '@/utils/log';
-import { showResponseMessage } from '@/utils/messages';
+import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import Button from '@/ui/Button/Button';
 
 import {
@@ -63,7 +63,7 @@ const ChatDriverPage = () => {
   const sendHandler = useCallback(
     async (data: CarMessageBody, form: FormApi<CarMessageBody>) => {
       if (!data.text) {
-        alert('Введите текст сообщения!');
+        showErrorMessage('Ошибка', 'Введите текст сообщения!');
         return;
       }
 
@@ -83,6 +83,7 @@ const ChatDriverPage = () => {
             .then(() => {
               handleEvent('send_message_success', eventData);
               resolve();
+              showSuccessMessage('Успех', 'Сообщение отправлено!');
             })
             .catch(res => {
               reject(res);
@@ -147,9 +148,9 @@ const ChatDriverPage = () => {
                   type='submit'
                   event='send_message'
                   eventParams={eventData}
-                  disabled={!values.text || (!dirtySinceLastSubmit && submitSucceeded)}
+                  disabled={!values.text || (submitSucceeded && !dirtySinceLastSubmit)}
                 >
-                  {dirtySinceLastSubmit || !submitSucceeded ? 'Отправить' : 'Отправлено!'}
+                  {submitSucceeded && !dirtySinceLastSubmit ? 'Отправлено!' : 'Отправить'}
                 </Button>
               </>
             )}
