@@ -37,7 +37,7 @@ jobs:
           docker stop beznomera_frontend || true
           docker rm -f beznomera_frontend || true
 
-          docker run --name beznomera_frontend -it -d -p 4000:80 -v /home/user/web/beznomera.net/frontend.env:/.env beznomera:frontend
+          docker run --name beznomera_frontend -it -d -p 3001:80 -v /home/user/web/beznomera.net/frontend.env:/.env beznomera:frontend
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_frontend) || true
 
   build-web:
@@ -52,7 +52,7 @@ jobs:
           docker stop beznomera_web || true
           docker rm -f beznomera_web || true
 
-          docker run --name beznomera_web -d -it -p 3001:3000 --env-file /home/user/web/beznomera.net/web.env beznomera:web
+          docker run --name beznomera_web -d -it -p 4000:3000 --env-file /home/user/web/beznomera.net/web.env beznomera:web
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_web) || true
 
   clean:
