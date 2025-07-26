@@ -1,17 +1,13 @@
-'use client';
-
-import styles from './page.module.css';
-import { AuthGuard } from '@/components/AuthGuard';
 import { CarsList } from '@/components/CarsList';
+import { getUserFromRequest } from '@/utils/auth';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
-  return (
-    <AuthGuard>
-      <div className={styles.page}>
-        <main className={styles.main}>
-          <CarsList />
-        </main>
-      </div>
-    </AuthGuard>
-  );
+export default async function Home() {
+  const user = await getUserFromRequest();
+
+  if (user) {
+    return <CarsList />;
+  } else {
+    redirect('/auth');
+  }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -16,6 +16,7 @@ import {
 import { useTelegramApp } from '@/hooks/useTelegramApp';
 import { useAuth } from '@/hooks/useAuth';
 import styled from 'styled-components';
+import { PageContainer } from '@/ui/Styled';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -32,6 +33,18 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const router = useRouter();
   const { isTelegramApp, isLoading } = useTelegramApp();
   const { authorized } = useAuth();
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+
+  // Отслеживаем изменения пути
+  useEffect(() => {
+    setNavigationHistory(prev => {
+      // Если это первый переход или путь изменился
+      if (prev.length === 0 || prev[prev.length - 1] !== pathname) {
+        return [...prev, pathname];
+      }
+      return prev;
+    });
+  }, [pathname]);
 
   // Если это Telegram Mini App, не показываем навигацию
   if (isLoading) {
@@ -55,8 +68,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     router.back();
   };
 
-  // Показываем кнопку "Назад" только если мы не на главной странице
-  const showBackButton = pathname !== '/';
+  // Показываем кнопку "Назад" только если есть история навигации и мы не на главной странице
+  const showBackButton = navigationHistory.length > 1 && pathname !== '/';
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -107,7 +120,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         </NavbarMenu>
       </StyledNavbar>
 
-      <main className='flex-1 flex flex-col center-container'>{children}</main>
+      <PageContainer>{children}</PageContainer>
     </div>
   );
 };

@@ -2,7 +2,6 @@ import { forbidden, notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
-import { PageContainer } from '@/ui/Styled';
 
 export default async function CarPage({ params }: PromiseParams<{ id: string }>) {
   const { id } = await params;
@@ -22,11 +21,7 @@ export default async function CarPage({ params }: PromiseParams<{ id: string }>)
       return notFound();
     }
 
-    return (
-      <PageContainer>
-        <CarFullInfo info={info} />
-      </PageContainer>
-    );
+    return <CarFullInfo info={info} />;
   } catch (e) {
     console.error(e);
     return notFound();

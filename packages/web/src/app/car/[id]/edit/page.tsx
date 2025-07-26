@@ -1,7 +1,6 @@
 import { forbidden, notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
-import { PageContainer } from '@/ui/Styled';
 import { CarEditForm } from '@/components/CarEditForm/CarEditForm';
 
 export default async function CarEditPage({ params }: PromiseParams<{ id: string }>) {
@@ -23,11 +22,7 @@ export default async function CarEditPage({ params }: PromiseParams<{ id: string
       return notFound();
     }
 
-    return (
-      <PageContainer>
-        <CarEditForm initialData={info} carId={idNumber} />
-      </PageContainer>
-    );
+    return <CarEditForm initialData={info} carId={idNumber} />;
   } catch (e) {
     console.error(e);
     return notFound();

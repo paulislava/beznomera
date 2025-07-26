@@ -18,10 +18,12 @@ export const ButtonsColumn = styled(CenterContainer)`
   gap: 10px;
 `;
 
-export const PageContainer = styled(CenterContainer)`
+export const PageContainer = styled(CenterContainer).attrs({
+  as: 'main'
+})`
+  flex: 1;
   max-width: 600px;
   margin: auto;
   padding: 20px;
   width: 100%;
-  min-height: 100vh;
 `;

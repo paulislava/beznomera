@@ -67,6 +67,8 @@ const ButtonsContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  flex-flow: column;
+  align-items: center;
 `;
 
 export const CarFullInfo = ({ info }: { info: FullCarInfo }) => {

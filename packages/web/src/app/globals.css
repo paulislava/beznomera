@@ -63,3 +63,7 @@ textarea, input {
 
   resize: none; /*remove the resize handle on the bottom right*/
 }
+
+form { 
+  width: 100%;
+}

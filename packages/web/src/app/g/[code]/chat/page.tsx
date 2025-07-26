@@ -105,59 +105,53 @@ const ChatDriverPage = () => {
   );
 
   return (
-    <>
-      <Head>
-        <title>{info ? `${info.no}: чат с водителем` : 'Чат с водителем'}</title>
-        <meta name='description' content='Отправить сообщение владельцу автомобиля' />
-      </Head>
-      <Form onSubmit={sendHandler}>
-        {({ values, dirtySinceLastSubmit, submitSucceeded }) => (
-          <ChatContainer>
-            {requested && !info && <div>Ошибка: ссылка недействительна</div>}
+    <Form onSubmit={sendHandler}>
+      {({ values, dirtySinceLastSubmit, submitSucceeded }) => (
+        <ChatContainer>
+          {requested && !info && <div>Ошибка: ссылка недействительна</div>}
 
-            {info && (
-              <>
-                {!!(info.owner.nickname || info.owner.firstName || info.owner.lastName) && (
-                  <Nickname>
-                    {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
-                  </Nickname>
-                )}
+          {info && (
+            <>
+              {!!(info.owner.nickname || info.owner.firstName || info.owner.lastName) && (
+                <Nickname>
+                  {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
+                </Nickname>
+              )}
 
-                {info.brand && (
-                  <ModelRow>
-                    <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
-                    {info.brand.logoUrl && (
-                      <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} />
-                    )}
-                    <CarModel>{info.model}</CarModel>
-                  </ModelRow>
-                )}
+              {info.brand && (
+                <ModelRow>
+                  <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
+                  {info.brand.logoUrl && (
+                    <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} />
+                  )}
+                  <CarModel>{info.model}</CarModel>
+                </ModelRow>
+              )}
 
-                {info.no && <CarNumber>{info.no}</CarNumber>}
+              {info.no && <CarNumber>{info.no}</CarNumber>}
 
-                <InputContainer>
-                  <Field
-                    name='text'
-                    label='Сообщение'
-                    type='textarea'
-                    placeholder='Введите ваше сообщение...'
-                  />
-                </InputContainer>
+              <InputContainer>
+                <Field
+                  name='text'
+                  label='Сообщение'
+                  type='textarea'
+                  placeholder='Введите ваше сообщение...'
+                />
+              </InputContainer>
 
-                <Button
-                  type='submit'
-                  event='send_message'
-                  eventParams={eventData}
-                  disabled={!values.text || (submitSucceeded && !dirtySinceLastSubmit)}
-                >
-                  {submitSucceeded && !dirtySinceLastSubmit ? 'Отправлено!' : 'Отправить'}
-                </Button>
-              </>
-            )}
-          </ChatContainer>
-        )}
-      </Form>
-    </>
+              <Button
+                type='submit'
+                event='send_message'
+                eventParams={eventData}
+                disabled={!values.text || (submitSucceeded && !dirtySinceLastSubmit)}
+              >
+                {submitSucceeded && !dirtySinceLastSubmit ? 'Отправлено!' : 'Отправить'}
+              </Button>
+            </>
+          )}
+        </ChatContainer>
+      )}
+    </Form>
   );
 };
 
