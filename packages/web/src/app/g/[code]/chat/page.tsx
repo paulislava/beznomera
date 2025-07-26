@@ -17,7 +17,6 @@ import {
   Nickname
 } from '@/components/CarDetails';
 import styled from 'styled-components';
-import Head from 'next/head';
 import FormField from '@/ui/FormField/FormField';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import { FormApi } from 'final-form';

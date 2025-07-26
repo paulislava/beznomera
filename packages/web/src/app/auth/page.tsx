@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, Suspense } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/services';
 import { TELEGRAM_BOT_NAME } from '@/utils/env';
