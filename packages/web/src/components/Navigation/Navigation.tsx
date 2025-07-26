@@ -107,7 +107,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         </NavbarMenu>
       </StyledNavbar>
 
-      <main className='flex-1 flex flex-col'>{children}</main>
+      <main className='flex-1 flex flex-col center-container'>{children}</main>
     </div>
   );
 };

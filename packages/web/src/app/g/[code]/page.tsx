@@ -49,11 +49,7 @@ export default async function Page({ params }: PromiseParams<{ code: string }>) 
   try {
     const info = await carService.info(code);
 
-    return (
-      <div className='center-container'>
-        <CarInfoPage info={info} code={code} />
-      </div>
-    );
+    return <CarInfoPage info={info} code={code} />;
   } catch {
     notFound();
   }
