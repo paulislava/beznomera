@@ -13,9 +13,9 @@ import {
   NavbarMenuToggle,
   Button
 } from '@heroui/react';
-import { useTelegramApp } from '@/hooks/useTelegramApp';
 import styled from 'styled-components';
 import { PageContainer } from '@/ui/Styled';
+import { isTelegramWebApp } from '@/utils/telegram';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -30,7 +30,6 @@ const StyledNavbar = styled(Navbar)`
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { isTelegramApp, isLoading } = useTelegramApp();
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -49,11 +48,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
-
-  // Если это Telegram Mini App, не показываем навигацию
-  if (isLoading) {
-    return <>{children}</>;
-  }
 
   const menuItems = [
     { name: 'Мои авто', href: '/', requiresAuth: true },
@@ -75,7 +69,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   return (
     <div className='min-h-screen flex flex-col'>
-      {!isTelegramApp && (
+      {!isTelegramWebApp && (
         <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
           <NavbarContent>
             <NavbarMenuToggle
