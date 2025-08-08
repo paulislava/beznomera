@@ -63,4 +63,4 @@ docker run -d --name postgres -p 5432:5432 -v pgdata:/var/lib/postgresql/data -e
 
 Подробная документация: [scripts/README.md](scripts/README.md)
 
-#toggler
+toggler
