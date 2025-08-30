@@ -7,7 +7,7 @@ export async function generateStaticParams() {
   try {
     const cars = await carService.list();
     return cars.map(car => ({
-      id: car.id
+      id: String(car.id)
     }));
   } catch {
     return [];
