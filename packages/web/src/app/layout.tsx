@@ -7,6 +7,8 @@ import './globals.css';
 import { CDN_URL, PRODUCTION_URL } from '@/constants/site';
 import { ProvidersContainer } from '@/components/ProvidersContainer/ProvidersContainer';
 import { Navigation } from '@/components/Navigation';
+import { initWebApp } from '@/utils/telegram';
+import { useEffectOnce } from '@/hooks/useEffectOnce';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -67,6 +69,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffectOnce(() => {
+    initWebApp();
+  });
+
   return (
     <html lang='ru'>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>

@@ -139,8 +139,10 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
               {driver.isOwner && <OwnerBadge>Владелец</OwnerBadge>}
             </DriverName>
             <DriverDetails>
-              {driver.nickname && `@${driver.nickname} • `}
-              {driver.tel && `${driver.tel} • `}
+              {driver.nickname && `@${driver.nickname}`}
+              {driver.tel && driver.nickname && ' • '}
+              {driver.tel}
+              <br />
               Добавлен: {formatDate(driver.addedAt)}
             </DriverDetails>
           </DriverInfo>
