@@ -7,6 +7,7 @@ import { carService } from '@/services';
 import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { handleEvent } from '@/utils/log';
 import type { TelegramContact, AddOwnerBody } from '@shared/car/car.types';
+import { isTelegramWebApp } from '@/utils/telegram';
 
 interface AddOwnerButtonProps {
   carId: number;
@@ -17,7 +18,7 @@ export const AddOwnerButton: React.FC<AddOwnerButtonProps> = ({ carId, eventData
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAddOwner = useCallback(async () => {
-    if (!window.Telegram?.WebApp) {
+    if (!isTelegramWebApp) {
       showErrorMessage('Ошибка', 'Эта функция доступна только в Telegram Web App');
       return;
     }
