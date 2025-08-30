@@ -24,21 +24,21 @@ jobs:
           docker run --name beznomera_backend -d -it --network host --env-file /home/user/web/beznomera.net/web.env -v /home/user/web/beznomera.net/config-backend.yaml:/config.yaml -v /home/user/web/beznomera.net/ip-location-data:/app/node_modules/ip-location-api/data beznomera:backend
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_backend) || true
 
-  build-frontend:
-    runs-on: self-hosted
-    steps:
-      - name: Build frontend Docker image
-        run: |
-          echo "Building frontend Docker image..."
+  # build-frontend:
+  #   runs-on: self-hosted
+  #   steps:
+  #     - name: Build frontend Docker image
+  #       run: |
+  #         echo "Building frontend Docker image..."
 
-          # Собираем образ с переменными окружения
-          docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
+  #         # Собираем образ с переменными окружения
+  #         docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
           
-          docker stop beznomera_frontend || true
-          docker rm -f beznomera_frontend || true
+  #         docker stop beznomera_frontend || true
+  #         docker rm -f beznomera_frontend || true
 
-          docker run --name beznomera_frontend -it -d -p 3001:80 -v /home/user/web/beznomera.net/frontend.env:/.env beznomera:frontend
-          docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_frontend) || true
+  #         docker run --name beznomera_frontend -it -d -p 3001:80 -v /home/user/web/beznomera.net/frontend.env:/.env beznomera:frontend
+  #         docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_frontend) || true
 
   build-web:
     runs-on: self-hosted
@@ -58,7 +58,7 @@ jobs:
   clean:
     runs-on: self-hosted
     needs:
-      - build-frontend
+      # - build-frontend
       - build-backend
       - build-web
     if: always()
