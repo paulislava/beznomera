@@ -19,6 +19,9 @@ export interface CarApi {
   brands(...args: any[]): Promise<T.BrandInfo[]>;
   models(brandId: number, ...args: any[]): Promise<T.ModelInfo[]>;
   addOwner(body: T.AddOwnerBody, ...args: any[]): Promise<void>;
+  getDrivers(carId: number, ...args: any[]): Promise<T.CarDriversInfo>;
+  addDriver(body: T.AddDriverBody, ...args: any[]): Promise<void>;
+  removeDriver(body: T.RemoveDriverBody, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -68,6 +71,15 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   addOwner: {
     path: ':id/add-owner',
     method: 'POST'
+  },
+  getDrivers: carId => `${carId || `:${ID_PARAM}`}/drivers`,
+  addDriver: {
+    path: ':id/add-driver',
+    method: 'POST'
+  },
+  removeDriver: {
+    path: ':id/remove-driver',
+    method: 'DELETE'
   }
 };
 

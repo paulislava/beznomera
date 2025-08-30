@@ -17,6 +17,8 @@ import { pluralize } from '@/utils/strings';
 import { isTelegramWebApp } from '@/utils/telegram';
 import Link from 'next/link';
 import { AddOwnerButton } from '../AddOwnerButton';
+import { CarDrivers } from '../CarDrivers';
+import { RequestUser } from '@shared/user/user.types';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -51,18 +53,6 @@ const StyledModelRow = styled(ModelRow)`
   margin-top: 20px;
 `;
 
-const StyledView = styled.div`
-  width: 100%;
-`;
-
-const QRButtonContainer = styled(CenterContainer)`
-  margin: 20px 0;
-`;
-
-const DeleteButtonContainer = styled(CenterContainer)`
-  margin-top: 20px;
-`;
-
 const ButtonsContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -71,7 +61,19 @@ const ButtonsContainer = styled.div`
   align-items: center;
 `;
 
-export const CarFullInfo = ({ info }: { info: FullCarInfo }) => {
+const QRButtonContainer = styled(CenterContainer)`
+  margin: 20px 0;
+`;
+
+const ActionsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUser }) => {
+  const isOwner = user?.userId === info.owner.id;
+
   return (
     <>
       {info.brand && (
@@ -96,7 +98,7 @@ export const CarFullInfo = ({ info }: { info: FullCarInfo }) => {
         <StyledCarImage color={info.color?.value ?? info.rawColor} />
       )}
 
-      <StyledView>
+      <ActionsContainer>
         <StatsContainer>
           <StatsItem>Позвали: {pluralize(info.callsCount, ['раз', 'раза', 'раз'])}</StatsItem>
           <StatsItem>
@@ -116,19 +118,22 @@ export const CarFullInfo = ({ info }: { info: FullCarInfo }) => {
           {info.year && <InfoText>Год выпуска: {info.year}</InfoText>}
           {info.color && <InfoText>Цвет: {info.color.title}</InfoText>}
         </InfoContainer>
-      </StyledView>
 
-      <ButtonsContainer>
-        <Link href={`/car/${info.id}/edit`}>
-          <Button>Редактировать</Button>
-        </Link>
-        {isTelegramWebApp && <AddOwnerButton carId={info.id} eventData={{ code: info.code }} />}
-      </ButtonsContainer>
-      <DeleteButtonContainer>
-        <Button view='danger' onClick={() => {}}>
-          Удалить
-        </Button>
-      </DeleteButtonContainer>
+        {/* Секция водителей */}
+        {isOwner && <CarDrivers info={info} isOwner={isOwner} />}
+
+        <ButtonsContainer>
+          <Link href={`/car/${info.id}/edit`}>
+            <Button>Редактировать</Button>
+          </Link>
+          {isTelegramWebApp && <AddOwnerButton carId={info.id} eventData={{ code: info.code }} />}
+        </ButtonsContainer>
+        <CenterContainer>
+          <Button view='danger' onClick={() => {}}>
+            Удалить
+          </Button>
+        </CenterContainer>
+      </ActionsContainer>
     </>
   );
 };

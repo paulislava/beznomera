@@ -58,6 +58,7 @@ export type FullCarInfo = ShortCarInfo & {
   chatsCount: number;
   code: string;
   owner: UserProfile;
+  drivers: DriverInfo[];  
 };
 
 export type EditCarInfo = CarInfoBase & {
@@ -94,4 +95,31 @@ export interface TelegramContact {
 export interface AddOwnerBody {
   contact: TelegramContact;
   carId: number;
+}
+
+export interface DriverInfo {
+  id: number;
+  firstName: string;
+  lastName?: string;
+  nickname?: string;
+  tel?: string;
+  telegramID?: number;
+  isOwner: boolean;
+  addedAt: Date;
+}
+
+export interface AddDriverBody {
+  contact: TelegramContact;
+  carId: number;
+}
+
+export interface RemoveDriverBody {
+  driverId: number;
+  carId: number;
+}
+
+export interface CarDriversInfo {
+  carId: number;
+  drivers: DriverInfo[];
+  owner: DriverInfo;
 }

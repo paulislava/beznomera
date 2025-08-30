@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { User } from '../user/user.entity';
@@ -13,6 +14,7 @@ import { randomUUID } from 'crypto';
 import { Brand } from './brand.entity';
 import { Color } from './color.entity';
 import { CarInfo, RgbColor } from '@paulislava/shared/car/car.types';
+import { CarDriver } from './car-driver.entity';
 
 @Entity('cars')
 export class Car extends BaseEntity implements CarInfo {
@@ -27,6 +29,9 @@ export class Car extends BaseEntity implements CarInfo {
 
   @ManyToOne(() => User)
   owner: User;
+
+  @OneToMany(() => CarDriver, (carDriver) => carDriver.car)
+  carDrivers: CarDriver[];
 
   @ManyToOne(() => Brand)
   brand: Brand | null;

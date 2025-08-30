@@ -32,7 +32,7 @@ export default async function CarPage({ params }: PromiseParams<{ id: string }>)
       return notFound();
     }
 
-    return <CarFullInfo info={info} />;
+    return <CarFullInfo user={user} info={info} />;
   } catch (e) {
     console.error(e);
     return notFound();

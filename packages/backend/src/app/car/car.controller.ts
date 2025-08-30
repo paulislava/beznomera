@@ -32,6 +32,9 @@ import {
   TelegramContact,
   EditCarInfoApi,
   ShortCarInfoApi,
+  AddDriverBody,
+  CarDriversInfo,
+  RemoveDriverBody,
   } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -181,6 +184,22 @@ export class AddOwnerDto implements AddOwnerBody {
   carId: number;
 }
 
+export class AddDriverDto implements AddDriverBody {
+  @IsObject()
+  contact: TelegramContactDto;
+
+  @IsNotEmpty()
+  carId: number;
+}
+
+export class RemoveDriverDto implements RemoveDriverBody {
+  @IsNotEmpty()
+  driverId: number;
+
+  @IsNotEmpty()
+  carId: number;
+}
+
 @Controller(CAR_API.path)
 export class CarController implements CarApi {
   constructor(private readonly carService: CarService) {}
@@ -309,13 +328,40 @@ export class CarController implements CarApi {
     await this.carService.sendQR(image, id, user);
   }
 
-  @Post(':id/add-owner')
+  @Post(CAR_API.backendRoutes.addOwner)
   @UseGuards(JwtAuthGuard)
   async addOwner(
     @Body() body: AddOwnerDto,
     @CurrentUser() user: RequestUser
   ): Promise<void> {
     return this.carService.addOwner(body, user.userId);
+  }
+
+  @Post(CAR_API.backendRoutes.addDriver)
+  @UseGuards(JwtAuthGuard)
+  async addDriver(
+    @Body() body: AddDriverDto,
+    @CurrentUser() user: RequestUser
+  ): Promise<void> {
+    return this.carService.addDriver(body, user.userId);
+  }
+
+  @Get(CAR_API.backendRoutes.getDrivers)
+  @UseGuards(JwtAuthGuard)
+  async getDrivers(
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser
+  ): Promise<CarDriversInfo> {
+    return this.carService.getDrivers(id, user.userId);
+  }
+
+  @Delete(CAR_API.backendRoutes.removeDriver)
+  @UseGuards(JwtAuthGuard)
+  async removeDriver(
+    @Body() body: RemoveDriverDto,
+    @CurrentUser() user: RequestUser
+  ): Promise<void> {
+    return this.carService.removeDriver(body, user.userId);
   }
 
   @Delete(CAR_API.backendRoutes.delete)
