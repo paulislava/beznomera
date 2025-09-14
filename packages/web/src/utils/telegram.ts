@@ -11,6 +11,7 @@ export let isTelegramWebApp = false;
 
 export const initWebApp = async () => {
   try {
+    console.log('initWebApp');
     init();
     alert('init');
     miniApp.mount();

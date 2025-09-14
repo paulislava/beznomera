@@ -7,4 +7,6 @@ export const InitWebApp = () => {
   useEffect(() => {
     initWebApp();
   }, []);
+
+  return null;
 };
