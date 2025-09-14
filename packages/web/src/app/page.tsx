@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation';
 export default async function Home() {
   const user = await getUserFromRequest();
 
+  console.log('user', user);
+
   if (user) {
     return <CarsList />;
   } else {

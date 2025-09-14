@@ -33,15 +33,18 @@ function AuthPageContent() {
     // Проверяем, есть ли данные от Telegram Web App
     const initData = initDataRaw();
 
+    console.log('initData', initData);
+
     if (initData) {
       authService
         .authTelegramWebApp({ data: initData })
         .then(() => {
+          console.log('authTelegramWebApp success');
           router.replace(to);
         })
         .catch((error: Error) => {
+          console.log('authTelegramWebApp error', error);
           showErrorMessage('Ошибка входа', 'Произошла ошибка при входе. Повторите попытку.');
-          console.error(error);
         });
     }
   }, [router, to]);
