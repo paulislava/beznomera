@@ -15,7 +15,7 @@ export const initWebApp = async () => {
     console.log('initWebApp');
     init();
     console.log('init');
-    miniApp.mount();
+    await miniApp.mount();
     console.log('mount');
     miniApp.ready();
     console.log('ready');
@@ -25,7 +25,7 @@ export const initWebApp = async () => {
     expandViewport();
     console.log('expandViewport');
 
-    viewport.mount();
+    await viewport.mount();
 
     await requestFullscreen();
     console.log('fullscreen');
