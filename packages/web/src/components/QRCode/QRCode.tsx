@@ -37,7 +37,7 @@ type QRCodePageProps = {
 export const QRCodePage = ({ info }: QRCodePageProps) => {
   const theme = useColorScheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const templateRef = useRef<SVGElement>(null);
+  const templateRef = useRef<SVGSVGElement>(null);
 
   const hiddenQrRef = useRef<QRCode>(null);
   const qrRef = useRef<QRCode>(null);
@@ -176,7 +176,6 @@ export const QRCodePage = ({ info }: QRCodePageProps) => {
           logoImage={`/logo-for-qr-${theme === 'dark' ? 'dark' : 'light'}.png`}
           logoWidth={100}
           logoHeight={100}
-          removeQrCodeBehindLogo={true}
           logoPaddingStyle='square'
           ref={qrRef}
         />
