@@ -34,7 +34,6 @@ import {
   ShortCarInfoApi,
   AddDriverBody,
   CarDriversInfo,
-  RemoveDriverBody,
   AddDriverByUsernameBody,
   } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
@@ -193,13 +192,6 @@ export class AddDriverDto implements AddDriverBody {
   carId: number;
 }
 
-export class RemoveDriverDto implements RemoveDriverBody {
-  @IsNotEmpty()
-  driverId: number;
-
-  @IsNotEmpty()
-  carId: number;
-}
 
 @Controller(CAR_API.path)
 export class CarController implements CarApi {
@@ -369,11 +361,11 @@ export class CarController implements CarApi {
   @Delete(CAR_API.backendRoutes.removeDriver)
   @UseGuards(JwtAuthGuard)
   async removeDriver(
-    @Body() body: RemoveDriverDto,
-    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @Param(ID_PARAM, ParseIntPipe) carId: number,
+    @Param('driverId', ParseIntPipe) driverId: number,
     @CurrentUser() user: RequestUser
   ): Promise<void> {
-    return this.carService.removeDriver(body, id);
+    return this.carService.removeDriver(carId, driverId, user.userId);
   }
 
   @Delete(CAR_API.backendRoutes.delete)

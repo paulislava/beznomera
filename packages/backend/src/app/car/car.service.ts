@@ -574,27 +574,26 @@ export class CarService {
     await this.carDriverRepository.save(carDriver);
   }
 
-  async removeDriver(body: RemoveDriverBody, userId: number): Promise<void> {
+  async removeDriver(carId: number, driverId: number, userId: number): Promise<void> {
     const car = await this.carRepository.findOne({
-      where: { id: body.carId },
-      relations: ['owner'],
+      where: { id: carId },
+      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
     });
 
     if (!car) {
-      throw new Error(`Автомобиль с ID ${body.carId} не найден`);
+      throw new CarNotFoundException(carId);
     }
 
-    // Проверяем, что пользователь является владельцем автомобиля
-    if (car.owner.id !== userId) {
-      throw new Error('Только владелец автомобиля может удалять водителей');
+    if(car.ownerId !== userId && !car.carDrivers.some(cd => cd.driverId === userId && cd.isOwner)) {
+      throw new ForbiddenException('Нет доступа к этому автомобилю');
     }
 
     const carDriver = await this.carDriverRepository.findOne({
-      where: { carId: body.carId, driverId: body.driverId },
+      where: { carId, driverId },
     });
 
     if (!carDriver) {
-      throw new Error('Водитель не найден для этого автомобиля');
+      throw new CarServiceException('Водитель не найден для этого автомобиля');
     }
 
     await this.carDriverRepository.remove(carDriver);

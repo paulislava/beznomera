@@ -96,7 +96,7 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
     }
 
     try {
-      await carService.removeDriver({ driverId, carId });
+      await carService.removeDriver(carId, driverId);
       showSuccessMessage('Успех', 'Водитель успешно удален');
       await loadDrivers();
     } catch (error: any) {

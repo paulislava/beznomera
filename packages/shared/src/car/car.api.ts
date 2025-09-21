@@ -22,7 +22,7 @@ export interface CarApi {
   getDrivers(carId: number, ...args: any[]): Promise<T.CarDriversInfo>;
   addDriver(body: T.AddDriverBody, ...args: any[]): Promise<void>;
   addDriverByUsername(body: T.AddDriverByUsernameBody, id: number, ...args: any[]): Promise<void>;
-  removeDriver(body: T.RemoveDriverBody, id: number, ...args: any[]): Promise<void>;
+  removeDriver(carId: number, driverId: number, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -83,7 +83,7 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
     method: 'POST'
   },
   removeDriver: {
-    path: ':id/remove-driver',
+    path: (carId, driverId) => `${carId || `:${ID_PARAM}`}/drivers/${driverId || `:driverId`}`,
     method: 'DELETE'
   }
 };
