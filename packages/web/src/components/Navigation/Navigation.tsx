@@ -100,7 +100,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
           {showBackButton && (
             <NavbarContent justify='end'>
               <NavbarItem>
-                <Button variant='flat' color='default' size='sm' a>
+                <Button variant='flat' color='default' size='sm'>
                   ← Назад
                 </Button>
               </NavbarItem>
