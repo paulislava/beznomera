@@ -459,14 +459,14 @@ export class CarService {
 
     // Ищем или создаем пользователя по Telegram ID
     const userRepo = this.carRepository.manager.getRepository(User);
-    let newOwner = await userRepo.findOne({ where: { telegramID: body.contact.id } });
+    let newOwner = await userRepo.findOne({ where: { telegramID: body.contact.id.toString() } });
 
     if (!newOwner) {
       newOwner = userRepo.create({
         firstName: body.contact.first_name,
         lastName: body.contact.last_name,
         nickname: body.contact.username,
-        telegramID: body.contact.id,
+        telegramID: body.contact.id.toString(),
         tel: body.contact.phone_number,
       });
       newOwner = await userRepo.save(newOwner);
@@ -541,7 +541,7 @@ export class CarService {
 
     // Ищем или создаем пользователя по Telegram ID
     let driver = await this.userRepository.findOne({ 
-      where: { telegramID: body.contact.id } 
+      where: { telegramID: body.contact.id.toString() } 
     });
 
     if (!driver) {
@@ -549,7 +549,7 @@ export class CarService {
         firstName: body.contact.first_name,
         lastName: body.contact.last_name,
         nickname: body.contact.username,
-        telegramID: body.contact.id,
+        telegramID: body.contact.id.toString(),
         tel: body.contact.phone_number,
       });
       driver = await this.userRepository.save(driver);

@@ -23,5 +23,5 @@ export interface UserProfile {
 
 export interface RequestUser {
   userId: number;
-  telegramID: number;
+  telegramID: string;
 }

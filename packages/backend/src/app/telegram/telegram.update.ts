@@ -39,7 +39,7 @@ export class TelegramUpdate {
 
       const forwardedMessage = await this.chatMessageRepository.findOne({
         where: {
-          telegramId: message.reply_to_message.message_id,
+          telegramId: message.reply_to_message.message_id.toString(),
         },
         relations: ['user', 'car'],
       });
@@ -57,7 +57,7 @@ export class TelegramUpdate {
       const tgMessage = await this.telegramService.sendMessage(
         `Вам ответили по автомобилю ${forwardedMessage.car.no}:\n${messageText}`,
         forwardedMessage.user,
-        forwardedMessage.sourceTelegramId,
+        forwardedMessage.sourceTelegramId && Number(forwardedMessage.sourceTelegramId),
       );
 
       const chatMessage = await this.chatMessageRepository.save(
@@ -66,9 +66,9 @@ export class TelegramUpdate {
           chatId: forwardedMessage.chatId,
           forwardedMessage,
           userId: forwardedMessage.user.id,
-          telegramId: tgMessage.message_id,
+          telegramId: tgMessage.message_id.toString(),
           car: forwardedMessage.car,
-          sourceTelegramId: message.message_id,
+          sourceTelegramId: message.message_id.toString(),
         }),
       );
 

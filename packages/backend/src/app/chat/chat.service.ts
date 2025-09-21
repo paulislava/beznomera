@@ -118,7 +118,7 @@ export class ChatService {
           }
         : undefined,
       userId,
-      telegramId: tgMessage.message_id,
+      telegramId: tgMessage.message_id.toString(),
     });
   }
 
@@ -164,7 +164,7 @@ export class ChatService {
           }
         : undefined,
       userId,
-      telegramId: tgMessage.message_id,
+      telegramId: tgMessage.message_id.toString(),
     });
 
     if (newAnonymousId) {

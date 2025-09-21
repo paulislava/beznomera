@@ -21,8 +21,8 @@ export abstract class UserCore extends BaseEntity {
   @Column({ nullable: true })
   tel: string | null;
 
-  @Column({ nullable: true, unique: true, type: 'bigint' })
-  telegramID: number | null;
+  @Column({ nullable: true, unique: true })
+  telegramID: string | null;
 
   @Column({ nullable: true })
   nickname: string | null;

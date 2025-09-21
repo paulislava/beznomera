@@ -103,7 +103,7 @@ export interface DriverInfo {
   lastName?: string;
   nickname?: string;
   tel?: string;
-  telegramID?: number;
+  telegramID?: string;
   isOwner: boolean;
   addedAt: Date;
 }
@@ -134,5 +134,5 @@ export interface UserSearchResult {
   username?: string;
   firstName: string;
   lastName?: string;
-  telegramID?: number;
+  telegramID?: string;
 }

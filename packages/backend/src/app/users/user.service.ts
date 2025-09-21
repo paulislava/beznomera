@@ -59,7 +59,7 @@ export class UserService {
     const isNumber = !isNaN(Number(username));
     
     const user = await this.userRepository.findOne({
-      where: isNumber ? { id: Number(username) } : { nickname: username },
+      where: isNumber ? { telegramID: username } : { nickname: username },
     });
 
     if(!user && !isNumber) {

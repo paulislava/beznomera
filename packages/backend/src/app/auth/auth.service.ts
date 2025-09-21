@@ -105,7 +105,7 @@ export class AuthService {
 
     const findUser = await this.userRepository.findOne({
       where: {
-        telegramID: data.id,
+        telegramID: data.id.toString(),
       },
     });
 
@@ -123,7 +123,7 @@ export class AuthService {
         // @ts-ignore
         lastName: data.last_name,
         nickname: data.username,
-        telegramID: data.id,
+        telegramID: data.id.toString(),
       }),
     );
 
@@ -139,7 +139,7 @@ export class AuthService {
 
     const findUser = await this.userRepository.findOne({
       where: {
-        telegramID: userData.id,
+        telegramID: userData.id.toString(),
       },
     });
 
@@ -155,7 +155,7 @@ export class AuthService {
         firstName: userData.first_name,
         lastName: userData.last_name,
         nickname: userData.username,
-        telegramID: userData.id,
+        telegramID: userData.id.toString(),
       }),
     );
 

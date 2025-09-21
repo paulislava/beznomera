@@ -36,7 +36,7 @@ export class MessageScene {
     const car = this.getCar(ctx);
 
     const user = await this.userRepository.findOne({
-      where: { telegramID: ctx.from.id },
+      where: { telegramID: ctx.from.id.toString() },
     });
 
     if (!user) {

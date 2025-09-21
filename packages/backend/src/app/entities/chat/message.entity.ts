@@ -42,10 +42,10 @@ export class ChatMessage extends BaseEntity {
   updatedAt: Date;
 
   @Column({ nullable: true })
-  telegramId: number | null;
+  telegramId: string | null;
 
   @Column({ nullable: true })
-  sourceTelegramId: number | null;
+  sourceTelegramId: string | null;
 
   @ManyToOne(() => ChatMessage, { nullable: true })
   forwardedMessage?: ChatMessage;
