@@ -9,9 +9,9 @@ export interface UserApi {
 }
 
 export const USER_ROUTES: APIRoutes<UserApi> = {
-  balance: () => '/balance',
-  transactions: () => '/transactions',
-  checkUsername: username => `/check/${username || ':username'}`
+  balance: () => 'balance',
+  transactions: () => 'transactions',
+  checkUsername: username => `check/${username || ':username'}`
 };
 
 export const USER_API = apiInfo(USER_ROUTES, 'user');
