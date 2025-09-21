@@ -145,6 +145,7 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
               <br />
               Добавлен: {formatDate(driver.addedAt)}
             </DriverDetails>
+            <div>Telegram ID: {driver.telegramID}</div>
           </DriverInfo>
 
           {isOwner && !driver.isOwner && (
