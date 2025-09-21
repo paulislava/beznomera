@@ -21,6 +21,8 @@ export interface CarApi {
   addOwner(body: T.AddOwnerBody, ...args: any[]): Promise<void>;
   getDrivers(carId: number, ...args: any[]): Promise<T.CarDriversInfo>;
   addDriver(body: T.AddDriverBody, ...args: any[]): Promise<void>;
+  addDriverByUsername(body: T.AddDriverByUsernameBody, ...args: any[]): Promise<void>;
+  findUserByUsername(username: string, ...args: any[]): Promise<T.UserSearchResult | null>;
   removeDriver(body: T.RemoveDriverBody, ...args: any[]): Promise<void>;
 }
 
@@ -76,6 +78,14 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   addDriver: {
     path: ':id/add-driver',
     method: 'POST'
+  },
+  addDriverByUsername: {
+    path: ':id/add-driver-by-username',
+    method: 'POST'
+  },
+  findUserByUsername: {
+    path: 'find-user/:username',
+    method: 'GET'
   },
   removeDriver: {
     path: ':id/remove-driver',
