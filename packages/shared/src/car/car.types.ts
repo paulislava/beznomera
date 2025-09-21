@@ -113,6 +113,12 @@ export interface AddDriverBody {
   carId: number;
 }
 
+export interface AddDriverByUsernameBody {
+  username: string;
+  role: string;
+  carId: number;
+}
+
 export interface RemoveDriverBody {
   driverId: number;
   carId: number;
@@ -122,4 +128,12 @@ export interface CarDriversInfo {
   carId: number;
   drivers: DriverInfo[];
   owner: DriverInfo;
+}
+
+export interface UserSearchResult {
+  id: number;
+  username?: string;
+  firstName: string;
+  lastName?: string;
+  telegramID?: number;
 }
