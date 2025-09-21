@@ -46,7 +46,7 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
     async (data: FormData, form: FormApi<FormData>) => {
       try {
         // Сначала ищем пользователя по нику или ID
-        const user = await userService.checkUsername(data.username.trim());
+        const user = await userService.checkUsername(data.username.trim()).catch(() => false);
 
         if (!user) {
           showErrorMessage('Ошибка', 'Пользователь с таким ником или ID не найден');
@@ -80,7 +80,7 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
         handleEvent('add_driver_error', {
           carId,
           username: data.username.trim(),
-          role: data.role.value,
+          // role: data.role.value,
           error,
           ...eventData
         });
