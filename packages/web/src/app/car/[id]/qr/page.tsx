@@ -2,7 +2,7 @@ import { forbidden, notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { PageContainer } from '@/ui/Styled';
-import { QRCode } from '@/components/QRCode';
+import { QRCodePage } from '@/components/QRCode';
 
 export default async function CarQRPage({ params }: PromiseParams<{ id: string }>) {
   const { id } = await params;
@@ -24,7 +24,7 @@ export default async function CarQRPage({ params }: PromiseParams<{ id: string }
 
     return (
       <PageContainer>
-        <QRCode />
+        <QRCodePage info={info} />
       </PageContainer>
     );
   } catch (e) {

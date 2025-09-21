@@ -58,27 +58,27 @@ services:
         npm run wait
         npm run start:backend:nodemon
 
-  frontend:
-    image: node:20.18-slim
-    environment:
-      - HOME=/tmp
-      - EXPO_PUBLIC_BACKEND_URL=${BACKEND_URL}
-      - EXPO_PUBLIC_TELEGRAM_BOT_NAME=${TELEGRAM_BOT_NAME}
-      - EXPO_PUBLIC_CDN_URL=${CDN_URL}
-      - FRONTEND_PORT=${FRONTEND_PORT:-4000}
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-    working_dir: /app
-    user: "${UID:-1000}:${GID:-1000}"
-    ports:
-      - ${FRONTEND_PORT:-4000}:${FRONTEND_PORT:-4000}
-    command:
-      - sh
-      - -c
-      - |
-        npm run wait
-        npx concurrently --kill-others-on-fail "npm:start:frontend:${PLATFORM:-dev}"
+  # frontend:
+  #   image: node:20.18-slim
+  #   environment:
+  #     - HOME=/tmp
+  #     - EXPO_PUBLIC_BACKEND_URL=${BACKEND_URL}
+  #     - EXPO_PUBLIC_TELEGRAM_BOT_NAME=${TELEGRAM_BOT_NAME}
+  #     - EXPO_PUBLIC_CDN_URL=${CDN_URL}
+  #     - FRONTEND_PORT=${FRONTEND_PORT:-4000}
+  #     - NODE_ENV=development
+  #   volumes:
+  #     - .:/app
+  #   working_dir: /app
+  #   user: "${UID:-1000}:${GID:-1000}"
+  #   ports:
+  #     - ${FRONTEND_PORT:-4000}:${FRONTEND_PORT:-4000}
+  #   command:
+  #     - sh
+  #     - -c
+  #     - |
+  #       npm run wait
+  #       npx concurrently --kill-others-on-fail "npm:start:frontend:${PLATFORM:-dev}"
 
   web:
     image: node:20.18-slim

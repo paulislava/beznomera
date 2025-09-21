@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Navbar,
   NavbarBrand,
@@ -29,7 +29,7 @@ const StyledNavbar = styled(Navbar)`
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
-  const router = useRouter();
+  // const router = useRouter();
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -56,9 +56,9 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const filteredMenuItems = menuItems;
 
-  const handleGoBack = () => {
-    router.back();
-  };
+  // const handleGoBack = () => {
+  //   router.back();
+  // };
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -75,7 +75,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
             <NavbarMenuToggle
               aria-label='Открыть меню'
               className='sm:hidden'
-              onPress={handleMenuToggle}
+              onClick={handleMenuToggle}
             />
             <NavbarBrand>
               <Link href='/' className='font-bold text-inherit'>
@@ -100,7 +100,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
           {showBackButton && (
             <NavbarContent justify='end'>
               <NavbarItem>
-                <Button variant='flat' color='default' size='sm' onPress={handleGoBack}>
+                <Button variant='flat' color='default' size='sm' a>
                   ← Назад
                 </Button>
               </NavbarItem>
