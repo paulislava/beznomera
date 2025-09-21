@@ -63,7 +63,7 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
         handleEvent('add_driver_success', {
           carId,
           username: data.username.trim(),
-          role: data.role.value,
+          // role: data.role.value,
           ...eventData
         });
 

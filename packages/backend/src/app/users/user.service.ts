@@ -56,9 +56,18 @@ export class UserService {
   }
 
   async findUserByUsername(username: string) {
+    const isNumber = !isNaN(Number(username));
+    
     const user = await this.userRepository.findOne({
-      where: { nickname: username },
+      where: isNumber ? { id: Number(username) } : { nickname: username },
     });
+
+    if(!user && !isNumber) {
+      return this.userRepository.findOne({
+        where: { nickname: username },
+      });
+    }
+
     return user;
   }
 }
