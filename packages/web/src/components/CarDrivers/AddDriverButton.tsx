@@ -17,11 +17,6 @@ export const AddDriverButton: React.FC<AddDriverButtonProps> = ({ carId, eventDa
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAddDriver = useCallback(async () => {
-    if (!window.Telegram?.WebApp) {
-      showErrorMessage('Ошибка', 'Эта функция доступна только в Telegram Web App');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
