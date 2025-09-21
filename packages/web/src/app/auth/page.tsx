@@ -34,9 +34,13 @@ function AuthPageContent() {
 
     console.log('initData', initData);
 
-    if (initData) {
+    initData.restore();
+
+    const raw = initData.raw();
+
+    if (raw) {
       authService
-        .authTelegramWebApp({ data: initData.raw() ?? '' })
+        .authTelegramWebApp({ data: raw })
         .then(() => {
           console.log('authTelegramWebApp success');
           router.replace(to);
