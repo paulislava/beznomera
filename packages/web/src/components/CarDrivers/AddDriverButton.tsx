@@ -6,10 +6,10 @@ import { AddDriverModal } from './AddDriverModal';
 import { handleEvent } from '@/utils/log';
 import type { AddDriverButtonProps } from './AddDriverButton.types';
 
-export const AddDriverButton: React.FC<AddDriverButtonProps> = ({ 
-  carId, 
+export const AddDriverButton: React.FC<AddDriverButtonProps> = ({
+  carId,
   eventData = {},
-  onSuccess 
+  onSuccess
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -37,7 +37,7 @@ export const AddDriverButton: React.FC<AddDriverButtonProps> = ({
       >
         +
       </Button>
-      
+
       <AddDriverModal
         isOpen={isModalOpen}
         onClose={handleModalClose}

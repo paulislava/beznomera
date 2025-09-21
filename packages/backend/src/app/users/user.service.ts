@@ -54,4 +54,11 @@ export class UserService {
       id: transaction.id,
     }));
   }
+
+  async findUserByUsername(username: string) {
+    const user = await this.userRepository.findOne({
+      where: { nickname: username },
+    });
+    return user;
+  }
 }

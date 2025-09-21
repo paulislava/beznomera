@@ -6,7 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  OneToMany,
+    OneToMany,
+    JoinColumn,
 } from 'typeorm';
 
 import { User } from '../user/user.entity';
@@ -26,6 +27,9 @@ export class Car extends BaseEntity implements CarInfo {
 
   @Column({ nullable: true })
   title: string | null;
+
+  @Column()
+  ownerId: number;
 
   @ManyToOne(() => User)
   owner: User;

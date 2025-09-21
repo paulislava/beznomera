@@ -115,8 +115,7 @@ export interface AddDriverBody {
 
 export interface AddDriverByUsernameBody {
   username: string;
-  role: string;
-  carId: number;
+  role?: string;
 }
 
 export interface RemoveDriverBody {

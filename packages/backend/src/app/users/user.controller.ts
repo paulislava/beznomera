@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, NotFoundException, Param, Query, UseGuards } from '@nestjs/common';
 import {
   UserBalance,
   UserTransaction,
@@ -24,5 +24,14 @@ export class UserController implements UserApi {
   @Get(USER_API.backendRoutes.transactions)
   transactions(@CurrentUser() user: RequestUser): Promise<UserTransaction[]> {
     return this.userService.getUserTransactions(user.userId);
+  }
+
+  @Get(USER_API.backendRoutes.checkUsername)
+  async checkUsername(@Param('username') username: string): Promise<boolean> {
+    const user = await this.userService.findUserByUsername(username);
+    if(!user) {
+      throw new NotFoundException('User not found');
+    }
+    return true;
   }
 }

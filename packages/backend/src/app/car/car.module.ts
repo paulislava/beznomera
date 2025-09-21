@@ -15,6 +15,7 @@ import { ChatModule } from '../chat/chat.module';
 import { Brand } from '../entities/car/brand.entity';
 import { Model } from '../entities/car/model.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
+import { UserModule } from '../users/user.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CarDriver } from '../entities/car/car-driver.entity';
     TelegramModule,
     ConfigModule,
     ChatModule,
+    UserModule,
   ],
   controllers: [CarController],
   providers: [CarService, TelegramService],

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
+import { FormApi } from 'final-form';
+import { Form } from '@/ui/FormContainer/FormContainer';
 import { Button } from '@/ui/Button';
-import { Input } from '@/ui/Input';
-import { SelectField } from '@/ui/Select';
-import { carService } from '@/services';
+import FormField from '@/ui/FormField/FormField';
+import { carService, userService } from '@/services';
 import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { handleEvent } from '@/utils/log';
 import * as S from './AddDriverModal.styled';
@@ -22,11 +23,17 @@ interface AddDriverModalProps {
   onSuccess?: () => void;
 }
 
-const DRIVER_ROLES: DriverRole[] = [
-  { value: 'driver', label: 'Водитель' },
-  { value: 'owner', label: 'Владелец' },
-  { value: 'admin', label: 'Администратор' }
-];
+interface FormData {
+  username: string;
+  role: DriverRole;
+}
+
+// const DRIVER_ROLES: DriverRole[] = [
+//   { value: 'driver', label: 'Водитель' },
+//   { value: 'owner', label: 'Владелец' }
+// ];
+
+const Field = FormField<FormData>;
 
 export const AddDriverModal: React.FC<AddDriverModalProps> = ({
   isOpen,
@@ -35,130 +42,91 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
   eventData = {},
   onSuccess
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [username, setUsername] = useState('');
-  const [selectedRole, setSelectedRole] = useState<DriverRole>(DRIVER_ROLES[0]);
+  const onSubmit = useCallback(
+    async (data: FormData, form: FormApi<FormData>) => {
+      try {
+        // Сначала ищем пользователя по нику или ID
+        const user = await userService.checkUsername(data.username.trim());
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!username.trim()) {
-      showErrorMessage('Ошибка', 'Введите ник или ID пользователя');
-      return;
-    }
+        if (!user) {
+          showErrorMessage('Ошибка', 'Пользователь с таким ником или ID не найден');
+          return;
+        }
+        // Добавляем пользователя как водителя
+        await carService.addDriverByUsername(
+          {
+            username: data.username.trim()
+          },
+          carId
+        );
 
-    setIsLoading(true);
+        handleEvent('add_driver_success', {
+          carId,
+          username: data.username.trim(),
+          role: data.role.value,
+          ...eventData
+        });
 
-    try {
-      // Сначала ищем пользователя по нику или ID
-      const user = await carService.findUserByUsername(username.trim());
-      
-      if (!user) {
-        showErrorMessage('Ошибка', 'Пользователь с таким ником или ID не найден');
-        return;
+        showSuccessMessage('Успех', 'Водитель успешно добавлен!');
+
+        // Сбрасываем форму
+        form.reset();
+
+        // Закрываем модальное окно и вызываем callback
+        onClose();
+        onSuccess?.();
+      } catch (error: any) {
+        console.error('Failed to add driver:', error);
+        handleEvent('add_driver_error', {
+          carId,
+          username: data.username.trim(),
+          role: data.role.value,
+          error,
+          ...eventData
+        });
+        showResponseMessage(error?.message || error);
       }
+    },
+    [carId, eventData, onClose, onSuccess]
+  );
 
-      // Добавляем пользователя как водителя
-      await carService.addDriverByUsername({
-        username: username.trim(),
-        role: selectedRole.value,
-        carId
-      });
-
-      handleEvent('add_driver_success', { 
-        carId, 
-        username: username.trim(),
-        role: selectedRole.value,
-        ...eventData 
-      });
-      
-      showSuccessMessage('Успех', 'Водитель успешно добавлен!');
-      
-      // Сбрасываем форму
-      setUsername('');
-      setSelectedRole(DRIVER_ROLES[0]);
-      
-      // Закрываем модальное окно и вызываем callback
-      onClose();
-      onSuccess?.();
-      
-    } catch (error: any) {
-      console.error('Failed to add driver:', error);
-      handleEvent('add_driver_error', { 
-        carId, 
-        username: username.trim(),
-        role: selectedRole.value,
-        error, 
-        ...eventData 
-      });
-      showResponseMessage(error?.message || error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleClose = () => {
-    if (!isLoading) {
-      setUsername('');
-      setSelectedRole(DRIVER_ROLES[0]);
-      onClose();
-    }
-  };
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
 
   if (!isOpen) return null;
 
   return (
     <S.Overlay onClick={handleClose}>
-      <S.Modal onClick={(e) => e.stopPropagation()}>
+      <S.Modal onClick={e => e.stopPropagation()}>
         <S.Header>
           <S.Title>Добавить водителя</S.Title>
-          <S.CloseButton onClick={handleClose} disabled={isLoading}>
-            ×
-          </S.CloseButton>
+          <S.CloseButton onClick={handleClose}>×</S.CloseButton>
         </S.Header>
-        
-        <S.Form onSubmit={handleSubmit}>
-          <S.Field>
-            <Input
-              label="Ник или ID пользователя"
-              placeholder="Введите ник или ID"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </S.Field>
-          
-          <S.Field>
-            <SelectField
-              name="role"
-              label="Роль"
-              options={DRIVER_ROLES}
-              value={selectedRole}
-              onChange={(value) => setSelectedRole(value as DriverRole)}
-              getLabel={(role) => role.label}
-              disabled={isLoading}
-            />
-          </S.Field>
-          
-          <S.Actions>
-            <Button
-              type="button"
-              view="secondary"
-              onClick={handleClose}
-              disabled={isLoading}
-            >
-              Отмена
-            </Button>
-            <Button
-              type="submit"
-              view="primary"
-              disabled={isLoading || !username.trim()}
-            >
-              {isLoading ? 'Добавление...' : 'Добавить'}
-            </Button>
-          </S.Actions>
-        </S.Form>
+
+        <Form onSubmit={onSubmit}>
+          {({ submitting, pristine }) => (
+            <>
+              <S.Field>
+                <Field
+                  name='username'
+                  label='Ник или ID пользователя'
+                  placeholder='Введите ник или ID'
+                  required
+                  disabled={submitting}
+                />
+              </S.Field>
+              <S.Actions>
+                <Button type='button' view='secondary' onClick={handleClose} disabled={submitting}>
+                  Отмена
+                </Button>
+                <Button type='submit' view='primary' disabled={submitting || pristine}>
+                  {submitting ? 'Добавление...' : 'Добавить'}
+                </Button>
+              </S.Actions>
+            </>
+          )}
+        </Form>
       </S.Modal>
     </S.Overlay>
   );

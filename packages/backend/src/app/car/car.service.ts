@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
 import { Repository } from 'typeorm';
@@ -16,6 +16,7 @@ import {
   AddDriverBody,
   RemoveDriverBody,
   CarDriversInfo,
+  AddDriverByUsernameBody,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
@@ -28,6 +29,7 @@ import { CALL_TIMEOUT_S } from '~/constants';
 import {
   CallNeedTimeoutException,
   CarNotFoundException,
+  CarServiceException,
   ValidationException,
 } from './car.exceptions';
 import { Chat } from '../entities/chat/chat.entity';
@@ -43,6 +45,7 @@ import { Brand } from '../entities/car/brand.entity';
 import { Model } from '../entities/car/model.entity';
 import { User } from '../entities/user/user.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
+import { UserService } from '../users/user.service';
 @Injectable()
 export class CarService {
   constructor(
@@ -62,6 +65,7 @@ export class CarService {
     private readonly telegramService: TelegramService,
     private readonly configService: ConfigService,
     private readonly chatService: ChatService,
+    private readonly userService: UserService,
   ) {}
 
   async getList(): Promise<ShortCarInfoApi[]> {
@@ -138,9 +142,9 @@ export class CarService {
     userAgent: Agent,
     ip: string,
   ): Promise<void> {
-    const { id, no, owner } = await this.carRepository.findOneOrFail({
+    const { id, no, owner, carDrivers } = await this.carRepository.findOneOrFail({
       where: { code },
-      relations: ['owner'],
+      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
     });
 
     const lastCall = await this.callRepository.findOne({
@@ -164,13 +168,21 @@ export class CarService {
 
     await this.callRepository.save({ car: { id }, ip });
 
-    const message = await this.telegramService.sendMessage(text, owner);
+    const drivers = [owner, ...carDrivers.map(cd => cd.driver)];
 
-    if (coords) {
-      await this.telegramService.sendLocation(coords, owner, {
-        reply_to_message_id: message.message_id,
-      });
-    }
+    drivers.forEach(async driver => {
+      if(driver.telegramID) {
+        const message = await this.telegramService.sendMessage(text, driver);
+
+        if (coords) {
+          await this.telegramService.sendLocation(coords, driver, {
+            reply_to_message_id: message.message_id,
+          });
+        }
+      }
+    });
+
+
   }
 
   async userList({ userId }: RequestUser): Promise<ShortCarInfo[]> {
@@ -519,7 +531,7 @@ export class CarService {
     });
 
     if (!car) {
-      throw new Error(`Автомобиль с ID ${body.carId} не найден`);
+      throw new NotFoundException(`Автомобиль с ID ${body.carId} не найден`);
     }
 
     // Проверяем, что пользователь является владельцем автомобиля
@@ -587,4 +599,35 @@ export class CarService {
 
     await this.carDriverRepository.remove(carDriver);
   }
+
+  async addDriverByUsername(body: AddDriverByUsernameBody, currentUser: RequestUser, id: number): Promise<void> {
+    const car = await this.carRepository.findOne({ where: { id }, relations: ['carDrivers'] });
+
+    if (!car) {
+      throw new CarNotFoundException(id);
+    }
+
+    if(car.ownerId !== currentUser.userId && !car.carDrivers.some(cd => cd.driverId === currentUser.userId && cd.isOwner)) {
+      throw new ForbiddenException('Нет доступа к этому автомобилю');
+    }
+
+    const user = await this.userService.findUserByUsername(body.username);
+
+    if(!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    if(car.carDrivers.some(cd => cd.driverId === user.id)) {
+      throw new CarServiceException('Этот водитель уже добавлен к автомобилю');
+    }
+
+    const carDriver = this.carDriverRepository.create({
+      carId: id,
+      driverId: user.id,
+      isOwner: body.role === 'owner',
+    });
+
+    await this.carDriverRepository.save(carDriver);
+  }
+
 }

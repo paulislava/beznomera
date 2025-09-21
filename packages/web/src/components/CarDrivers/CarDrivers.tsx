@@ -129,7 +129,7 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
     <DriversContainer>
       <Header>
         <TextL style={{ fontWeight: '600' }}>Водители автомобиля</TextL>
-        <AddDriverButton carId={info.id} eventData={{ code: info.code }} />
+        <AddDriverButton onSuccess={loadDrivers} carId={info.id} eventData={{ code: info.code }} />
       </Header>
       {allDrivers.map(driver => (
         <DriverItem key={driver.id}>
@@ -156,14 +156,6 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
           )}
         </DriverItem>
       ))}
-
-      {allDrivers.length === 1 && (
-        <CenterContainer>
-          <TextL style={{ color: '#666', fontStyle: 'italic' }}>
-            Пока нет дополнительных водителей
-          </TextL>
-        </CenterContainer>
-      )}
     </DriversContainer>
   );
 };
