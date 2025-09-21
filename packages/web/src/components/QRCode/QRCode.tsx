@@ -9,7 +9,6 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { carService } from '@/services';
 import { QRTemplate } from '@/components/QRTemplate';
 import { Canvg } from 'canvg';
-import webStyled from 'styled-components';
 import { CenterContainer } from '@/ui/Styled';
 import { downloadFile } from '@/utils/downloadFile';
 import { uploadFile } from '@/utils/files';
@@ -21,8 +20,9 @@ const QRCodeContainer = styled.div`
   align-items: center;
 `;
 
-const StyledCanvas = webStyled.canvas`
+const StyledCanvas = styled.canvas`
   margin-bottom: 20px;
+  display: none;
 `;
 
 const ButtonsRow = styled(CenterContainer)`
@@ -110,11 +110,10 @@ export const QRCodePage = ({ info }: QRCodePageProps) => {
         if (ctx) {
           // ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-          const svg = await Canvg.from(
-            ctx,
-            (templateRef.current.elementRef as any).current.outerHTML,
-            { scaleWidth: 1858, scaleHeight: 662 }
-          );
+          const svg = await Canvg.from(ctx, templateRef.current.outerHTML, {
+            scaleWidth: 1858,
+            scaleHeight: 662
+          });
 
           await svg.render();
 

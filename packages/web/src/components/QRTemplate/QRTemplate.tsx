@@ -4,7 +4,8 @@ import styled from 'styled-components';
 const StyledSvg = styled.svg`
   width: 100%;
   height: auto;
-  display: none;
+  margin-bottom: 20px;
+  /* display: none; */
 `;
 
 type QRTemplateProps = {
