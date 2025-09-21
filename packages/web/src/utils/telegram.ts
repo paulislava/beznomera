@@ -20,6 +20,8 @@ export const initWebApp = async () => {
     miniApp.ready();
     console.log('ready');
     initData.restore();
+    console.log('initData', initData.raw());
+    console.log('initDataUser', initData.user);
     console.log('restore');
     isTelegramWebApp = true;
     expandViewport();
