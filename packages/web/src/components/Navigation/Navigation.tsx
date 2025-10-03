@@ -29,7 +29,7 @@ const StyledNavbar = styled(Navbar)`
 
 const TgSpace = styled.div`
   padding-top: 60px;
-  padding-top: env(safe-area-inset-top);
+  /* padding-top: env(safe-area-inset-top); */
 `;
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
