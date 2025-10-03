@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { RequestUser } from '../../../shared/src/user/user.types';
 import { cookies } from 'next/headers';
 import { AUTH_COOKIE_NAME } from '@/helpers/constants';
+import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 // JWT секрет должен быть таким же как в backend
 const JWT_SECRET = process.env.JWT_SECRET || 'MY_SECRET';
@@ -9,7 +10,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'MY_SECRET';
 /**
  * Декодирует JWT токен и возвращает информацию о пользователе
  */
-export function decodeUserFromToken(token: string): RequestUser | null {
+export function decodeUserFromToken(
+  token: string,
+  cookieStore: ReadonlyRequestCookies
+): RequestUser | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as RequestUser;
 
@@ -18,6 +22,7 @@ export function decodeUserFromToken(token: string): RequestUser | null {
       return decoded;
     }
 
+    cookieStore.delete(AUTH_COOKIE_NAME);
     return null;
   } catch (error) {
     console.warn('Invalid JWT token:', error);
@@ -43,7 +48,7 @@ export const getUserFromRequest = async () => {
   const cookie = cookieStore.get(AUTH_COOKIE_NAME);
 
   if (cookie?.value) {
-    return decodeUserFromToken(cookie.value);
+    return decodeUserFromToken(cookie.value, cookieStore);
   }
 
   return null;
