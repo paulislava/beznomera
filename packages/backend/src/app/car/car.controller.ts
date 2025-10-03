@@ -35,7 +35,7 @@ import {
   AddDriverBody,
   CarDriversInfo,
   AddDriverByUsernameBody,
-  } from '@paulislava/shared/car/car.types';
+} from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -81,8 +81,6 @@ export class CreatableDto<T> {
   @Type(() => WithIdDto)
   value: Maybe<T>;
 }
-
-
 
 export class CreatableStringDto<T>
   extends CreatableDto<T>
@@ -192,7 +190,6 @@ export class AddDriverDto implements AddDriverBody {
   carId: number;
 }
 
-
 @Controller(CAR_API.path)
 export class CarController implements CarApi {
   constructor(private readonly carService: CarService) {}
@@ -201,7 +198,6 @@ export class CarController implements CarApi {
   info(@Param(CODE_PARAM) code: string): Promise<CarInfo> {
     return this.carService.getInfo(code);
   }
-  
 
   @Post(CAR_API.backendRoutes.call)
   async call(
@@ -259,9 +255,7 @@ export class CarController implements CarApi {
 
   @Get(CAR_API.backendRoutes.fullInfoApi)
   @UseGuards(ApiClientAuthGuard)
-  fullInfoApi(
-    @Param(ID_PARAM, ParseIntPipe) id: number,
-  ): Promise<FullCarInfo> {
+  fullInfoApi(@Param(ID_PARAM, ParseIntPipe) id: number): Promise<FullCarInfo> {
     return this.carService.getFullInfo(id);
   }
 
@@ -325,7 +319,7 @@ export class CarController implements CarApi {
   @UseGuards(JwtAuthGuard)
   async addOwner(
     @Body() body: AddOwnerDto,
-    @CurrentUser() user: RequestUser
+    @CurrentUser() user: RequestUser,
   ): Promise<void> {
     return this.carService.addOwner(body, user.userId);
   }
@@ -334,7 +328,7 @@ export class CarController implements CarApi {
   @UseGuards(JwtAuthGuard)
   async addDriver(
     @Body() body: AddDriverDto,
-    @CurrentUser() user: RequestUser
+    @CurrentUser() user: RequestUser,
   ): Promise<void> {
     return this.carService.addDriver(body, user.userId);
   }
@@ -344,7 +338,7 @@ export class CarController implements CarApi {
   async addDriverByUsername(
     @Body() body: AddDriverByUsernameBody,
     @Param(ID_PARAM, ParseIntPipe) id: number,
-    @CurrentUser() user: RequestUser
+    @CurrentUser() user: RequestUser,
   ): Promise<void> {
     return this.carService.addDriverByUsername(body, user, id);
   }
@@ -353,7 +347,7 @@ export class CarController implements CarApi {
   @UseGuards(JwtAuthGuard)
   async getDrivers(
     @Param(ID_PARAM, ParseIntPipe) id: number,
-    @CurrentUser() user: RequestUser
+    @CurrentUser() user: RequestUser,
   ): Promise<CarDriversInfo> {
     return this.carService.getDrivers(id, user.userId);
   }
@@ -363,7 +357,7 @@ export class CarController implements CarApi {
   async removeDriver(
     @Param(ID_PARAM, ParseIntPipe) carId: number,
     @Param('driverId', ParseIntPipe) driverId: number,
-    @CurrentUser() user: RequestUser
+    @CurrentUser() user: RequestUser,
   ): Promise<void> {
     return this.carService.removeDriver(carId, driverId, user.userId);
   }

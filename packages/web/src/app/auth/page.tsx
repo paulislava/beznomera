@@ -8,6 +8,7 @@ import { initData } from '@telegram-apps/sdk-react';
 import type { TelegramUser } from 'telegram-login-button';
 import { TelegramLoginButtonWrapper } from '@/components/TelegramLoginButtonWrapper';
 import { showErrorMessage } from '@/utils/messages';
+import { isTelegramWebApp } from '@/utils/telegram';
 
 function AuthPageContent() {
   const router = useRouter();
@@ -30,9 +31,9 @@ function AuthPageContent() {
   );
 
   useEffect(() => {
-    // Проверяем, есть ли данные от Telegram Web App
-
-    console.log('initData', initData);
+    if (!isTelegramWebApp) {
+      return;
+    }
 
     initData.restore();
 
