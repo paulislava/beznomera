@@ -27,6 +27,11 @@ const StyledNavbar = styled(Navbar)`
   }
 `;
 
+const TgSpace = styled.div`
+  padding-top: 60px;
+  padding-top: env(safe-area-inset-top);
+`;
+
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
   // const router = useRouter();
@@ -69,7 +74,9 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   return (
     <div className='min-h-screen flex flex-col'>
-      {!isTelegramWebApp && (
+      {isTelegramWebApp ? (
+        <TgSpace />
+      ) : (
         <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
           <NavbarContent>
             <NavbarMenuToggle
