@@ -9,10 +9,11 @@ import {
   isTMA,
   backButton
 } from '@telegram-apps/sdk-react';
+import { NextRouter } from 'next/navigation';
 
 export const isTelegramWebApp = isTMA();
 
-export const initWebApp = async () => {
+export const initWebApp = async (router: NextRouter) => {
   try {
     if (!isTelegramWebApp) {
       return;
@@ -33,8 +34,10 @@ export const initWebApp = async () => {
     backButton.mount();
     backButton.show();
     backButton.onClick(() => {
-      console.log('BACK PAGE!');
+      router.back();
     });
+
+    console.log('backButton');
 
     await viewport.mount();
 

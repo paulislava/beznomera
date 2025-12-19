@@ -2,11 +2,16 @@
 
 import { useEffect } from 'react';
 import { initWebApp } from '@/utils/telegram';
+import { useRouter } from 'next/router';
 
 export const InitWebApp = () => {
+  const router = useRouter();
+
   useEffect(() => {
-    initWebApp();
-  }, []);
+    if (router) {
+      initWebApp(router);
+    }
+  }, [router]);
 
   return null;
 };
