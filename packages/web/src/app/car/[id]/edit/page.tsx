@@ -3,6 +3,7 @@ import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { CarEditForm } from '@/components/CarEditForm/CarEditForm';
 import { revalidatePath } from 'next/cache';
+import { AUTH_PATHNAME } from '@/helpers/constants';
 
 // Серверное действие для ревалидации страниц
 async function revalidateCarPages(carId: number, code: string) {
@@ -33,7 +34,7 @@ export default async function CarEditPage({ params }: PromiseParams<{ id: string
   const user = await getUserFromRequest();
 
   if (!user) {
-    return redirect('/auth?redirect=/car/' + idNumber + '/edit');
+    return redirect(AUTH_PATHNAME + '?redirect=/car/' + idNumber + '/edit');
   }
 
   try {

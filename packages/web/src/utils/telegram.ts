@@ -1,3 +1,4 @@
+import { AUTH_PATHNAME } from '@/helpers/constants';
 import {
   init,
   miniApp,
@@ -13,7 +14,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 
 export const isTelegramWebApp = isTMA();
 
-export const initWebApp = async (router: AppRouterInstance) => {
+export const initWebApp = async (router: AppRouterInstance, pathname: string) => {
   try {
     if (!isTelegramWebApp) {
       return;
@@ -32,7 +33,12 @@ export const initWebApp = async (router: AppRouterInstance) => {
     console.log('expandViewport');
 
     backButton.mount();
-    backButton.show();
+
+    if (pathname && !['/', AUTH_PATHNAME].includes(pathname)) {
+      backButton.show();
+    } else {
+      backButton.hide();
+    }
     backButton.onClick(() => {
       router.back();
     });

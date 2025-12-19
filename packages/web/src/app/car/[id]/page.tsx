@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { carService } from '@/services';
 import { getUserFromRequest } from '@/utils/auth';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
+import { AUTH_PATHNAME } from '@/helpers/constants';
 
 export async function generateStaticParams() {
   try {
@@ -22,7 +23,7 @@ export default async function CarPage({ params }: PromiseParams<{ id: string }>)
   const user = await getUserFromRequest();
 
   if (!user) {
-    return redirect('/auth?redirect=/car/' + idNumber);
+    return redirect(AUTH_PATHNAME + '?redirect=/car/' + idNumber);
   }
 
   try {
