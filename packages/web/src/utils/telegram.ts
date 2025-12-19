@@ -18,12 +18,11 @@ export const initWebApp = async () => {
       return;
     }
 
-    if (backButton.isSupported()) {
-      console.log('backButton supported');
-      backButton.show();
-    } else {
-      console.log(`backButton not supported`);
-    }
+    backButton.mount();
+    backButton.show();
+    backButton.onClick(() => {
+      console.log('BACK PAGE!');
+    });
 
     console.log('initWebApp');
     init();
