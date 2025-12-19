@@ -16,11 +16,6 @@ import {
 import styled from 'styled-components';
 import { PageContainer } from '@/ui/Styled';
 import { isTelegramWebApp } from '@/utils/telegram';
-import { backButton } from '@telegram-apps/sdk-react';
-
-if (backButton.isSupported()) {
-  backButton.show();
-}
 interface NavigationProps {
   children?: React.ReactNode;
 }

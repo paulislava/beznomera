@@ -6,7 +6,8 @@ import {
   requestFullscreen,
   requestContactPromise,
   viewport,
-  isTMA
+  isTMA,
+  backButton
 } from '@telegram-apps/sdk-react';
 
 export const isTelegramWebApp = isTMA();
@@ -15,6 +16,13 @@ export const initWebApp = async () => {
   try {
     if (!isTelegramWebApp) {
       return;
+    }
+
+    if (backButton.isSupported()) {
+      console.log('backButton supported');
+      backButton.show();
+    } else {
+      console.log(`backButton not supported`);
     }
 
     console.log('initWebApp');
