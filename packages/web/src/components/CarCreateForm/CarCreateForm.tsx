@@ -3,7 +3,7 @@
 import React, { useCallback } from 'react';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import { useRouter } from 'next/navigation';
-import { EditCarInfo } from '@shared/car/car.types';
+import { BrandInfo, EditCarInfo } from '@shared/car/car.types';
 import { carService } from '@/services';
 import { Button } from '@/ui/Button';
 import FormField from '@/ui/FormField/FormField';
@@ -13,6 +13,8 @@ import { FormApi } from 'final-form';
 import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
+import { Field as FinalField } from 'react-final-form';
+import { Autocomplete, AutocompleteItem } from '@heroui/react';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -35,7 +37,7 @@ const initialValues: EditCarInfo = {
   brand: null
 };
 
-export function CarCreateForm() {
+export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
   const router = useRouter();
 
   const onSubmit = useCallback(
@@ -59,6 +61,21 @@ export function CarCreateForm() {
       <Form initialValues={initialValues} onSubmit={onSubmit}>
         {({ handleSubmit, pristine, submitting }) => (
           <>
+            <FinalField name='brand'>
+              {({ input, meta }) => (
+                <Autocomplete
+                  name={input.name}
+                  label={'Марка'}
+                  isInvalid={!!meta.error}
+                  errorMessage={meta.error}
+                  onSelectionChange={input.onChange}
+                >
+                  {brands.map(brand => (
+                    <AutocompleteItem key={brand.id}>{brand.title}</AutocompleteItem>
+                  ))}
+                </Autocomplete>
+              )}
+            </FinalField>
             <Field name='no' label='Гос. номер' />
             <Field name='model' label='Модель' />
             <Field name='version' label='Версия' />

@@ -46,6 +46,7 @@ import {
   ValidateNested,
   IsNotEmpty,
   IsObject,
+  IsNumberString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
@@ -137,9 +138,8 @@ export class CarUpdateDto implements EditCarInfo {
   // @Type(() => CreatableStringDto)
   // brand: Creatable<BrandInfo, string>;
 
-  @IsOptional()
-  @IsNumber()
-  brand: Maybe<number>;
+  @IsNumberString()
+  brand: number;
 
   @IsOptional()
   @IsString()
