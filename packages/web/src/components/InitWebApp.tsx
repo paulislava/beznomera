@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { initWebApp } from '@/utils/telegram';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export const InitWebApp = () => {
   const router = useRouter();

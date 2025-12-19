@@ -9,11 +9,11 @@ import {
   isTMA,
   backButton
 } from '@telegram-apps/sdk-react';
-import { NextRouter } from 'next/router';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 export const isTelegramWebApp = isTMA();
 
-export const initWebApp = async (router: NextRouter) => {
+export const initWebApp = async (router: AppRouterInstance) => {
   try {
     if (!isTelegramWebApp) {
       return;
