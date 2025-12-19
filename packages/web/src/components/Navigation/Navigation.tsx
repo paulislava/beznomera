@@ -16,7 +16,11 @@ import {
 import styled from 'styled-components';
 import { PageContainer } from '@/ui/Styled';
 import { isTelegramWebApp } from '@/utils/telegram';
+import { backButton } from '@telegram-apps/sdk-react';
 
+if (backButton.isSupported()) {
+  backButton.show();
+}
 interface NavigationProps {
   children?: React.ReactNode;
 }
@@ -75,7 +79,9 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   return (
     <div className='min-h-screen flex flex-col'>
       {isTelegramWebApp ? (
-        <TgSpace />
+        <>
+          <TgSpace />
+        </>
       ) : (
         <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
           <NavbarContent>
