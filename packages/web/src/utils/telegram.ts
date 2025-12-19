@@ -18,12 +18,6 @@ export const initWebApp = async () => {
       return;
     }
 
-    backButton.mount();
-    backButton.show();
-    backButton.onClick(() => {
-      console.log('BACK PAGE!');
-    });
-
     console.log('initWebApp');
     init();
     console.log('init');
@@ -36,7 +30,15 @@ export const initWebApp = async () => {
     expandViewport();
     console.log('expandViewport');
 
+    backButton.mount();
+    backButton.show();
+    backButton.onClick(() => {
+      console.log('BACK PAGE!');
+    });
+
     await viewport.mount();
+
+    console.log(`viewport mount`);
 
     await requestFullscreen();
     console.log('fullscreen');
