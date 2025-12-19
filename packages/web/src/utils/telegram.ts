@@ -9,7 +9,7 @@ import {
   isTMA,
   backButton
 } from '@telegram-apps/sdk-react';
-import { NextRouter } from 'next/navigation';
+import { NextRouter } from 'next/router';
 
 export const isTelegramWebApp = isTMA();
 
