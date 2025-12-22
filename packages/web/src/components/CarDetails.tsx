@@ -29,7 +29,7 @@ export const BrandLogo = styled(Image).attrs({
   height: 21.5
 })`
   margin: 0 10px;
-  width: 100px;
+  width: auto;
   height: 21.5px;
 `;
 
