@@ -48,7 +48,7 @@ import {
   IsObject,
   IsNumberString,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import userAgentParser from 'useragent';
 import { Response, Request } from 'express';
 import { Creatable } from '@paulislava/shared/forms';
@@ -119,9 +119,11 @@ export class CreatableRgbColorDto<T>
 
 export class CarUpdateDto implements EditCarInfo {
   @IsString()
+  @IsNotEmpty()
   no: string;
 
   @IsString()
+  @IsNotEmpty()
   model: string;
 
   @IsOptional()
@@ -138,7 +140,9 @@ export class CarUpdateDto implements EditCarInfo {
   // @Type(() => CreatableStringDto)
   // brand: Creatable<BrandInfo, string>;
 
-  @IsNumberString()
+  @Type(() => Number)
+  @IsNumber()
+  @IsNotEmpty()
   brand: number;
 
   @IsOptional()
