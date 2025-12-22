@@ -15,7 +15,6 @@ import { FullCarInfo } from '@shared/car/car.types';
 import { Button } from '@/ui/Button';
 import { pluralize } from '@/utils/strings';
 import { isTelegramWebApp } from '@/utils/telegram';
-import Link from 'next/link';
 import { AddOwnerButton } from '../AddOwnerButton';
 import { CarDrivers } from '../CarDrivers';
 import { RequestUser } from '@shared/user/user.types';

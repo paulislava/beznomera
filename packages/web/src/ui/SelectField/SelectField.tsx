@@ -1,24 +1,6 @@
 import { Autocomplete, AutocompleteItem } from '@heroui/react';
-import React, { FC } from 'react';
+import React from 'react';
 import { Field } from 'react-final-form';
-
-{
-  /* <FinalField name='brand'>
-{({ input, meta }) => (
-  <Autocomplete
-    name={input.name}
-    label={'Марка'}
-    isInvalid={!!meta.error}
-    errorMessage={meta.error}
-    onSelectionChange={input.onChange}
-  >
-    {brands.map(brand => (
-      <AutocompleteItem key={brand.id}>{brand.title}</AutocompleteItem>
-    ))}
-  </Autocomplete>
-)}
-</FinalField> */
-}
 
 export type SelectFieldProps<
   FormData = any,
