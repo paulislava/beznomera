@@ -3,7 +3,7 @@
 import React, { useCallback } from 'react';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import { useRouter } from 'next/navigation';
-import { EditCarInfo } from '@shared/car/car.types';
+import { BrandInfo, EditCarInfo } from '@shared/car/car.types';
 import { carService } from '@/services';
 import { Button } from '@/ui/Button';
 import FormField from '@/ui/FormField/FormField';
@@ -14,6 +14,8 @@ import { FormApi } from 'final-form';
 import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
+import { SelectField } from '@/ui/SelectField/SelectField';
+import { revalidateCarPages } from '@/utils/paths';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -31,12 +33,13 @@ const ImageContainer = styled.div`
 interface CarEditFormProps {
   initialData: EditCarInfo;
   carId: number;
-  revalidatePages?: (carId: number, code: string) => Promise<void>;
+  brands: BrandInfo[];
 }
 
 const Field = FormField<EditCarInfo>;
+const Select = SelectField<EditCarInfo>;
 
-export function CarEditForm({ initialData, carId, revalidatePages }: CarEditFormProps) {
+export function CarEditForm({ initialData, carId, brands }: CarEditFormProps) {
   const router = useRouter();
 
   const onSubmit = useCallback(
@@ -46,10 +49,7 @@ export function CarEditForm({ initialData, carId, revalidatePages }: CarEditForm
         showSuccessMessage('Успех!', 'Автомобиль успешно обновлен');
         form.restart(data);
 
-        // Ревалидируем страницы через серверное действие
-        if (revalidatePages) {
-          await revalidatePages(carId, data.code);
-        }
+        await revalidateCarPages(carId, data.code);
 
         router.push(`/car/${carId}`);
       } catch (error) {
@@ -57,7 +57,7 @@ export function CarEditForm({ initialData, carId, revalidatePages }: CarEditForm
         showErrorMessage('Ошибка!', 'Ошибка при обновлении автомобиля');
       }
     },
-    [carId, router, revalidatePages]
+    [carId, router]
   );
 
   return (
@@ -66,6 +66,13 @@ export function CarEditForm({ initialData, carId, revalidatePages }: CarEditForm
       <Form initialValues={initialData} onSubmit={onSubmit}>
         {({ handleSubmit, pristine, submitting }) => (
           <>
+            <Select
+              name='brand'
+              label='Марка'
+              options={brands}
+              optionKey='id'
+              optionValue='title'
+            />
             <Field name='no' label='Гос. номер' />
             <Field name='model' label='Модель' />
             <Field name='version' label='Версия' />

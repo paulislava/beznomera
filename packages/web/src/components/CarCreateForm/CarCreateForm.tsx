@@ -13,9 +13,8 @@ import { FormApi } from 'final-form';
 import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
-import { Field as FinalField } from 'react-final-form';
-import { Autocomplete, AutocompleteItem } from '@heroui/react';
 import { revalidateHome } from '@/utils/paths';
+import { SelectField } from '@/ui/SelectField/SelectField';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -25,6 +24,7 @@ const Title = styled.h1`
 `;
 
 const Field = FormField<EditCarInfo>;
+const Select = SelectField<EditCarInfo>;
 
 const initialValues: EditCarInfo = {
   no: '',
@@ -63,21 +63,13 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
       <Form initialValues={initialValues} onSubmit={onSubmit}>
         {({ handleSubmit, pristine, submitting }) => (
           <>
-            <FinalField name='brand'>
-              {({ input, meta }) => (
-                <Autocomplete
-                  name={input.name}
-                  label={'Марка'}
-                  isInvalid={!!meta.error}
-                  errorMessage={meta.error}
-                  onSelectionChange={input.onChange}
-                >
-                  {brands.map(brand => (
-                    <AutocompleteItem key={brand.id}>{brand.title}</AutocompleteItem>
-                  ))}
-                </Autocomplete>
-              )}
-            </FinalField>
+            <Select
+              name='brand'
+              label='Марка'
+              options={brands}
+              optionKey='id'
+              optionValue='title'
+            />
             <Field name='no' label='Гос. номер' />
             <Field name='model' label='Модель' />
             <Field name='version' label='Версия' />
