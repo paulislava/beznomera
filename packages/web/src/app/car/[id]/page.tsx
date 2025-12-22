@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import { carService } from '@/services';
-import { getUserFromRequest } from '@/utils/auth';
+import { getUserFromRequest } from '@/utils/auth-server';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
 import { AUTH_PATHNAME } from '@/helpers/constants';
 

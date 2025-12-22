@@ -8,6 +8,8 @@ import { CDN_URL, PRODUCTION_URL } from '@/constants/site';
 import { ProvidersContainer } from '@/components/ProvidersContainer/ProvidersContainer';
 import { Navigation } from '@/components/Navigation';
 import { InitWebApp } from '@/components/InitWebApp';
+import { getUserFromRequest } from '@/utils/auth-server';
+import { AuthProvider } from '@/context/Auth/Auth.context';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -63,18 +65,22 @@ export const viewport: Viewport = {
   themeColor: '#090633'
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUserFromRequest();
+
   return (
     <html lang='ru'>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <InitWebApp />
         <StyledComponentsRegistry>
           <ProvidersContainer>
-            <Navigation>{children}</Navigation>
+            <AuthProvider user={user}>
+              <Navigation>{children}</Navigation>
+            </AuthProvider>
           </ProvidersContainer>
         </StyledComponentsRegistry>
 

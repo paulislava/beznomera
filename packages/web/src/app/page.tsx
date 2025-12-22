@@ -1,16 +1,11 @@
 import { CarsList } from '@/components/CarsList';
-import { AUTH_PATHNAME } from '@/helpers/constants';
-import { getUserFromRequest } from '@/utils/auth';
-import { redirect } from 'next/navigation';
+import { AuthComponent, withUser } from '@/context/Auth/withUser';
+import { carService } from '@/services';
 
-export default async function Home() {
-  const user = await getUserFromRequest();
+const Home: AuthComponent = async ({ user }) => {
+  const cars = await carService.userList(user.userId);
 
-  console.log('user', user);
+  return <CarsList cars={cars} />;
+};
 
-  if (user) {
-    return <CarsList />;
-  } else {
-    redirect(AUTH_PATHNAME);
-  }
-}
+export default withUser(Home);

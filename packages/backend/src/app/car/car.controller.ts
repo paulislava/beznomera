@@ -215,7 +215,13 @@ export class CarController implements CarApi {
   @UseGuards(JwtAuthGuard)
   my(@CurrentUser() user): Promise<ShortCarInfo[]> {
     console.log('my', user);
-    return this.carService.userList(user);
+    return this.carService.userList(user.userId);
+  }
+
+  @Get(CAR_API.backendRoutes.userList)
+  @UseGuards(ApiClientAuthGuard)
+  userList(@Param(ID_PARAM) id: number, ...args: any[]): Promise<ShortCarInfo[]> {
+    return this.carService.userList(id);
   }
 
   @Get(CAR_API.backendRoutes.list)

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { RequestUser } from '../../../shared/src/user/user.types';
-import { cookies } from 'next/headers';
+
 import { AUTH_COOKIE_NAME } from '@/helpers/constants';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
@@ -41,15 +41,3 @@ export function isValidToken(token: string): boolean {
     return false;
   }
 }
-
-export const getUserFromRequest = async () => {
-  const cookieStore = await cookies();
-
-  const cookie = cookieStore.get(AUTH_COOKIE_NAME);
-
-  if (cookie?.value) {
-    return decodeUserFromToken(cookie.value, cookieStore);
-  }
-
-  return null;
-};

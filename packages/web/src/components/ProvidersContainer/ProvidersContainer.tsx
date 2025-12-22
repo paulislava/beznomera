@@ -4,6 +4,7 @@ import React from 'react';
 import { HeroUIProvider, ToastProvider } from '@heroui/react';
 import { ThemeProvider } from '@/context/Theme/Theme.context';
 import { useThemeSync } from '@/hooks/useTheme';
+import { AuthProvider } from '@/context/Auth/Auth.context';
 
 export const ProvidersContainer = ({ children }: { children: React.ReactNode }) => {
   useThemeSync();
@@ -12,7 +13,7 @@ export const ProvidersContainer = ({ children }: { children: React.ReactNode }) 
     <ThemeProvider>
       <HeroUIProvider>
         <ToastProvider placement='top-center' />
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </HeroUIProvider>
     </ThemeProvider>
   );

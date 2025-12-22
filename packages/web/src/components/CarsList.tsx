@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { useAPI } from '@/utils/api-service';
@@ -86,25 +86,7 @@ const ErrorContainer = styled.div`
   color: #ff4444;
 `;
 
-export const CarsList: React.FC = () => {
-  const { value: cars, loading, error } = useAPI(carService.my);
-
-  if (loading) {
-    return (
-      <LoadingContainer>
-        <TextL>Загрузка автомобилей...</TextL>
-      </LoadingContainer>
-    );
-  }
-
-  if (error) {
-    return (
-      <ErrorContainer>
-        <TextL>Ошибка загрузки: {error.message}</TextL>
-      </ErrorContainer>
-    );
-  }
-
+export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
   if (!cars || cars.length === 0) {
     return (
       <Container>

@@ -185,9 +185,9 @@ export class CarService {
 
   }
 
-  async userList({ userId }: RequestUser): Promise<ShortCarInfo[]> {
+  async userList(id: number): Promise<ShortCarInfo[]> {
     const cars = await this.carRepository.find({
-      where: { owner: { id: userId } },
+      where: { owner: { id } },
       relations: ['owner', 'brand', 'color'],
     });
 
