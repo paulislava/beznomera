@@ -8,6 +8,7 @@ export enum ResponseCode {
 }
 
 export enum ValidationCode {
+  UNKNOWN = 'UNKNOWN',
   DUPLICATE_NUMBER = 'DUPLICATE_NUMBER',
   DUPLICATE_CODE = 'DUPLICATE_CODE'
 }

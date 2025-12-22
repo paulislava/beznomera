@@ -9,20 +9,20 @@ type MetaProps = {
 };
 
 export const InputMeta: FC<MetaProps> = ({ meta, errors }) => {
-  if (!meta) {
+  if (!meta || (!meta.error && !meta.submitError?.length && !errors?.length)) {
     return null;
   }
 
+  // if (!meta.touched || meta.dirtySinceLastSubmit) {
+  //   return null;
+  // }
+
   return (
     <S.MetaContainer>
-      {meta.touched && !meta.dirtySinceLastSubmit && (
-        <>
-          {meta.error && <S.Meta>{meta.error}</S.Meta>}
-          {(meta.submitError || errors)?.map(({ code, message }: SubmissionError) => (
-            <S.Meta key={code}>{message}</S.Meta>
-          ))}
-        </>
-      )}
+      {meta.error && <S.Meta>{meta.error}</S.Meta>}
+      {(meta.submitError || errors)?.map(({ code, message }: SubmissionError) => (
+        <S.Meta key={code}>{message}</S.Meta>
+      ))}
     </S.MetaContainer>
   );
 };

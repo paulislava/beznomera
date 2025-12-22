@@ -76,7 +76,7 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />
             <Field name='imageRatio' type='number' label='Соотношение сторон' />
-            <Field name='imageUrl' type='url' label='Ссылка на изображение' />
+            <Field name='imageUrl' type='file' label='Изображение' />
             <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
 
             <Field name='color' component={CarColorPicker} />
