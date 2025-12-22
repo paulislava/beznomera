@@ -57,17 +57,37 @@ const StyledContainer = styled.div`
   position: relative;
 `;
 
+const StyledText = styled.div`
+  color: inherit;
+  font-size: 17px;
+
+  text-align: center;
+
+  padding: 15px 25px;
+  font-weight: 100;
+`;
+
 const StyledPressable = styled(RawButton)<{
   $view: ButtonView;
   $theme: ColorSchemeName;
   $fullWidth?: boolean;
+  $hasLink: boolean;
 }>`
   position: relative;
   cursor: pointer;
   border-radius: 35px;
   overflow: hidden;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
-  padding: 0;
+  ${({ $hasLink }) =>
+    $hasLink &&
+    css`
+      padding: 0;
+
+      & ${StyledText} {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+    `}
 
   /* Явно убираем все границы по умолчанию */
   border: none;
@@ -92,16 +112,6 @@ const StyledPressable = styled(RawButton)<{
   max-width: 300px;
 
   height: max-content;
-`;
-
-const StyledText = styled.div`
-  color: inherit;
-  font-size: 17px;
-
-  text-align: center;
-
-  padding: 15px 25px;
-  font-weight: 100;
 `;
 
 const StyledLink = styled(ExternalLink)`
@@ -170,6 +180,7 @@ export const Button = forwardRef<any, ButtonProps>(
         onClick={handleClick}
         type={type}
         isLoading={isLoading}
+        $hasLink={!!externalHref}
       >
         {view === 'glass' && <Glass />}
 
