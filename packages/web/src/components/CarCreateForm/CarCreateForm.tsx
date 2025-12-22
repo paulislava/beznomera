@@ -69,9 +69,10 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
               options={brands}
               optionKey='id'
               optionValue='title'
+              required
             />
-            <Field name='no' label='Гос. номер' />
-            <Field name='model' label='Модель' />
+            <Field name='no' required label='Гос. номер' />
+            <Field name='model' required label='Модель' />
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />
             <Field name='imageRatio' type='number' label='Соотношение сторон' />

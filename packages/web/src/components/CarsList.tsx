@@ -76,7 +76,7 @@ export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
         <TextL style={{ textAlign: 'center', marginBottom: '20px' }}>
           У вас пока нет автомобилей
         </TextL>
-        <Link href='/car/new' passHref>
+        <Link href='/car/new'>
           <AddButton view='glass'>Добавить автомобиль</AddButton>
         </Link>
       </Container>
@@ -96,9 +96,9 @@ export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
           </CarInfo>
         </CarItem>
       ))}
-      <Link href='/car/new' passHref>
-        <AddButton view='glass'>Добавить автомобиль</AddButton>
-      </Link>
+      <AddButton href='/car/new' view='glass'>
+        Добавить автомобиль
+      </AddButton>
     </Container>
   );
 };

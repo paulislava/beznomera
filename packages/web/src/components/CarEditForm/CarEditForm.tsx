@@ -72,9 +72,10 @@ export function CarEditForm({ initialData, carId, brands }: CarEditFormProps) {
               options={brands}
               optionKey='id'
               optionValue='title'
+              required
             />
-            <Field name='no' label='Гос. номер' />
-            <Field name='model' label='Модель' />
+            <Field name='no' label='Гос. номер' required />
+            <Field name='model' label='Модель' required />
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />
             <Field name='imageRatio' type='number' step='0.01' label='Соотношение сторон' />

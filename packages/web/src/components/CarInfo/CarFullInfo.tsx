@@ -108,9 +108,7 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
         </StatsContainer>
 
         <QRButtonContainer>
-          <Link href={`/car/${info.id}/qr`}>
-            <Button>Получить QR-код</Button>
-          </Link>
+          <Button href={`/car/${info.id}/qr`}>Получить QR-код</Button>
         </QRButtonContainer>
 
         <InfoContainer>
@@ -123,9 +121,8 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
         {isOwner && <CarDrivers info={info} isOwner={isOwner} />}
 
         <ButtonsContainer>
-          <Link href={`/car/${info.id}/edit`}>
-            <Button>Редактировать</Button>
-          </Link>
+          <Button href={`/car/${info.id}/edit`}>Редактировать</Button>
+
           {isTelegramWebApp && <AddOwnerButton carId={info.id} eventData={{ code: info.code }} />}
         </ButtonsContainer>
         <CenterContainer>

@@ -9,12 +9,14 @@ import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Button as RawButton } from '@heroui/react';
+import { preventDefault } from '@/utils/events';
 
 type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
 
 interface ButtonProps {
   children?: React.ReactNode;
   href?: string;
+  to?: string;
   disabled?: boolean;
   view?: ButtonView;
   onClick?(): any;
@@ -52,6 +54,10 @@ const viewConfigs: Record<ButtonView, ViewConfig> = {
 
 const getViewConfig = (view: ButtonView): ViewConfig => viewConfigs[view];
 
+const StyledContainer = styled.div`
+  position: relative;
+`;
+
 const StyledPressable = styled(RawButton)<{
   $view: ButtonView;
   $theme: ColorSchemeName;
@@ -62,6 +68,7 @@ const StyledPressable = styled(RawButton)<{
   border-radius: 35px;
   overflow: hidden;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
+  padding: 0;
 
   /* Явно убираем все границы по умолчанию */
   border: none;
@@ -86,13 +93,6 @@ const StyledPressable = styled(RawButton)<{
   max-width: 300px;
 
   height: max-content;
-
-  ${({ disabled }) =>
-    disabled &&
-    css`
-      cursor: inherit;
-      background: gray;
-    `}
 `;
 
 const StyledText = styled.div`
@@ -105,12 +105,8 @@ const StyledText = styled.div`
   font-weight: 100;
 `;
 
-const StyledLink = styled(ExternalLink)<{ $fullWidth?: boolean }>`
-  ${({ $fullWidth }) =>
-    $fullWidth &&
-    css`
-      width: 100%;
-    `}
+const StyledLink = styled(ExternalLink)`
+  width: 100%;
 `;
 
 // eslint-disable-next-line react/display-name
@@ -153,36 +149,34 @@ export const Button = forwardRef<any, ButtonProps>(
       }
     }, [onClick, event, eventParams, isLoading]);
 
-    const content = (
+    const content = externalHref ? (
+      <StyledLink
+        href={externalHref}
+        rel={noFollowNoIndex ? 'nofollow noopener noreferrer' : undefined}
+      >
+        <StyledText>{children}</StyledText>
+      </StyledLink>
+    ) : (
+      <StyledText>{children}</StyledText>
+    );
+
+    return (
       <StyledPressable
         $theme={theme}
-        $fullWidth={fullWidth}
         ref={ref}
+        $fullWidth={fullWidth}
         $view={view}
-        disabled={disabled}
+        isDisabled={disabled}
         className={className}
         onClick={handleClick}
         type={type}
         isLoading={isLoading}
       >
         {view === 'glass' && <Glass />}
-        <StyledText>{children}</StyledText>
+
+        <StyledContainer>{content}</StyledContainer>
       </StyledPressable>
     );
-
-    if (externalHref) {
-      return (
-        <StyledLink
-          href={externalHref}
-          rel={noFollowNoIndex ? 'nofollow noopener noreferrer' : ''}
-          $fullWidth={fullWidth}
-        >
-          {content}
-        </StyledLink>
-      );
-    }
-
-    return content;
   }
 );
 

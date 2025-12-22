@@ -33,11 +33,11 @@ export const Input: FC<InputProps> = ({
   value
 }) => {
   const extractedProps = {
-    required,
+    isRequired: required,
     minLength,
     maxLength,
-    readOnly,
-    disabled,
+    isReadOnly: readOnly,
+    isDisabled: disabled,
     name,
     onChange,
     onFocus,
