@@ -1,30 +1,15 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { carService } from '@/services';
-import { getUserFromRequest } from '@/utils/auth-server';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
-import { AUTH_PATHNAME } from '@/helpers/constants';
+import { AuthProps, withUser } from '@/context/Auth/withUser';
+import { generateCarsStaticParams } from '@/utils/paths';
 
-export async function generateStaticParams() {
-  try {
-    const cars = await carService.list();
-    return cars.map(car => ({
-      id: String(car.id)
-    }));
-  } catch {
-    return [];
-  }
-}
+export const generateStaticParams = generateCarsStaticParams;
 
-export default async function CarPage({ params }: PromiseParams<{ id: string }>) {
+async function CarPage({ params, user }: PromiseParams<{ id: string }> & AuthProps) {
   const { id } = await params;
   const idNumber = Number(id);
   if (!idNumber) return notFound();
-
-  const user = await getUserFromRequest();
-
-  if (!user) {
-    return redirect(AUTH_PATHNAME + '?redirect=/car/' + idNumber);
-  }
 
   try {
     const info = await carService.fullInfoApi(idNumber);
@@ -39,3 +24,5 @@ export default async function CarPage({ params }: PromiseParams<{ id: string }>)
     return notFound();
   }
 }
+
+export default withUser(CarPage);

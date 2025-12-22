@@ -1,22 +1,18 @@
-import { forbidden, notFound } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { carService } from '@/services';
-import { getUserFromRequest } from '@/utils/auth';
 import { PageContainer } from '@/ui/Styled';
 import { QRCodePage } from '@/components/QRCode';
+import { AuthComponent, withUser } from '@/context/Auth/withUser';
+import { extractNumberId } from '@/utils/params';
+import { generateCarsStaticParams } from '@/utils/paths';
 
-export default async function CarQRPage({ params }: PromiseParams<{ id: string }>) {
-  const { id } = await params;
-  const idNumber = Number(id);
-  if (!idNumber) return notFound();
+export const generateStaticParams = generateCarsStaticParams;
 
-  const user = await getUserFromRequest();
-
-  if (!user) {
-    return forbidden();
-  }
+const CarQRPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ params, user }) => {
+  const id = await extractNumberId(params);
 
   try {
-    const info = await carService.fullInfoApi(idNumber);
+    const info = await carService.fullInfoApi(id);
 
     if (info.owner.id !== user?.userId) {
       return notFound();
@@ -31,4 +27,6 @@ export default async function CarQRPage({ params }: PromiseParams<{ id: string }
     console.error(e);
     return notFound();
   }
-}
+};
+
+export default withUser(CarQRPage);
