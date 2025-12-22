@@ -15,6 +15,7 @@ import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
 import { Field as FinalField } from 'react-final-form';
 import { Autocomplete, AutocompleteItem } from '@heroui/react';
+import { revalidateHome } from '@/utils/paths';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -47,6 +48,7 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
         showSuccessMessage('Успех!', 'Автомобиль успешно создан');
         form.restart(initialValues);
         router.push(`/car/${newCar.id}`);
+        revalidateHome();
       } catch (error) {
         console.error('Ошибка при создании автомобиля:', error);
         showErrorMessage('Ошибка!', 'Ошибка при создании автомобиля');

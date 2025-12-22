@@ -1,4 +1,5 @@
 import { carService } from '@/services';
+import { revalidatePath } from 'next/cache';
 
 export const generateCarsStaticParams = async () => {
   try {
@@ -9,4 +10,10 @@ export const generateCarsStaticParams = async () => {
   } catch {
     return [];
   }
+};
+
+export const revalidateHome = () => {
+  'use server';
+
+  revalidatePath('/');
 };

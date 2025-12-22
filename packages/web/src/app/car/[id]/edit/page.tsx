@@ -9,6 +9,7 @@ import { generateCarsStaticParams } from '@/utils/paths';
 // Серверное действие для ревалидации страниц
 async function revalidateCarPages(carId: number, code: string) {
   'use server';
+  revalidatePath('/');
   revalidatePath(`/car/${carId}/edit`);
   console.log('revalidated /car/${carId}/edit');
   revalidatePath(`/car/${carId}`);
