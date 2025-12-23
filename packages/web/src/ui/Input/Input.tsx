@@ -1,8 +1,9 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback } from 'react';
 import * as S from './Input.styled';
 import { DEFAULT_TEXTAREA_MAX_ROWS } from '@/helpers/constants';
 import { InputMeta } from './Meta';
 import { InputProps } from './Input.types';
+import { useErrorsContent } from '@/utils/forms';
 
 const autoComplete = process.env.REACT_APP_AUTOCOMPLETE === '1';
 
@@ -54,17 +55,7 @@ export const Input: FC<InputProps> = ({
     [onChange, mask]
   );
 
-  const errorsContent = useMemo(
-    () =>
-      errors?.length ? (
-        <>
-          {errors.map(er => (
-            <div key={er.code}>{er.message}</div>
-          ))}
-        </>
-      ) : undefined,
-    [errors]
-  );
+  const errorsContent = useErrorsContent(errors);
 
   return (
     <S.Container>

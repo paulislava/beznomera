@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
 import { revalidateHome } from '@/utils/paths';
-import { SelectField } from '@/ui/SelectField/SelectField';
+import { SelectField } from '@/ui/Select/SelectField';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -34,7 +34,7 @@ const initialValues: EditCarInfo = {
   imageRatio: 2.8,
   imageUrl: '',
   code: '',
-  color: { value: null, newValue: { r: 113, g: 142, b: 191 } },
+  color: { value: null, newValue: { r: 255, g: 0, b: 0 } },
   brand: null
 };
 

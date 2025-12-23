@@ -55,16 +55,16 @@ jobs:
           docker run --name beznomera_web -d -it -p 4000:3000 --env-file /home/user/web/beznomera.net/web.env beznomera:web
           docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_web) || true
 
-  # clean:
-  #   runs-on: self-hosted
-  #   needs:
-  #     # - build-frontend
-  #     - build-backend
-  #     - build-web
-  #   if: always()
-  #   steps:
-  #     - name: Clean unused containers and volumes
-  #       run: |
-  #         echo "Deleting unused containers, volumes..."
-  #         docker system prune -a -f
+  clean:
+    runs-on: self-hosted
+    needs:
+      # - build-frontend
+      - build-backend
+      - build-web
+    if: always()
+    steps:
+      - name: Clean unused containers and volumes
+        run: |
+          echo "Deleting unused containers, volumes..."
+          docker system prune -f
 

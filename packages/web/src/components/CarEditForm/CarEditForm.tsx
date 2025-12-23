@@ -14,7 +14,7 @@ import { FormApi } from 'final-form';
 import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
-import { SelectField } from '@/ui/SelectField/SelectField';
+import { SelectField } from '@/ui/Select/SelectField';
 import { revalidateCarPages } from '@/utils/paths';
 
 const Title = styled.h1`

@@ -49,7 +49,7 @@ export const CarColorPicker = ({ input: { value, onChange } }: CarColorPickerPro
         ? `#${value.newValue.r.toString(16).padStart(2, '0')}${value.newValue.g
             .toString(16)
             .padStart(2, '0')}${value.newValue.b.toString(16).padStart(2, '0')}`
-        : '#000000',
+        : '#ff0000',
     [value]
   );
 
