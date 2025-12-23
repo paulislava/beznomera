@@ -1,4 +1,4 @@
-import { FileInfo } from '@shared/file/file.types';
+import { FileInfo } from '@paulislava/shared/file/file.types';
 import { IsUUID } from 'class-validator';
 
 export class FileDto implements FileInfo {

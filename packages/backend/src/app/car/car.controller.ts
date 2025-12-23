@@ -46,9 +46,8 @@ import {
   ValidateNested,
   IsNotEmpty,
   IsObject,
-  IsNumberString,
 } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
 import { Response, Request } from 'express';
 import { Creatable } from '@paulislava/shared/forms';
@@ -56,7 +55,7 @@ import { ImageBody } from '@paulislava/shared/core.types';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 import { ApiClientAuthGuard } from '../auth/api-auth.guard';
 import { FileDto } from '../file/file.dto';
-import { FileInfo } from '@shared/file/file.types';
+import { FileInfo } from '@paulislava/shared/file/file.types';
 
 class LocationDto implements LocationInfo {
   @IsNumber()

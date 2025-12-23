@@ -3,7 +3,6 @@ import 'dotenv/config';
 import { addAlias } from 'module-alias';
 
 addAlias('~', __dirname);
-addAlias('@shared', __dirname + '/node_modules/@paulislava/shared');
 
 import { Encoding } from 'crypto';
 import { ServerResponse } from 'http';
