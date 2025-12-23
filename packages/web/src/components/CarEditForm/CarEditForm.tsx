@@ -16,6 +16,7 @@ import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
 import { SelectField } from '@/ui/Select/SelectField';
 import { revalidateCarPages } from '@/utils/paths';
+import { processFormSubmit } from '@/utils/forms';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -43,20 +44,19 @@ export function CarEditForm({ initialData, carId, brands }: CarEditFormProps) {
   const router = useRouter();
 
   const onSubmit = useCallback(
-    async (data: EditCarInfo, form: FormApi<EditCarInfo>) => {
-      try {
-        await carService.update(data, carId);
-        showSuccessMessage('Успех!', 'Автомобиль успешно обновлен');
-        form.restart(data);
+    async (data: EditCarInfo, form: FormApi<EditCarInfo>) =>
+      processFormSubmit(
+        carService.update(data, carId),
+        'Автомобиль успешно обновлен',
+        'Ошибка при обновлении автомобиля',
+        async () => {
+          form.restart(data);
 
-        await revalidateCarPages(carId, data.code);
+          await revalidateCarPages(carId, data.code);
 
-        router.push(`/car/${carId}`);
-      } catch (error) {
-        console.error('Ошибка при обновлении автомобиля:', error);
-        showErrorMessage('Ошибка!', 'Ошибка при обновлении автомобиля');
-      }
-    },
+          router.push(`/car/${carId}`);
+        }
+      ),
     [carId, router]
   );
 

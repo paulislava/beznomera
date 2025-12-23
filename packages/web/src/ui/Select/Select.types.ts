@@ -1,6 +1,6 @@
 import { SubmissionError } from '@shared/errors';
 import { FieldRenderProps } from 'react-final-form';
-import { Key } from 'readline';
+import { Key } from 'react';
 import { ValidatorsProps } from '../FormField/FormField.types';
 
 export type RawSelectProps<

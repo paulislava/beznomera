@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": false,
     "types": ["node", "jest", "multer"],
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["./src/*"],
+      "@shared/*": ["../shared/src/*"]
     }
   },
   "sourceMap": true,

@@ -1,7 +1,11 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
-import { Repository } from 'typeorm';
+import { Equal, FindOptionsWhere, Not, Repository } from 'typeorm';
 import {
   CarInfo,
   EditCarInfo,
@@ -60,7 +64,8 @@ export class CarService {
     private readonly brandRepository: Repository<Brand>,
     @InjectRepository(Model)
     private readonly modelRepository: Repository<Model>,
-    @InjectRepository(CarDriver) private readonly carDriverRepository: Repository<CarDriver>,
+    @InjectRepository(CarDriver)
+    private readonly carDriverRepository: Repository<CarDriver>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly telegramService: TelegramService,
     private readonly configService: ConfigService,
@@ -74,25 +79,24 @@ export class CarService {
     });
 
     return cars.map((car) => ({
-    
-        id: car.id,
-        no: car.no,
-        brand: car.brand,
-        brandRaw: car.brandRaw,
-        model: car.model,
-        year: car.year,
-        version: car.version,
-        color: car.color,
-        rawColor: car.rawColor,
-        imageUrl: car.imageUrl,
-          imageRatio: car.imageRatio,
-        owner: {
-          firstName: car.owner.firstName,
-          lastName: car.owner.lastName,
-          nickname: car.owner.nickname,
-          tel: car.owner.tel,
-        },
-        code: car.code,
+      id: car.id,
+      no: car.no,
+      brand: car.brand,
+      brandRaw: car.brandRaw,
+      model: car.model,
+      year: car.year,
+      version: car.version,
+      color: car.color,
+      rawColor: car.rawColor,
+      imageUrl: car.imageUrl,
+      imageRatio: car.imageRatio,
+      owner: {
+        firstName: car.owner.firstName,
+        lastName: car.owner.lastName,
+        nickname: car.owner.nickname,
+        tel: car.owner.tel,
+      },
+      code: car.code,
     }));
   }
 
@@ -142,10 +146,11 @@ export class CarService {
     userAgent: Agent,
     ip: string,
   ): Promise<void> {
-    const { id, no, owner, carDrivers } = await this.carRepository.findOneOrFail({
-      where: { code },
-      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
-    });
+    const { id, no, owner, carDrivers } =
+      await this.carRepository.findOneOrFail({
+        where: { code },
+        relations: ['owner', 'carDrivers', 'carDrivers.driver'],
+      });
 
     const lastCall = await this.callRepository.findOne({
       where: { car: { id }, ip },
@@ -168,10 +173,10 @@ export class CarService {
 
     await this.callRepository.save({ car: { id }, ip });
 
-    const drivers = [owner, ...carDrivers.map(cd => cd.driver)];
+    const drivers = [owner, ...carDrivers.map((cd) => cd.driver)];
 
-    drivers.forEach(async driver => {
-      if(driver.telegramID) {
+    drivers.forEach(async (driver) => {
+      if (driver.telegramID) {
         const message = await this.telegramService.sendMessage(text, driver);
 
         if (coords) {
@@ -181,8 +186,6 @@ export class CarService {
         }
       }
     });
-
-
   }
 
   async userList(id: number): Promise<ShortCarInfo[]> {
@@ -252,7 +255,7 @@ export class CarService {
         tel: car.owner.tel,
         id: car.owner.id,
       },
-      drivers: car.carDrivers.map(cd => ({
+      drivers: car.carDrivers.map((cd) => ({
         id: cd.driver.id,
         firstName: cd.driver.firstName,
         lastName: cd.driver.lastName,
@@ -265,9 +268,12 @@ export class CarService {
     };
   }
 
-  async getInfoForUpdate(id: number, user?: RequestUser): Promise<EditCarInfoApi> {
+  async getInfoForUpdate(
+    id: number,
+    user?: RequestUser,
+  ): Promise<EditCarInfoApi> {
     const car = await this.carRepository.findOne({
-      where: { id, owner: user ? { id: user.userId } : undefined   },
+      where: { id, owner: user ? { id: user.userId } : undefined },
       relations: ['brand', 'color', 'owner'],
     });
 
@@ -309,6 +315,10 @@ export class CarService {
       throw new CarNotFoundException(id);
     }
 
+    await this.validateCarData(data, id);
+
+    const code = data.code || data.no.toLowerCase().replace(/\s+/g, '');
+
     await this.carRepository.update(car.id, {
       no: data.no,
       model: data.model,
@@ -327,40 +337,12 @@ export class CarService {
       year: data.year,
       imageRatio: data.imageRatio,
       imageUrl: data.imageUrl,
-      code: data.code,
+      code,
     });
   }
 
   async create(data: CarCreateDto, user: RequestUser): Promise<number> {
-    // Проверяем уникальность номера и кода
-    const [existingNo, existingCode] = await Promise.all([
-      this.carRepository.findOne({ where: { no: data.no } }),
-      data.code && this.carRepository.findOne({ where: { code: data.code } }),
-    ]);
-
-    const errors: Record<string, SubmissionError[]> = {};
-
-    if (existingNo) {
-      errors.no = [
-        {
-          message: 'Автомобиль с таким номером уже существует',
-          code: ValidationCode.DUPLICATE_NUMBER,
-        },
-      ];
-    }
-
-    if (existingCode) {
-      errors.code = [
-        {
-          message: 'Автомобиль с таким кодом уже существует',
-          code: ValidationCode.DUPLICATE_CODE,
-        },
-      ];
-    }
-
-    if (Object.keys(errors).length > 0) {
-      throw new ValidationException(errors);
-    }
+    await this.validateCarData(data);
 
     const code = data.code || data.no.toLowerCase().replace(/\s+/g, '');
 
@@ -454,12 +436,16 @@ export class CarService {
 
     // Проверяем, что пользователь является владельцем автомобиля
     if (car.owner.id !== userId) {
-      throw new Error('Только владелец автомобиля может добавлять других владельцев');
+      throw new Error(
+        'Только владелец автомобиля может добавлять других владельцев',
+      );
     }
 
     // Ищем или создаем пользователя по Telegram ID
     const userRepo = this.carRepository.manager.getRepository(User);
-    let newOwner = await userRepo.findOne({ where: { telegramID: body.contact.id.toString() } });
+    let newOwner = await userRepo.findOne({
+      where: { telegramID: body.contact.id.toString() },
+    });
 
     if (!newOwner) {
       newOwner = userRepo.create({
@@ -489,13 +475,13 @@ export class CarService {
 
     // Проверяем, что пользователь является владельцем или водителем
     const isOwner = car.owner.id === userId;
-    const isDriver = car.carDrivers.some(cd => cd.driverId === userId);
-    
+    const isDriver = car.carDrivers.some((cd) => cd.driverId === userId);
+
     if (!isOwner && !isDriver) {
       throw new Error('У вас нет доступа к информации об этом автомобиле');
     }
 
-    const drivers: DriverInfo[] = car.carDrivers.map(cd => ({
+    const drivers: DriverInfo[] = car.carDrivers.map((cd) => ({
       id: cd.driver.id,
       firstName: cd.driver.firstName,
       lastName: cd.driver.lastName,
@@ -540,8 +526,8 @@ export class CarService {
     }
 
     // Ищем или создаем пользователя по Telegram ID
-    let driver = await this.userRepository.findOne({ 
-      where: { telegramID: body.contact.id.toString() } 
+    let driver = await this.userRepository.findOne({
+      where: { telegramID: body.contact.id.toString() },
     });
 
     if (!driver) {
@@ -574,7 +560,11 @@ export class CarService {
     await this.carDriverRepository.save(carDriver);
   }
 
-  async removeDriver(carId: number, driverId: number, userId: number): Promise<void> {
+  async removeDriver(
+    carId: number,
+    driverId: number,
+    userId: number,
+  ): Promise<void> {
     const car = await this.carRepository.findOne({
       where: { id: carId },
       relations: ['owner', 'carDrivers', 'carDrivers.driver'],
@@ -584,7 +574,10 @@ export class CarService {
       throw new CarNotFoundException(carId);
     }
 
-    if(car.ownerId !== userId && !car.carDrivers.some(cd => cd.driverId === userId && cd.isOwner)) {
+    if (
+      car.ownerId !== userId &&
+      !car.carDrivers.some((cd) => cd.driverId === userId && cd.isOwner)
+    ) {
       throw new ForbiddenException('Нет доступа к этому автомобилю');
     }
 
@@ -599,24 +592,36 @@ export class CarService {
     await this.carDriverRepository.remove(carDriver);
   }
 
-  async addDriverByUsername(body: AddDriverByUsernameBody, currentUser: RequestUser, id: number): Promise<void> {
-    const car = await this.carRepository.findOne({ where: { id }, relations: ['carDrivers'] });
+  async addDriverByUsername(
+    body: AddDriverByUsernameBody,
+    currentUser: RequestUser,
+    id: number,
+  ): Promise<void> {
+    const car = await this.carRepository.findOne({
+      where: { id },
+      relations: ['carDrivers'],
+    });
 
     if (!car) {
       throw new CarNotFoundException(id);
     }
 
-    if(car.ownerId !== currentUser.userId && !car.carDrivers.some(cd => cd.driverId === currentUser.userId && cd.isOwner)) {
+    if (
+      car.ownerId !== currentUser.userId &&
+      !car.carDrivers.some(
+        (cd) => cd.driverId === currentUser.userId && cd.isOwner,
+      )
+    ) {
       throw new ForbiddenException('Нет доступа к этому автомобилю');
     }
 
     const user = await this.userService.findUserByUsername(body.username);
 
-    if(!user) {
+    if (!user) {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    if(car.carDrivers.some(cd => cd.driverId === user.id)) {
+    if (car.carDrivers.some((cd) => cd.driverId === user.id)) {
       throw new CarServiceException('Этот водитель уже добавлен к автомобилю');
     }
 
@@ -629,4 +634,46 @@ export class CarService {
     await this.carDriverRepository.save(carDriver);
   }
 
+  private async validateCarData(
+    data: EditCarInfo,
+    currentId?: number,
+  ): Promise<void> {
+    const exceptCurrentWhere: FindOptionsWhere<Car> = currentId
+      ? { id: Not(Equal(currentId)) }
+      : {};
+
+    const [existingNo, existingCode] = await Promise.all([
+      this.carRepository.findOne({
+        where: { no: data.no, ...exceptCurrentWhere },
+      }),
+      data.code &&
+        this.carRepository.findOne({
+          where: { code: data.code, ...exceptCurrentWhere },
+        }),
+    ]);
+
+    const errors: Record<string, SubmissionError[]> = {};
+
+    if (existingNo) {
+      errors.no = [
+        {
+          message: 'Автомобиль с таким номером уже существует',
+          code: ValidationCode.DUPLICATE_NUMBER,
+        },
+      ];
+    }
+
+    if (existingCode) {
+      errors.code = [
+        {
+          message: 'Автомобиль с таким кодом уже существует',
+          code: ValidationCode.DUPLICATE_CODE,
+        },
+      ];
+    }
+
+    if (Object.keys(errors).length > 0) {
+      throw new ValidationException(errors);
+    }
+  }
 }
