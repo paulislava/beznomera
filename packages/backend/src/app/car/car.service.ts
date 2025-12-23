@@ -75,7 +75,7 @@ export class CarService {
 
   async getList(): Promise<ShortCarInfoApi[]> {
     const cars = await this.carRepository.find({
-      relations: ['owner', 'brand', 'color'],
+      relations: ['owner', 'brand', 'color', 'image'],
     });
 
     return cars.map((car) => ({
@@ -89,6 +89,7 @@ export class CarService {
       color: car.color,
       rawColor: car.rawColor,
       imageUrl: car.imageUrl,
+      image: car.image?.info(),
       imageRatio: car.imageRatio,
       owner: {
         firstName: car.owner.firstName,
@@ -113,10 +114,11 @@ export class CarService {
       owner,
       rawColor,
       imageUrl,
+      image,
       imageRatio: imageRatio,
     } = await this.carRepository.findOneOrFail({
       where: { code },
-      relations: ['owner', 'brand', 'color'],
+      relations: ['owner', 'brand', 'color', 'image'],
     });
 
     return {
@@ -131,6 +133,7 @@ export class CarService {
       rawColor,
       imageUrl,
       imageRatio: imageRatio,
+      image: image?.info(),
       owner: {
         firstName: owner.firstName,
         lastName: owner.lastName,
@@ -191,10 +194,10 @@ export class CarService {
   async userList(id: number): Promise<ShortCarInfo[]> {
     const cars = await this.carRepository.find({
       where: { owner: { id } },
-      relations: ['owner', 'brand', 'color'],
+      relations: ['owner', 'brand', 'color', 'file'],
     });
 
-    return cars;
+    return cars.map((car) => ({ ...car, image: car.image?.info() }));
   }
 
   async sendMessage(
@@ -228,7 +231,14 @@ export class CarService {
   async getFullInfo(id: number, user?: RequestUser): Promise<FullCarInfo> {
     const car = await this.carRepository.findOne({
       where: { id, owner: user ? { id: user.userId } : undefined },
-      relations: ['owner', 'brand', 'color', 'carDrivers', 'carDrivers.driver'],
+      relations: [
+        'owner',
+        'brand',
+        'color',
+        'carDrivers',
+        'carDrivers.driver',
+        'image',
+      ],
     });
 
     if (!car) {
@@ -245,6 +255,7 @@ export class CarService {
 
     return {
       ...car,
+      image: car.image?.info(),
       messagesCount,
       callsCount,
       chatsCount,
@@ -274,7 +285,7 @@ export class CarService {
   ): Promise<EditCarInfoApi> {
     const car = await this.carRepository.findOne({
       where: { id, owner: user ? { id: user.userId } : undefined },
-      relations: ['brand', 'color', 'owner'],
+      relations: ['brand', 'color', 'owner', 'image'],
     });
 
     if (!car) {
@@ -299,6 +310,7 @@ export class CarService {
       year: car.year,
       imageRatio: car.imageRatio,
       ownerId: car.owner.id,
+      image: car.image?.info(),
     };
   }
 
@@ -336,7 +348,9 @@ export class CarService {
       // brandRaw: data.brand?.newValue,
       year: data.year,
       imageRatio: data.imageRatio,
-      imageUrl: data.imageUrl,
+      image: {
+        id: data.image?.id,
+      },
       code,
     });
   }

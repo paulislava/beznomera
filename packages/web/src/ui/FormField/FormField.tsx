@@ -8,6 +8,7 @@ import { useValidators } from '@/hooks/useValidators';
 import { useMemo } from 'react';
 import { inputPlaceholders } from './constants';
 import { parseFunc } from './FormField.utils';
+import { FileField } from '../FileButton/FileField';
 
 // Контейнер для поля и кнопки
 const Wrapper = styled.div`
@@ -42,12 +43,12 @@ function FormField<T = any>({
     required
   });
 
-  const finalComponent = FinalInput;
+  let finalComponent = FinalInput;
   let finalMask: string | undefined;
 
-  // if (type === 'file') {
-  //   finalComponent = FileField;
-  // }
+  if (type === 'file') {
+    finalComponent = FileField;
+  }
 
   let finalType = type;
 

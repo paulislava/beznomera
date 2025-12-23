@@ -55,6 +55,8 @@ import { Creatable } from '@paulislava/shared/forms';
 import { ImageBody } from '@paulislava/shared/core.types';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 import { ApiClientAuthGuard } from '../auth/api-auth.guard';
+import { FileDto } from '../file/file.dto';
+import { FileInfo } from '@shared/file/file.types';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -157,9 +159,11 @@ export class CarUpdateDto implements EditCarInfo {
   @IsNumber()
   imageRatio: Maybe<number>;
 
-  @IsOptional()
-  @IsString()
-  imageUrl: Maybe<string>;
+  @ValidateNested()
+  @Type(() => FileDto)
+  image: FileInfo;
+
+  imageUrl: string;
 }
 
 export class CarCreateDto extends CarUpdateDto {}
@@ -224,7 +228,10 @@ export class CarController implements CarApi {
 
   @Get(CAR_API.backendRoutes.userList)
   @UseGuards(ApiClientAuthGuard)
-  userList(@Param(ID_PARAM) id: number, ...args: any[]): Promise<ShortCarInfo[]> {
+  userList(
+    @Param(ID_PARAM) id: number,
+    ...args: any[]
+  ): Promise<ShortCarInfo[]> {
     return this.carService.userList(id);
   }
 

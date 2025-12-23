@@ -12,8 +12,7 @@ import { CarExternalImage } from '@/components/CarDetails';
 import { PRODUCTION_URL } from '@/constants/site';
 import { FormApi } from 'final-form';
 import styled from 'styled-components';
-import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
-import { ButtonsRow } from '@/ui/Styled';
+import { ButtonsRow, ImageContainer } from '@/ui/Styled';
 import { SelectField } from '@/ui/Select/SelectField';
 import { revalidateCarPages } from '@/utils/paths';
 import { processFormSubmit } from '@/utils/forms';
@@ -23,12 +22,6 @@ const Title = styled.h1`
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
-`;
-
-const ImageContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
 `;
 
 interface CarEditFormProps {
@@ -64,7 +57,7 @@ export function CarEditForm({ initialData, carId, brands }: CarEditFormProps) {
     <div>
       <Title>Редактирование автомобиля</Title>
       <Form initialValues={initialData} onSubmit={onSubmit}>
-        {({ handleSubmit, pristine, submitting }) => (
+        {({ handleSubmit, pristine, submitting, values }) => (
           <>
             <Select
               name='brand'
@@ -79,14 +72,14 @@ export function CarEditForm({ initialData, carId, brands }: CarEditFormProps) {
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />
             <Field name='imageRatio' type='number' step='0.01' label='Соотношение сторон' />
-            <Field name='imageUrl' type='url' label='Ссылка на изображение' />
             <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
 
-            {initialData.imageUrl ? (
+            <Field name='image' type='file' label='Изображение' fileType='image' />
+            {values.image?.url ? (
               <ImageContainer>
                 <CarExternalImage
-                  $aspectRatio={initialData.imageRatio}
-                  src={initialData.imageUrl}
+                  $aspectRatio={values.imageRatio}
+                  src={values.image?.url}
                   alt='Изображение автомобиля'
                   width={400}
                   height={142}

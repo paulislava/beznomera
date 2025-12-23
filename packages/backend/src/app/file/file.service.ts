@@ -107,7 +107,9 @@ export class FileService {
 
     await Promise.all(
       prevFiles.map(async (prevFile) => {
-        await this.deleteFile(prevFile.id);
+        await this.deleteFile(prevFile.id).catch((err) =>
+          console.error(`Error while deleting file ${prevFile.id}: `, err),
+        );
       }),
     );
   }

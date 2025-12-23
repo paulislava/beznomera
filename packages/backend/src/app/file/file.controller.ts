@@ -15,26 +15,40 @@ import { RequestUser } from '@paulislava/shared/user/user.types';
 import { FileFolder, FileInfo } from '@paulislava/shared/file/file.types';
 
 import { WrongMimetypeException } from './file.exceptions';
-import { FileSerializer } from './file.serializer';
 import FILE_API, {
   FileApi,
   FILE_NAME_PARAM,
 } from '@paulislava/shared/file/file.api';
+
+enum AllowedImageMimeType {
+  Png = 'image/png',
+  Webp = 'image/webp',
+  Avif = 'image/avif',
+}
+
+enum AllowedImageExtension {
+  Png = '.png',
+  Webp = '.webp',
+  Avif = '.avif',
+}
+
+const ALLOWED_IMAGE_MIMETYPES = Object.values(AllowedImageMimeType);
+const ALLOWED_IMAGE_EXTENSIONS = Object.values(AllowedImageExtension);
 @Controller(FILE_API.path)
 export class FileController implements FileApi {
-  constructor(
-    private readonly fileService: FileService,
-    private readonly fileSerializer: FileSerializer,
-  ) {}
+  constructor(private readonly fileService: FileService) {}
 
   @Post(FILE_API.backendRoutes.upload)
   @UseInterceptors(
     FileInterceptor(FILE_NAME_PARAM, {
       fileFilter: (req, file, callback) => {
-        if (
-          file.mimetype !== 'image/png' ||
-          !file.originalname.endsWith('.png')
-        ) {
+        const hasAllowedMimeType = ALLOWED_IMAGE_MIMETYPES.includes(
+          file.mimetype as AllowedImageMimeType,
+        );
+        const hasAllowedExtension = ALLOWED_IMAGE_EXTENSIONS.some((extension) =>
+          file.originalname.toLowerCase().endsWith(extension),
+        );
+        if (!hasAllowedMimeType || !hasAllowedExtension) {
           return callback(new WrongMimetypeException(), false);
         }
         callback(null, true);
@@ -48,6 +62,6 @@ export class FileController implements FileApi {
     @CurrentUser() user: RequestUser,
   ): Promise<FileInfo> {
     const fileEntity = await this.fileService.uploadFile(file, folder, user);
-    return this.fileSerializer.info(fileEntity);
+    return fileEntity.info();
   }
 }

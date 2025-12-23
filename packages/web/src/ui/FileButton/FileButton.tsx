@@ -10,9 +10,9 @@ export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, .
 
   const handleChange = useCallback(
     (file: File | null) => {
-      if (file) {
-        onChange?.(file);
+      onChange?.(file);
 
+      if (file) {
         loadingFiles.push(
           uploadFile(file, FileFolder.Temp)
             .then(data => {
@@ -24,6 +24,8 @@ export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, .
               throw err;
             })
         );
+      } else {
+        onUpload?.(null);
       }
     },
     [loadingFiles, onChange, onError, onUpload]

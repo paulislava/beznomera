@@ -1,14 +1,28 @@
 import styled from 'styled-components';
-import { inputContainerMixin } from '@/ui/Input/Input.styled';
+import { Input } from '../Input/Input.styled';
 
-export const Container = styled.label<{ height?: number }>`
-  ${inputContainerMixin}
-  align-items: center;
-  gap: 10px;
-  display: grid;
-  grid-template-columns: 31px 1fr;
-  cursor: pointer;
-  white-space: nowrap; // Чтобы текст не обрезался
+export const Container = styled.label`
+  width: 100%;
+  position: relative;
+
+  & * {
+    cursor: pointer;
+  }
+`;
+
+export const FileInput = styled(Input)`
+  & input {
+    caret-color: transparent;
+  }
+`;
+
+export const HiddenFileInput = styled.input`
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
 `;
 
 export const Filename = styled.div`

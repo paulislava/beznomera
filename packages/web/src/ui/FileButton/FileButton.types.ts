@@ -1,6 +1,7 @@
 import { FileInfo } from '@shared/file/file.types';
 import { FieldRenderProps } from 'react-final-form';
 import { FetchError } from '@/typings/fetch';
+import { SubmissionError } from '@shared/errors';
 
 export type FileType = 'image';
 
@@ -9,6 +10,8 @@ type TypeProps = {
 };
 
 type BaseData = TypeProps & {
+  errors?: SubmissionError[];
+  label?: React.ReactNode;
   value?: FileInfo;
 };
 
@@ -22,7 +25,7 @@ export type FileFieldProps = FieldRenderProps<FileInfo> & {
 } & TypeProps;
 
 export type FileButtonProps = BaseData & {
-  onUpload(data: FileInfo): void;
+  onUpload(data: Maybe<FileInfo>): void;
   onError?(err: FetchError): void;
-  onChange?(file: File): void;
+  onChange?(file: Maybe<File>): void;
 };

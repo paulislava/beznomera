@@ -27,3 +27,9 @@ export const PageContainer = styled(CenterContainer).attrs({
   padding: 20px;
   width: 100%;
 `;
+
+export const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+`;

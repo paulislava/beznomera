@@ -12,10 +12,11 @@ import { PRODUCTION_URL } from '@/constants/site';
 import { FormApi } from 'final-form';
 import styled from 'styled-components';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
-import { ButtonsRow } from '@/ui/Styled';
+import { ButtonsRow, ImageContainer } from '@/ui/Styled';
 import { revalidateHome } from '@/utils/paths';
 import { SelectField } from '@/ui/Select/SelectField';
 import { processFormSubmit } from '@/utils/forms';
+import { CarExternalImage } from '../CarDetails';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -33,8 +34,9 @@ const initialValues: EditCarInfo = {
   version: '',
   year: new Date().getFullYear(),
   imageRatio: 2.8,
-  imageUrl: '',
+  image: null,
   code: '',
+  imageUrl: '',
   color: { value: null, newValue: { r: 255, g: 0, b: 0 } },
   brand: null
 };
@@ -61,7 +63,7 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
     <div>
       <Title>Добавить автомобиль</Title>
       <Form initialValues={initialValues} onSubmit={onSubmit}>
-        {({ handleSubmit, pristine, submitting }) => (
+        {({ handleSubmit, pristine, submitting, values }) => (
           <>
             <Select
               name='brand'
@@ -76,10 +78,22 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
             <Field name='version' label='Версия' />
             <Field name='year' type='number' label='Год выпуска' />
             <Field name='imageRatio' type='number' label='Соотношение сторон' />
-            <Field name='imageUrl' type='file' label='Изображение' />
             <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
 
-            <Field name='color' component={CarColorPicker} />
+            <Field name='image' type='file' label='Изображение' fileType='image' />
+            {values.image?.url ? (
+              <ImageContainer>
+                <CarExternalImage
+                  $aspectRatio={values.imageRatio}
+                  src={values.image?.url}
+                  alt='Изображение автомобиля'
+                  width={400}
+                  height={142}
+                />
+              </ImageContainer>
+            ) : (
+              <Field name='color' component={CarColorPicker} />
+            )}
 
             <ButtonsRow>
               <Button onClick={handleSubmit} disabled={pristine || submitting}>

@@ -1,4 +1,5 @@
 import { ImageBody } from '../core.types';
+import { FileInfo } from '../file/file.types';
 import { Creatable } from '../forms';
 import { UserProfile } from '../user/user.types';
 
@@ -33,6 +34,7 @@ type CarInfoBase = {
   imageRatio: Maybe<number>;
   imageUrl: Maybe<string>;
   year: Maybe<number>;
+  image: Maybe<FileInfo>;
 };
 
 export type ShortCarInfo = CarInfoBase & {

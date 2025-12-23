@@ -6,8 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-    OneToMany,
-    JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 import { User } from '../user/user.entity';
@@ -16,9 +15,10 @@ import { Brand } from './brand.entity';
 import { Color } from './color.entity';
 import { CarInfo, RgbColor } from '@paulislava/shared/car/car.types';
 import { CarDriver } from './car-driver.entity';
+import { File } from '../file.entity';
 
 @Entity('cars')
-export class Car extends BaseEntity implements CarInfo {
+export class Car extends BaseEntity implements Omit<CarInfo, 'image'> {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -63,6 +63,9 @@ export class Car extends BaseEntity implements CarInfo {
 
   @Column({ nullable: true })
   imageUrl: string | null;
+
+  @ManyToOne(() => File)
+  image: File;
 
   @Column({ nullable: true, type: 'float' })
   imageRatio: number | null;

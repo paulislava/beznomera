@@ -8,7 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from './user/user.entity';
-import { FileFolder } from '@paulislava/shared/file/file.types';
+import { FileFolder, FileInfo } from '@paulislava/shared/file/file.types';
 
 @Entity()
 export class File extends BaseEntity {
@@ -52,5 +52,13 @@ export class File extends BaseEntity {
 
   fileUrl(): string {
     return `${process.env.CDN_URL}/${this.fileKey()}`;
+  }
+
+  info(): FileInfo {
+    return {
+      id: this.id,
+      name: this.originalName,
+      url: this.fileUrl(),
+    };
   }
 }
