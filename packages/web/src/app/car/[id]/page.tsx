@@ -2,10 +2,6 @@ import { notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
 import { AuthProps, withUser } from '@/context/Auth/withUser';
-import { generateCarsStaticParams } from '@/utils/paths';
-
-export const generateStaticParams = generateCarsStaticParams;
-
 async function CarPage({ params, user }: PromiseParams<{ id: string }> & AuthProps) {
   const { id } = await params;
   const idNumber = Number(id);

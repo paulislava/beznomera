@@ -4,9 +4,6 @@ import { PageContainer } from '@/ui/Styled';
 import { QRCodePage } from '@/components/QRCode';
 import { AuthComponent, withUser } from '@/context/Auth/withUser';
 import { extractNumberId } from '@/utils/params';
-import { generateCarsStaticParams } from '@/utils/paths';
-
-export const generateStaticParams = generateCarsStaticParams;
 
 const CarQRPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ params, user }) => {
   const id = await extractNumberId(params);

@@ -3,11 +3,6 @@ import { carService } from '@/services';
 import { CarEditForm } from '@/components/CarEditForm/CarEditForm';
 import { extractNumberId } from '@/utils/params';
 import { AuthComponent, withUser } from '@/context/Auth/withUser';
-import { generateCarsStaticParams } from '@/utils/paths';
-
-// Серверное действие для ревалидации страниц
-
-export const generateStaticParams = generateCarsStaticParams;
 
 const CarEditPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ params, user }) => {
   const id = await extractNumberId(params);
