@@ -85,13 +85,13 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
 
       {info.no && <CarNumber>{info.no}</CarNumber>}
 
-      {info.imageUrl ? (
+      {!!info.imageUrl || !!info.image?.url ? (
         <CarExternalImage
           width={400}
           height={info.imageRatio ? info.imageRatio * 400 : 142}
           alt={`${info.no}, ${info.brandRaw || info.brand?.title} ${info.model}`}
           $aspectRatio={info.imageRatio}
-          src={info.imageUrl}
+          src={(info.image?.url || info.imageUrl)!}
         />
       ) : (
         <StyledCarImage color={info.color?.value ?? info.rawColor} />
