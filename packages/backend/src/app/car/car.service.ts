@@ -348,8 +348,8 @@ export class CarService {
       // brandRaw: data.brand?.newValue,
       year: data.year,
       imageRatio: data.imageRatio,
-      image: {
-        id: data.image?.id,
+      image: data.image && {
+        id: data.image.id,
       },
       code,
     });
@@ -367,6 +367,9 @@ export class CarService {
       year: data.year,
       imageRatio: data.imageRatio,
       imageUrl: data.imageUrl,
+      image: data.image && {
+        id: data.image.id,
+      },
       owner: {
         id: user.userId,
       },

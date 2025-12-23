@@ -1,4 +1,4 @@
-import { FileInfo } from '@shared/file/file.types';
+import { FileFolder, FileInfo } from '@shared/file/file.types';
 import { FieldRenderProps } from 'react-final-form';
 import { FetchError } from '@/typings/fetch';
 import { SubmissionError } from '@shared/errors';
@@ -7,6 +7,7 @@ export type FileType = 'image';
 
 type TypeProps = {
   fileType?: FileType;
+  folder?: FileFolder;
 };
 
 type BaseData = TypeProps & {

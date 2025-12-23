@@ -3,14 +3,7 @@ import { FileButton } from './FileButton';
 import { FileFieldProps } from './FileButton.types';
 import { useMergeErrors } from '@/utils/forms';
 
-export const FileField: FC<FileFieldProps> = ({
-  input,
-  label,
-  fileType,
-  onChange,
-  errors,
-  meta
-}) => {
+export const FileField: FC<FileFieldProps> = ({ input, onChange, errors, meta, ...props }) => {
   const finalErrors = useMergeErrors(meta, errors);
 
   return (
@@ -18,9 +11,8 @@ export const FileField: FC<FileFieldProps> = ({
       onUpload={input.onChange}
       onChange={onChange}
       value={input.value}
-      fileType={fileType}
-      label={label}
       errors={finalErrors}
+      {...props}
     />
   );
 };

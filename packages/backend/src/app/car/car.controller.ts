@@ -159,6 +159,7 @@ export class CarUpdateDto implements EditCarInfo {
   @IsNumber()
   imageRatio: Maybe<number>;
 
+  @IsOptional()
   @ValidateNested()
   @Type(() => FileDto)
   image: FileInfo;

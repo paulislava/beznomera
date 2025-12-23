@@ -16,6 +16,7 @@ import { ButtonsRow, ImageContainer } from '@/ui/Styled';
 import { SelectField } from '@/ui/Select/SelectField';
 import { revalidateCarPages } from '@/utils/paths';
 import { processFormSubmit } from '@/utils/forms';
+import { FileFolder } from '@shared/file/file.types';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -74,7 +75,13 @@ export function CarEditForm({ initialData, carId, brands }: CarEditFormProps) {
             <Field name='imageRatio' type='number' step='0.01' label='Соотношение сторон' />
             <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
 
-            <Field name='image' type='file' label='Изображение' fileType='image' />
+            <Field
+              name='image'
+              type='file'
+              label='Изображение'
+              fileType='image'
+              folder={FileFolder.Cars}
+            />
             {values.image?.url ? (
               <ImageContainer>
                 <CarExternalImage

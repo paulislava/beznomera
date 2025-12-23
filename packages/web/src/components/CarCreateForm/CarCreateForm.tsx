@@ -11,12 +11,12 @@ import { CarColorPicker } from '@/components/CarColorPicker';
 import { PRODUCTION_URL } from '@/constants/site';
 import { FormApi } from 'final-form';
 import styled from 'styled-components';
-import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow, ImageContainer } from '@/ui/Styled';
 import { revalidateHome } from '@/utils/paths';
 import { SelectField } from '@/ui/Select/SelectField';
 import { processFormSubmit } from '@/utils/forms';
 import { CarExternalImage } from '../CarDetails';
+import { FileFolder } from '@shared/file/file.types';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -80,7 +80,13 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
             <Field name='imageRatio' type='number' label='Соотношение сторон' />
             <Field name='code' label='URL-адрес' beforeText={`${PRODUCTION_URL}/g/`} />
 
-            <Field name='image' type='file' label='Изображение' fileType='image' />
+            <Field
+              name='image'
+              type='file'
+              label='Изображение'
+              fileType='image'
+              folder={FileFolder.Cars}
+            />
             {values.image?.url ? (
               <ImageContainer>
                 <CarExternalImage
