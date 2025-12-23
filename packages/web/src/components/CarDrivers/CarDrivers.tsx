@@ -14,7 +14,7 @@ import { AddDriverButton } from './AddDriverButton';
 const DriversContainer = styled.div`
   margin: 20px 0;
   padding: 16px;
-  background-color: #f8f9fa;
+  background-color: ${({ theme }) => theme.secondaryBackground};
   border-radius: 8px;
 `;
 
@@ -24,9 +24,10 @@ const DriverItem = styled.div`
   align-items: center;
   padding: 12px;
   margin: 8px 0;
-  background-color: white;
+  background-color: ${({ theme }) => theme.bodyBackgroundColor};
   border-radius: 6px;
-  border: 1px solid #e9ecef;
+  border: 1px solid
+    ${({ theme }) => (theme.name === 'dark' ? 'rgba(113, 142, 191, 0.3)' : '#e9ecef')};
 `;
 
 const DriverInfo = styled.div`
@@ -36,11 +37,12 @@ const DriverInfo = styled.div`
 const DriverName = styled(TextL)`
   font-weight: 600;
   margin-bottom: 4px;
+  color: ${({ theme }) => theme.textColor};
 `;
 
 const DriverDetails = styled(TextL)`
   font-size: 14px;
-  color: #666;
+  color: ${({ theme }) => (theme.name === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#666')};
 `;
 
 const DriverActions = styled.div`
@@ -49,7 +51,7 @@ const DriverActions = styled.div`
 `;
 
 const OwnerBadge = styled.span`
-  background-color: #28a745;
+  background-color: ${({ theme }) => (theme.name === 'dark' ? '#718EBF' : '#28a745')};
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
@@ -65,6 +67,12 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 16px;
   gap: 8px;
+`;
+
+const TelegramIdText = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => (theme.name === 'dark' ? 'rgba(255, 255, 255, 0.5)' : '#999')};
+  margin-top: 4px;
 `;
 
 interface CarDriversProps {
@@ -128,7 +136,7 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
   return (
     <DriversContainer>
       <Header>
-        <TextL style={{ fontWeight: '600' }}>Водители автомобиля</TextL>
+        <TextL style={{ fontWeight: '600', color: 'inherit' }}>Водители автомобиля</TextL>
         <AddDriverButton onSuccess={loadDrivers} carId={info.id} eventData={{ code: info.code }} />
       </Header>
       {allDrivers.map(driver => (
@@ -145,7 +153,7 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
               <br />
               Добавлен: {formatDate(driver.addedAt)}
             </DriverDetails>
-            <div>Telegram ID: {driver.telegramID}</div>
+            <TelegramIdText>Telegram ID: {driver.telegramID}</TelegramIdText>
           </DriverInfo>
 
           {isOwner && !driver.isOwner && (

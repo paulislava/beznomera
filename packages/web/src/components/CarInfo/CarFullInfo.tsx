@@ -54,10 +54,10 @@ const StyledModelRow = styled(ModelRow)`
 
 const ButtonsContainer = styled.div`
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   flex-flow: column;
   align-items: center;
+  gap: 16px;
 `;
 
 const QRButtonContainer = styled(CenterContainer)`
@@ -121,14 +121,10 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
 
         <ButtonsContainer>
           <Button href={`/car/${info.id}/edit`}>Редактировать</Button>
-
-          {isTelegramWebApp && <AddOwnerButton carId={info.id} eventData={{ code: info.code }} />}
-        </ButtonsContainer>
-        <CenterContainer>
           <Button view='danger' onClick={() => {}}>
             Удалить
           </Button>
-        </CenterContainer>
+        </ButtonsContainer>
       </ActionsContainer>
     </>
   );
