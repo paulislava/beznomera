@@ -194,7 +194,7 @@ export class CarService {
   async userList(id: number): Promise<ShortCarInfo[]> {
     const cars = await this.carRepository.find({
       where: { owner: { id } },
-      relations: ['owner', 'brand', 'color', 'file'],
+      relations: ['owner', 'brand', 'color', 'image'],
     });
 
     return cars.map((car) => ({ ...car, image: car.image?.info() }));
