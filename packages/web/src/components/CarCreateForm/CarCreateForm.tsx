@@ -15,6 +15,7 @@ import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { ButtonsRow } from '@/ui/Styled';
 import { revalidateHome } from '@/utils/paths';
 import { SelectField } from '@/ui/Select/SelectField';
+import { processFormSubmit } from '@/utils/forms';
 
 const Title = styled.h1`
   font-size: 24px;
@@ -42,18 +43,17 @@ export function CarCreateForm({ brands }: { brands: BrandInfo[] }) {
   const router = useRouter();
 
   const onSubmit = useCallback(
-    async (data: EditCarInfo, form: FormApi<EditCarInfo>) => {
-      try {
-        const newCar = await carService.create(data);
-        showSuccessMessage('Успех!', 'Автомобиль успешно создан');
-        form.restart(initialValues);
-        router.push(`/car/${newCar.id}`);
-        revalidateHome();
-      } catch (error) {
-        console.error('Ошибка при создании автомобиля:', error);
-        showErrorMessage('Ошибка!', 'Ошибка при создании автомобиля');
-      }
-    },
+    async (data: EditCarInfo, form: FormApi<EditCarInfo>) =>
+      processFormSubmit(
+        carService.create(data),
+        'Автомобиль успешно добавлен',
+        'Ошибка при добавлении автомобиля',
+        async newCar => {
+          form.restart(initialValues);
+          router.push(`/car/${newCar.id}`);
+          await revalidateHome();
+        }
+      ),
     [router]
   );
 
