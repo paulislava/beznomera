@@ -657,7 +657,7 @@ export class CarService {
     if (existingNo) {
       errors.no = [
         {
-          message: 'Автомобиль с таким номером уже существует',
+          message: 'Автомобиль с таким номером уже добавлен',
           code: ValidationCode.DUPLICATE_NUMBER,
         },
       ];
@@ -666,7 +666,7 @@ export class CarService {
     if (existingCode) {
       errors.code = [
         {
-          message: 'Автомобиль с таким кодом уже существует',
+          message: 'Автомобиль с таким адресом уже добавлен',
           code: ValidationCode.DUPLICATE_CODE,
         },
       ];
