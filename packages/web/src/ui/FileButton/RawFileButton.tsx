@@ -45,6 +45,7 @@ export const RawFileButton: React.FC<FileInputButtonProps> = ({
         errorMessage={errorsContent}
         isInvalid={!!errorsContent}
         value={fileName ? fileName : value ? value.name : 'Выберите файл'}
+        isClearable={!!fileName || !!value}
         onClear={handleClear}
       />
       <S.HiddenFileInput
