@@ -9,7 +9,8 @@ export const RawFileButton: React.FC<FileInputButtonProps> = ({
   value,
   fileType,
   label,
-  errors
+  errors,
+  loading
 }) => {
   const errorsContent = useErrorsContent(errors);
   const [fileName, setFileName] = useState<string>(''); // Состояние для хранения имени файла
@@ -36,16 +37,22 @@ export const RawFileButton: React.FC<FileInputButtonProps> = ({
   }, [onChange]);
 
   return (
-    <S.Container>
+    <S.Container $loading={loading}>
       <S.FileInput
         label={label}
         // isReadOnly
+        isDisabled={loading}
         errorMessage={errorsContent}
         isInvalid={!!errorsContent}
         value={fileName ? fileName : value ? value.name : 'Выберите файл'}
         onClear={handleClear}
       />
-      <S.HiddenFileInput type='file' onChange={handleFileChange} accept={accept} />
+      <S.HiddenFileInput
+        type='file'
+        disabled={loading}
+        onChange={handleFileChange}
+        accept={accept}
+      />
     </S.Container>
   );
 

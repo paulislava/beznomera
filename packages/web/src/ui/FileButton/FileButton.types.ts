@@ -16,6 +16,7 @@ type BaseData = TypeProps & {
 };
 
 export type FileInputButtonProps = BaseData & {
+  loading: boolean;
   onChange: (file: File | null) => void; // Колбек для обработки выбранного файла
 };
 

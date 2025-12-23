@@ -1,4 +1,4 @@
-import { FC, useCallback, useContext } from 'react';
+import { FC, useCallback, useContext, useState } from 'react';
 import RawFileButton from './RawFileButton';
 import { FileButtonProps } from './FileButton.types';
 import { FormContext } from '@/ui/FormContainer/FormContainer';
@@ -7,12 +7,14 @@ import { FileFolder } from '@shared/file/file.types';
 
 export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, ...rawProps }) => {
   const { loadingFiles } = useContext(FormContext);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = useCallback(
     (file: File | null) => {
       onChange?.(file);
 
       if (file) {
+        setLoading(true);
         loadingFiles.push(
           uploadFile(file, FileFolder.Temp)
             .then(data => {
@@ -23,6 +25,9 @@ export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, .
               onError?.(err);
               throw err;
             })
+            .finally(() => {
+              setLoading(false);
+            })
         );
       } else {
         onUpload?.(null);
@@ -31,5 +36,5 @@ export const FileButton: FC<FileButtonProps> = ({ onUpload, onError, onChange, .
     [loadingFiles, onChange, onError, onUpload]
   );
 
-  return <RawFileButton onChange={handleChange} {...rawProps} />;
+  return <RawFileButton onChange={handleChange} loading={loading} {...rawProps} />;
 };
