@@ -9,6 +9,7 @@ export type Theme = 'light' | 'dark' | 'system';
 export const DEFAULT_THEME: Theme = 'system';
 
 const THEME_LOCAL_STORAGE_KEY = 'theme';
+const THEME_LOCAL_STORAGE_KEY_MANUAL = 'theme_manual';
 
 type ThemeContextProps = { theme: ThemeValues; setTheme(theme: Theme): void };
 
@@ -18,6 +19,14 @@ export const ThemeContext = createContext<ThemeContextProps>({
     return;
   }
 });
+
+const setThemeIfNotManual = (theme: Theme) => {
+  const isManual = localStorage.getItem(THEME_LOCAL_STORAGE_KEY_MANUAL) === '1';
+
+  if (!isManual) {
+    localStorage.setItem(THEME_LOCAL_STORAGE_KEY, theme);
+  }
+};
 
 export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
   const [value, setValue] = useState<Theme>(() => {
@@ -35,7 +44,12 @@ export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
 
     const handleChange = (e: MediaQueryListEvent) => {
       setSystemTheme(e.matches ? 'dark' : 'light');
+      setThemeIfNotManual(theme);
     };
+
+    const theme = mediaQuery.matches ? 'dark' : 'light';
+
+    setThemeIfNotManual(theme);
 
     setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
     mediaQuery.addEventListener('change', handleChange);
@@ -63,6 +77,7 @@ export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
         setValue(theme);
         if (typeof window !== 'undefined') {
           localStorage.setItem(THEME_LOCAL_STORAGE_KEY, theme);
+          localStorage.setItem(THEME_LOCAL_STORAGE_KEY_MANUAL, '1');
         }
       }
     }),
