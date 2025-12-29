@@ -7,7 +7,6 @@ import { ExternalLink } from '../../components/ExternalLink';
 
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
-import { useColorScheme } from '@/components/useColorScheme';
 import { Button as RawButton } from '@heroui/react';
 import { useThemeName } from '@/themes/utils';
 
