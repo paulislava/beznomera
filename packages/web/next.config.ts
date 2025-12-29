@@ -6,15 +6,7 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
     workerThreads: false,
-    authInterrupts: true,
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js'
-        }
-      }
-    }
+    authInterrupts: true
   },
 
   webpack(config) {
@@ -45,6 +37,12 @@ const nextConfig: NextConfig = {
   },
   turbopack: {
     root: '..',
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js'
+      }
+    },
     resolveAlias: {
       '@shared': path.join(__dirname, '../shared/src')
     }

@@ -90,12 +90,12 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         const promise = qrScanner.open({
           text: 'Scan the QR Code', // Optional text to display
           onCaptured: (qrContent: string) => {
-            if (qrContent.startsWith(PRODUCTION_URL)) {
+            if (qrContent?.startsWith(PRODUCTION_URL)) {
               showSuccessMessage('Сканирован QR-код', qrContent);
               // You can process the QR content and close the scanner if needed
-              if (qrContent) {
-                qrScanner.close();
-              }
+
+              qrScanner.close();
+              router.push(qrContent.slice(PRODUCTION_URL.length));
             } else {
               alert('Некорректный QR-код');
             }
