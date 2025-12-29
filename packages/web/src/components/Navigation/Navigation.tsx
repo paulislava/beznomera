@@ -19,7 +19,7 @@ import { isTelegramWebApp } from '@/utils/telegram';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import qrCodeSvg from '@/assets/images/qrcode.svg';
 import { useToggle } from '@/hooks/booleans';
-import { showErrorMessage } from '@/utils/messages';
+import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -87,8 +87,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       try {
         const promise = qrScanner.open({
           text: 'Scan the QR Code', // Optional text to display
-          onCaptured: qrContent => {
-            console.log('Scanned QR Content:', qrContent);
+          onCaptured: (qrContent: any) => {
+            showSuccessMessage('Сканирован QR-код', qrContent);
             // You can process the QR content and close the scanner if needed
             if (qrContent) {
               qrScanner.close();
