@@ -6,7 +6,36 @@ const nextConfig: NextConfig = {
   experimental: {
     cpus: 1,
     workerThreads: false,
-    authInterrupts: true
+    authInterrupts: true,
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js'
+        }
+      }
+    }
+  },
+
+  webpack(config) {
+    const fileLoaderRule = config.module.rules.find((rule: any) => rule.test?.test?.('.svg'));
+
+    config.module.rules.push(
+      {
+        ...fileLoaderRule,
+        test: /\.svg$/i,
+        resourceQuery: /url/
+      },
+      {
+        test: /\.svg$/i,
+        issuer: fileLoaderRule.issuer,
+        resourceQuery: { not: [/url/] },
+        use: ['@svgr/webpack']
+      }
+    );
+    fileLoaderRule.exclude = /\.svg$/i;
+
+    return config;
   },
   images: {
     remotePatterns: [new URL(`${CDN_URL}/**`)]

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Navbar,
   NavbarBrand,
@@ -20,6 +20,7 @@ import { qrScanner } from '@telegram-apps/sdk-react';
 import qrCodeSvg from '@/assets/images/qrcode.svg';
 import { useToggle } from '@/hooks/booleans';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
+import { PRODUCTION_URL } from '@/constants/site';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -36,9 +37,9 @@ const TgSpace = styled.div`
   /* padding-top: env(safe-area-inset-top); */
 `;
 
-const QRCode = styled.div`
+const QRCode = styled(qrCodeSvg)`
   cursor: pointer;
-  content: url(${qrCodeSvg});
+  fill: white;
   position: fixed;
   bottom: 16px;
   right: 16px;
@@ -49,6 +50,7 @@ const QRCode = styled.div`
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
+  const router = useRouter();
   // const router = useRouter();
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -87,11 +89,15 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       try {
         const promise = qrScanner.open({
           text: 'Scan the QR Code', // Optional text to display
-          onCaptured: (qrContent: any) => {
-            showSuccessMessage('Сканирован QR-код', qrContent);
-            // You can process the QR content and close the scanner if needed
-            if (qrContent) {
-              qrScanner.close();
+          onCaptured: (qrContent: string) => {
+            if (qrContent.startsWith(PRODUCTION_URL)) {
+              showSuccessMessage('Сканирован QR-код', qrContent);
+              // You can process the QR content and close the scanner if needed
+              if (qrContent) {
+                qrScanner.close();
+              }
+            } else {
+              alert('Некорректный QR-код');
             }
           }
         });
@@ -115,7 +121,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       {isTelegramWebApp ? (
         <>
           <TgSpace />
-          <QRCode onClick={handleQrCodeScan} />
         </>
       ) : (
         <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
@@ -171,6 +176,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       )}
 
       <PageContainer>{children}</PageContainer>
+      {isTelegramWebApp && <QRCode onClick={handleQrCodeScan} />}
     </div>
   );
 };
