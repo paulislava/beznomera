@@ -4,7 +4,6 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { ShortCarInfo } from '@shared/car/car.types';
-import { TextL } from './Themed';
 import { Glass } from '@/ui/Glass';
 import { Button } from '@/ui/Button';
 
@@ -63,7 +62,7 @@ const CarNumber = styled(TextL)`
   font-size: 16px;
 `;
 
-const CarModel = styled(TextL)`
+const CarModel = styled.div`
   font-weight: 400;
   font-size: 14px;
   opacity: 0.8;
