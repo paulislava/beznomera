@@ -1,6 +1,6 @@
 import { RuleSet } from 'styled-components';
 import { ThemeValues } from './themes.types';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/context/Theme/Theme.context';
 
 type ThemeProps = { theme: ThemeValues };
 
