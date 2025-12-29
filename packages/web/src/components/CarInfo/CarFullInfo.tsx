@@ -119,6 +119,9 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
 
         <ButtonsContainer>
           <Button href={`/car/${info.id}/edit`}>Редактировать</Button>
+          <Button href={`/g/${info.code}`} view='glass'>
+            Страница авто
+          </Button>
           <Button view='danger' onClick={() => {}}>
             Удалить
           </Button>
