@@ -18,7 +18,7 @@ export const ProvidersContainer = ({ children }: { children: React.ReactNode }) 
   return (
     <ThemeProvider>
       <Container>
-        <ToastProvider placement='top-center' />
+        <ToastProvider placement='bottom-center' />
         {children}
       </Container>
     </ThemeProvider>
