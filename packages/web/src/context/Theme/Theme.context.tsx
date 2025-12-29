@@ -65,10 +65,15 @@ export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
   // Обновляем класс на html элементе
   useEffect(() => {
     const html = document.documentElement;
+
+    // Удаляем все классы тем
+    html.classList.remove('light', 'dark');
+
+    // Добавляем класс текущей темы
     if (activeTheme === 'dark') {
       html.classList.add('dark');
     } else {
-      html.classList.remove('dark');
+      html.classList.add('light');
     }
   }, [activeTheme]);
 
