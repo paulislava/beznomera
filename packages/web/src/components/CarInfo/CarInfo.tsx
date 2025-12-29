@@ -71,7 +71,9 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
   );
 
   const openChat = useCallback(() => {
-    window.open(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=msg_${encodeURIComponent(code)}`);
+    if (!isTelegramWebApp) {
+      window.open(`tg://resolve?domain=${TELEGRAM_BOT_NAME}&start=msg_${encodeURIComponent(code)}`);
+    }
   }, [code]);
 
   return (
@@ -136,7 +138,6 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
             Отправить сообщение
           </Button>
         </Link>
-        {isTelegramWebApp && <AddOwnerButton carId={info.id} eventData={eventData} />}
         <Button href='/' view='glass' event='go_create_qr' eventParams={eventData}>
           Создать свой QR-код
         </Button>
