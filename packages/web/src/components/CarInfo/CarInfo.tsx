@@ -22,7 +22,6 @@ import {
 import { ButtonsColumn } from '@/ui/Styled';
 import Link from 'next/link';
 import { isTelegramWebApp } from '@/utils/telegram';
-import { AddOwnerButton } from '@/components/AddOwnerButton';
 
 interface CarInfoProps {
   info: CarInfo;
