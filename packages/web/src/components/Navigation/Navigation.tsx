@@ -14,7 +14,7 @@ import {
   Button
 } from '@heroui/react';
 import styled from 'styled-components';
-import { PageContainer } from '@/ui/Styled';
+import { PageContainer, pagePaddingTop } from '@/ui/Styled';
 import { isTelegramWebApp } from '@/utils/telegram';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import qrCodeSvg from '@/assets/images/qrcode.svg';
@@ -33,7 +33,7 @@ const StyledNavbar = styled(Navbar)`
 `;
 
 const TgSpace = styled.div`
-  /* padding-top: 60px; */
+  padding-top: ${pagePaddingTop};
 `;
 
 const QRCode = styled(qrCodeSvg)`

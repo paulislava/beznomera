@@ -30,6 +30,6 @@ export const showErrorMessage = (title: string, description: string) => {
     description,
     color: 'danger',
     variant: 'flat',
-    timeout: 5000
+    timeout: 500000
   });
 };

@@ -7,6 +7,7 @@ import { ShortCarInfo } from '@shared/car/car.types';
 import { TextL } from './Themed';
 import { Glass } from '@/ui/Glass';
 import { Button } from '@/ui/Button';
+import { showErrorMessage } from '@/utils/messages';
 
 const Container = styled.div`
   max-width: 500px;
@@ -99,6 +100,7 @@ export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
       <AddButton href='/car/new' view='glass'>
         Добавить автомобиль
       </AddButton>
+      <Button onClick={() => showErrorMessage('test', 'test')}>Тест</Button>
     </Container>
   );
 };
