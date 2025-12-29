@@ -87,7 +87,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     if (qrScanner.open.isAvailable()) {
       try {
         const promise = qrScanner.open({
-          text: 'Scan the QR Code', // Optional text to display
+          text: 'QR-код автомобиля или водителя',
           onCaptured: (qrContent: string) => {
             if (qrContent?.startsWith(PRODUCTION_URL)) {
               qrScanner.close();
