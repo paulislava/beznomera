@@ -41,8 +41,8 @@ const QRCode = styled(qrCodeSvg)`
   cursor: pointer;
   fill: white;
   position: fixed;
-  bottom: 16px;
-  right: 16px;
+  bottom: 24px;
+  right: 24px;
   width: 32px;
   height: 32px;
   z-index: 100;
@@ -91,9 +91,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
           text: 'Scan the QR Code', // Optional text to display
           onCaptured: (qrContent: string) => {
             if (qrContent?.startsWith(PRODUCTION_URL)) {
-              showSuccessMessage('Сканирован QR-код', qrContent);
-              // You can process the QR content and close the scanner if needed
-
               qrScanner.close();
               router.push(qrContent.slice(PRODUCTION_URL.length));
             } else {
@@ -111,7 +108,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     } else {
       showErrorMessage('Недоступен QR-сканнер', 'QR-сканнер недоступен в этой версии Telegram.');
     }
-  }, []);
+  }, [router]);
 
   // Показываем кнопку "Назад" только если есть история навигации и мы не на главной странице
   const showBackButton = navigationHistory.length > 1 && pathname !== '/';
