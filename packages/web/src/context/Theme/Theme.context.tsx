@@ -21,11 +21,13 @@ export const ThemeContext = createContext<ThemeContextProps>({
 });
 
 const setThemeIfNotManual = (theme: Theme) => {
-  const isManual = localStorage.getItem(THEME_LOCAL_STORAGE_KEY_MANUAL) === '1';
+  // const isManual = localStorage.getItem(THEME_LOCAL_STORAGE_KEY_MANUAL) === '1';
 
-  if (!isManual) {
-    localStorage.setItem(THEME_LOCAL_STORAGE_KEY, theme);
-  }
+  // if (!isManual) {
+  //   localStorage.setItem(THEME_LOCAL_STORAGE_KEY, theme);
+  // }
+
+  return theme;
 };
 
 export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
