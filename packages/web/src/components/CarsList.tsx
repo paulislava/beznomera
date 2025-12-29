@@ -100,7 +100,6 @@ export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
       <AddButton href='/car/new' view='glass'>
         Добавить автомобиль
       </AddButton>
-      <Button onClick={() => showErrorMessage('test', 'test')}>Тест</Button>
     </Container>
   );
 };
