@@ -1,4 +1,5 @@
 'use client';
+import { isTelegramWebApp } from '@/utils/telegram';
 import styled from 'styled-components';
 
 export const CenterContainer = styled.div`
@@ -33,3 +34,5 @@ export const ImageContainer = styled.div`
   justify-content: center;
   margin: 20px 0;
 `;
+
+export const safeAreaInsetTop = () => (isTelegramWebApp ? `env(safe-area-inset-top, 44px)` : '0px');
