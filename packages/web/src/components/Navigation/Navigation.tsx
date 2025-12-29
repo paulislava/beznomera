@@ -44,6 +44,7 @@ const QRCode = styled.div`
   right: 16px;
   width: 32px;
   height: 32px;
+  z-index: 100;
 `;
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
