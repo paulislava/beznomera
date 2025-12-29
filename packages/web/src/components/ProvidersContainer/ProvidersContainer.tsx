@@ -11,6 +11,10 @@ const Container = styled(HeroUIProvider)`
   & [data-placement='top-center'] {
     top: ${pagePaddingTop};
   }
+
+  & [data-placement='bottom-center'] {
+    bottom: 24px;
+  }
 `;
 
 export const ProvidersContainer = ({ children }: { children: React.ReactNode }) => {

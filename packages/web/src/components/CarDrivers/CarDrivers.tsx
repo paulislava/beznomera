@@ -10,11 +10,12 @@ import { CenterContainer } from '@/ui/Styled';
 import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { formatDate } from '@/utils/date';
 import { AddDriverButton } from './AddDriverButton';
+import { forThemeValue, themeable } from '@/themes/utils';
 
 const DriversContainer = styled.div`
   margin: 20px 0;
   padding: 16px;
-  background-color: ${({ theme }) => theme.secondaryBackground};
+  background-color: ${themeable('secondaryBackground')};
   border-radius: 8px;
 `;
 
@@ -24,10 +25,9 @@ const DriverItem = styled.div`
   align-items: center;
   padding: 12px;
   margin: 8px 0;
-  background-color: ${({ theme }) => theme.bodyBackgroundColor};
+  background-color: ${themeable('bodyBackgroundColor')};
   border-radius: 6px;
-  border: 1px solid
-    ${({ theme }) => (theme.name === 'dark' ? 'rgba(113, 142, 191, 0.3)' : '#e9ecef')};
+  border: 1px solid ${forThemeValue('#e9ecef', 'rgba(113, 142, 191, 0.3)')};
 `;
 
 const DriverInfo = styled.div`
@@ -37,12 +37,12 @@ const DriverInfo = styled.div`
 const DriverName = styled(TextL)`
   font-weight: 600;
   margin-bottom: 4px;
-  color: ${({ theme }) => theme.textColor};
+  color: ${themeable('textColor')};
 `;
 
 const DriverDetails = styled(TextL)`
   font-size: 14px;
-  color: ${({ theme }) => (theme.name === 'dark' ? 'rgba(255, 255, 255, 0.7)' : '#666')};
+  color: ${forThemeValue('#666', 'rgba(255, 255, 255, 0.7)')};
 `;
 
 const DriverActions = styled.div`
@@ -51,7 +51,7 @@ const DriverActions = styled.div`
 `;
 
 const OwnerBadge = styled.span`
-  background-color: ${({ theme }) => (theme.name === 'dark' ? '#718EBF' : '#28a745')};
+  background-color: ${forThemeValue('#28a745', '#718EBF')};
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
@@ -71,7 +71,7 @@ const Header = styled.div`
 
 const TelegramIdText = styled.div`
   font-size: 12px;
-  color: ${({ theme }) => (theme.name === 'dark' ? 'rgba(255, 255, 255, 0.5)' : '#999')};
+  color: ${forThemeValue('#999', 'rgba(255, 255, 255, 0.5)')};
   margin-top: 4px;
 `;
 

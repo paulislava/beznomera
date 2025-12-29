@@ -27,10 +27,12 @@ export const forLightTheme =
   ({ theme }: ThemeProps) =>
     theme.name === 'light' && content;
 
-export const theme = {
-  mainBackgroundColor: '#ffffff',
-  scrollbarTrackColor: '#f1f1f1',
-  scrollbarThumbColor: '#888888',
-  scrollbarThumbHoverColor: '#555555'
-  // другие переменные темы...
-};
+export const forTheme =
+  (lightContent: RuleSet<object>, darkContent: RuleSet<object>) =>
+  ({ theme }: ThemeProps) =>
+    theme.name === 'light' ? lightContent : darkContent;
+
+export const forThemeValue =
+  (lightContent: string | number, darkContent: string | number) =>
+  ({ theme }: ThemeProps) =>
+    theme.name === 'light' ? lightContent : darkContent;

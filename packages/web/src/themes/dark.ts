@@ -40,7 +40,8 @@ export const darkTheme = {
     optionColor: '#fff'
   },
   tableHeadingCellBackground: 'rgba(37, 40, 54, 0.85)',
-  skeletonBackground: `radial-gradient(circle, rgb(63, 65, 74) 0%, rgb(29, 26, 43) 100%)`
+  skeletonBackground: `radial-gradient(circle, rgb(63, 65, 74) 0%, rgb(29, 26, 43) 100%)`,
+  qrCodeFill: '#fff'
 };
 
 export default css`

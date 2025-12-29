@@ -21,6 +21,7 @@ import qrCodeSvg from '@/assets/images/qrcode.svg';
 import { useToggle } from '@/hooks/booleans';
 import { showErrorMessage } from '@/utils/messages';
 import { PRODUCTION_URL } from '@/constants/site';
+import { themeable } from '@/themes/utils';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -38,13 +39,12 @@ const TgSpace = styled.div`
 
 const QRCode = styled(qrCodeSvg)`
   cursor: pointer;
-  fill: white;
+  fill: ${themeable('qrCodeFill')};
   position: fixed;
   bottom: 24px;
   right: 24px;
   width: 32px;
   height: 32px;
-  z-index: 100;
 `;
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
@@ -172,7 +172,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       )}
 
       <PageContainer>{children}</PageContainer>
-      {isTelegramWebApp && <QRCode onClick={handleQrCodeScan} />}
+      <QRCode onClick={handleQrCodeScan} />
     </div>
   );
 };

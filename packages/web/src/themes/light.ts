@@ -40,7 +40,8 @@ export const lightTheme: ThemeValues = {
     background: white
   },
   tableHeadingCellBackground: 'rgba(245, 247, 250, 0.85)',
-  skeletonBackground: `radial-gradient(circle, rgba(165, 191, 233, 0.4) 0%, rgba(113, 142, 191) 100%)`
+  skeletonBackground: `radial-gradient(circle, rgba(165, 191, 233, 0.4) 0%, rgba(113, 142, 191) 100%)`,
+  qrCodeFill: '#000'
 };
 
 export default css``;
