@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -16,6 +16,11 @@ import {
 import styled from 'styled-components';
 import { PageContainer } from '@/ui/Styled';
 import { isTelegramWebApp } from '@/utils/telegram';
+import { qrScanner } from '@telegram-apps/sdk-react';
+import qrCodeSvg from '@/assets/images/qrcode.svg';
+import { useToggle } from '@/hooks/booleans';
+import { showErrorMessage } from '@/utils/messages';
+
 interface NavigationProps {
   children?: React.ReactNode;
 }
@@ -29,6 +34,16 @@ const StyledNavbar = styled(Navbar)`
 const TgSpace = styled.div`
   padding-top: 60px;
   /* padding-top: env(safe-area-inset-top); */
+`;
+
+const QRCode = styled.div`
+  cursor: pointer;
+  content: url(${qrCodeSvg});
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
 `;
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
@@ -64,9 +79,32 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   //   router.back();
   // };
 
-  const handleMenuToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const handleMenuToggle = useToggle(setIsMenuOpen);
+
+  const handleQrCodeScan = useCallback(async () => {
+    if (qrScanner.open.isAvailable()) {
+      try {
+        const promise = qrScanner.open({
+          text: 'Scan the QR Code', // Optional text to display
+          onCaptured: qrContent => {
+            console.log('Scanned QR Content:', qrContent);
+            // You can process the QR content and close the scanner if needed
+            if (qrContent) {
+              qrScanner.close();
+            }
+          }
+        });
+
+        // This promise resolves when the scanner is closed
+        await promise;
+        console.log('QR Scanner closed');
+      } catch (error) {
+        console.error('Error opening QR scanner:', error);
+      }
+    } else {
+      showErrorMessage('Недоступен QR-сканнер', 'QR-сканнер недоступен в этой версии Telegram.');
+    }
+  }, []);
 
   // Показываем кнопку "Назад" только если есть история навигации и мы не на главной странице
   const showBackButton = navigationHistory.length > 1 && pathname !== '/';
@@ -76,6 +114,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       {isTelegramWebApp ? (
         <>
           <TgSpace />
+          <QRCode onClick={handleQrCodeScan} />
         </>
       ) : (
         <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
