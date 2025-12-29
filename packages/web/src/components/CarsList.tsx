@@ -57,7 +57,7 @@ const CarInfo = styled.div`
   flex: 1;
 `;
 
-const CarNumber = styled(TextL)`
+const CarNumber = styled.div`
   font-weight: 600;
   font-size: 16px;
 `;
