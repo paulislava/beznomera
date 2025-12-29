@@ -7,7 +7,6 @@ import { ShortCarInfo } from '@shared/car/car.types';
 import { TextL } from './Themed';
 import { Glass } from '@/ui/Glass';
 import { Button } from '@/ui/Button';
-import { showErrorMessage } from '@/utils/messages';
 
 const Container = styled.div`
   max-width: 500px;

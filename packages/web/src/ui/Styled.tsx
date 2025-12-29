@@ -37,4 +37,4 @@ export const ImageContainer = styled.div`
 
 export const safeAreaInsetTop = () => (isTelegramWebApp ? `env(safe-area-inset-top, 44px)` : '0px');
 
-export const pagePaddingTop = isTelegramWebApp ? '60px' : '60px';
+export const pagePaddingTop = isTelegramWebApp ? '60px' : '0';
