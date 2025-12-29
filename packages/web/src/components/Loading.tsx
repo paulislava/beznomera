@@ -1,6 +1,6 @@
+import { useThemeName } from '@/themes/utils';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { useColorScheme } from '@/components/useColorScheme';
 
 const LoadingContainer = styled.div`
   display: flex;
@@ -26,7 +26,7 @@ export type LoadingProps = {
 };
 
 export const Loading: React.FC<LoadingProps> = ({ size = 'large' }) => {
-  const theme = useColorScheme();
+  const theme = useThemeName();
 
   return <RawLoading size={size} color={theme === 'dark' ? '#ffffff' : '#090633'} />;
 };

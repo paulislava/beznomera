@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { Button } from '@/ui/Button';
 import { QRCode } from 'react-qrcode-logo';
 import { PRODUCTION_URL } from '@/constants/site';
-import { useColorScheme } from '@/components/useColorScheme';
 import { carService } from '@/services';
 import { QRTemplate } from '@/components/QRTemplate';
 import { Canvg } from 'canvg';
@@ -14,6 +13,7 @@ import { downloadFile } from '@/utils/downloadFile';
 import { uploadFile } from '@/utils/files';
 import { FileFolder } from '@shared/file/file.types';
 import { FullCarInfo } from '@shared/car/car.types';
+import { useThemeName } from '@/themes/utils';
 
 const QRCodeContainer = styled.div`
   margin: 20px 0;
@@ -35,7 +35,7 @@ type QRCodePageProps = {
 };
 
 export const QRCodePage = ({ info }: QRCodePageProps) => {
-  const theme = useColorScheme();
+  const theme = useThemeName();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const templateRef = useRef<SVGSVGElement>(null);
 

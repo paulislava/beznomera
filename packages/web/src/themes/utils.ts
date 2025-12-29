@@ -1,7 +1,14 @@
 import { RuleSet } from 'styled-components';
 import { ThemeValues } from './themes.types';
+import { useTheme } from '@/hooks/useTheme';
 
 type ThemeProps = { theme: ThemeValues };
+
+export const useThemeName = () => {
+  const theme = useTheme();
+
+  return theme.name === 'light' ? 'light' : 'dark';
+};
 
 /**
  * функция возвращает значение параметры темы из dark.ts (darkTheme)
