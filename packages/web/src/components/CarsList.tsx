@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ShortCarInfo } from '@shared/car/car.types';
 import { Glass } from '@/ui/Glass';
 import { Button } from '@/ui/Button';
+import { TextL } from './Themed';
 
 const Container = styled.div`
   max-width: 500px;
