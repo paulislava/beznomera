@@ -19,7 +19,7 @@ import { isTelegramWebApp } from '@/utils/telegram';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import qrCodeSvg from '@/assets/images/qrcode.svg';
 import { useToggle } from '@/hooks/booleans';
-import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
+import { showErrorMessage } from '@/utils/messages';
 import { PRODUCTION_URL } from '@/constants/site';
 
 interface NavigationProps {
