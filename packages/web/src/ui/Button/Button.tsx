@@ -7,7 +7,9 @@ import { ExternalLink } from '../../components/ExternalLink';
 
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
+import { useColorScheme } from '@/components/useColorScheme';
 import { Button as RawButton } from '@heroui/react';
+import { useThemeName } from '@/themes/utils';
 
 type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
 
@@ -68,6 +70,7 @@ const StyledText = styled.div`
 
 const StyledPressable = styled(RawButton)<{
   $view: ButtonView;
+  $theme: ColorSchemeName;
   $fullWidth?: boolean;
   $hasLink: boolean;
 }>`
@@ -91,14 +94,12 @@ const StyledPressable = styled(RawButton)<{
   border: none;
   outline: none;
 
-  ${({ $view, theme }) => {
+  ${({ $view, $theme }) => {
     const config = getViewConfig($view);
 
     return css`
       background: ${config.background};
-      color: ${typeof config.color === 'string'
-        ? config.color
-        : config.color[theme.name === 'system' ? 'dark' : theme.name]};
+      color: ${typeof config.color === 'string' ? config.color : config.color[$theme ?? 'dark']};
 
       ${$view === 'glass' &&
       css`
@@ -136,6 +137,7 @@ export const Button = forwardRef<any, ButtonProps>(
     },
     ref
   ) => {
+    const theme = useThemeName();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleClick = useCallback(async () => {
@@ -170,6 +172,7 @@ export const Button = forwardRef<any, ButtonProps>(
 
     return (
       <StyledPressable
+        $theme={theme}
         ref={ref}
         $fullWidth={fullWidth}
         $view={view}
