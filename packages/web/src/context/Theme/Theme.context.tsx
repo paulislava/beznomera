@@ -43,8 +43,10 @@ export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setSystemTheme(e.matches ? 'dark' : 'light');
-      setThemeIfNotManual(theme);
+      const newTheme = e.matches ? 'dark' : 'light';
+
+      setSystemTheme(newTheme);
+      setThemeIfNotManual(newTheme);
     };
 
     const theme = mediaQuery.matches ? 'dark' : 'light';
