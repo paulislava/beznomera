@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { Car } from '../entities/car/car.entity';
+import { User } from '../entities/user/user.entity';
 
 @Update()
 export class TelegramUpdate {
@@ -14,6 +15,8 @@ export class TelegramUpdate {
     private readonly chatMessageRepository: Repository<ChatMessage>,
     @InjectRepository(Car)
     private readonly carRepository: Repository<Car>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly telegramService: TelegramService,
   ) {}
 
@@ -41,7 +44,7 @@ export class TelegramUpdate {
         where: {
           telegramId: message.reply_to_message.message_id.toString(),
         },
-        relations: ['user', 'car'],
+        relations: ['user', 'car', 'forwardedMessage'],
       });
 
       if (!forwardedMessage) {
@@ -57,15 +60,20 @@ export class TelegramUpdate {
       const tgMessage = await this.telegramService.sendMessage(
         `Вам ответили по автомобилю ${forwardedMessage.car.no}:\n${messageText}`,
         forwardedMessage.user,
-        forwardedMessage.sourceTelegramId && Number(forwardedMessage.sourceTelegramId),
+        forwardedMessage.sourceTelegramId &&
+          Number(forwardedMessage.sourceTelegramId),
       );
+
+      const sender = await this.userRepository.findOneByOrFail({
+        telegramID: message.from.id.toString(),
+      });
 
       const chatMessage = await this.chatMessageRepository.save(
         this.chatMessageRepository.create({
           text: messageText,
           chatId: forwardedMessage.chatId,
           forwardedMessage,
-          userId: forwardedMessage.user.id,
+          userId: sender.id,
           telegramId: tgMessage.message_id.toString(),
           car: forwardedMessage.car,
           sourceTelegramId: message.message_id.toString(),
