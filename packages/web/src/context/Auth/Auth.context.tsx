@@ -5,7 +5,7 @@ import { RequestUser } from '@shared/user/user.types';
 import { redirect } from 'next/navigation';
 import React, { createContext, FC, useContext, useMemo } from 'react';
 
-const AuthContext = createContext<{ user: Maybe<RequestUser> }>({ user: null });
+export const AuthContext = createContext<{ user: Maybe<RequestUser> }>({ user: null });
 
 export const AuthProvider: FC<ChildrenProps & { user: Maybe<RequestUser> }> = ({
   children,

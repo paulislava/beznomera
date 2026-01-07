@@ -1,8 +1,8 @@
 'use client';
 
 import { carService } from '@/services';
-import { CarMessageBody } from '@shared/car/car.types';
-import React, { FC, useCallback, useMemo } from 'react';
+import { CarMessageAnswerType, CarMessageBody } from '@shared/car/car.types';
+import React, { FC, useCallback, useContext, useMemo } from 'react';
 import { handleEvent } from '@/utils/log';
 import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import Button from '@/ui/Button/Button';
@@ -20,6 +20,8 @@ import FormField from '@/ui/FormField/FormField';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import { FormApi } from 'final-form';
 import { CarInfoProps } from './CarInfo.types';
+import { SelectField } from '@/ui/Select/SelectField';
+import { AuthContext } from '@/context/Auth/Auth.context';
 
 const InputContainer = styled.div`
   margin: 20px 0;
@@ -37,9 +39,22 @@ const ChatContainer = styled.div`
 `;
 
 const Field = FormField<CarMessageBody>;
+const Select = SelectField<CarMessageBody>;
 
 export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
   const eventData = useMemo(() => ({ carId: info?.id, code }), [info, code]);
+  const { user } = useContext(AuthContext);
+
+  const answerTypesOptions = useMemo(
+    () => [
+      user
+        ? { label: 'Анонимно через бот', value: CarMessageAnswerType.BOT }
+        : { label: 'Не получать ответ', value: CarMessageAnswerType.NO },
+      { label: 'По телефону', value: CarMessageAnswerType.TEL },
+      { label: 'На E-mail', value: CarMessageAnswerType.EMAIL }
+    ],
+    [user]
+  );
 
   const sendHandler = useCallback(
     async (data: CarMessageBody, form: FormApi<CarMessageBody>) => {
@@ -57,7 +72,10 @@ export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
                   latitude: location.coords.latitude,
                   longitude: location.coords.longitude
                 },
-                text: data.text
+                text: data.text,
+                answerType: data.answerType,
+                tel: data.tel,
+                email: data.email
               },
               code
             )
@@ -115,6 +133,8 @@ export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
                 type='textarea'
                 placeholder='Введите ваше сообщение...'
               />
+
+              <Select name='answerType' options={answerTypesOptions} label='Получить ответ' />
             </InputContainer>
 
             <Button

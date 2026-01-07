@@ -76,12 +76,22 @@ export type EditCarInfoApi = EditCarInfo & {
 
 export type LocationInfo = { latitude: number; longitude: number };
 export type CarCallBody = { coords?: LocationInfo };
+
+export enum CarMessageAnswerType {
+  NO = 'no',
+  BOT = 'bot',
+  TEL = 'tel',
+  EMAIL = 'email'
+}
 export interface CarMessageBody {
   coords?: {
     latitude: number;
     longitude: number;
   };
   text: string;
+  answerType: CarMessageAnswerType;
+  tel?: string;
+  email?: string;
 }
 
 export type CarPlateBody = ImageBody;

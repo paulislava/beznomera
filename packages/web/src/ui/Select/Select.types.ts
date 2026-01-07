@@ -3,13 +3,18 @@ import { FieldRenderProps } from 'react-final-form';
 import { Key } from 'react';
 import { ValidatorsProps } from '../FormField/FormField.types';
 
+export type SelectOption = {
+  label: string;
+  value: string | number;
+};
+
 export type RawSelectProps<
   OptionData extends Record<string, React.ReactNode> = Record<string, React.ReactNode>
 > = {
   label: string;
   options: OptionData[];
-  optionKey: keyof OptionData;
-  optionValue: keyof OptionData;
+  optionKey?: keyof OptionData;
+  optionValue?: keyof OptionData;
   required?: boolean;
 };
 
