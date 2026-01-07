@@ -2,6 +2,7 @@ import { carService } from '@/services';
 import { Metadata } from 'next';
 import { CarInfoPage } from '@/components/CarInfo';
 import { notFound } from 'next/navigation';
+import { extractCode } from '@/utils/params';
 
 export async function generateMetadata({
   params
@@ -57,11 +58,10 @@ export async function generateStaticParams() {
 }
 
 export default async function Page({ params }: PromiseParams<{ code: string }>) {
-  const { code } = await params;
+  const code = await extractCode(params);
 
-  // Проверяем что code является валидной строкой
-  if (!code || typeof code !== 'string' || code.trim() === '') {
-    notFound();
+  if (!code) {
+    return;
   }
 
   try {

@@ -25,3 +25,13 @@ export const extractNumberId = async (params: Promise<{ id: number }>) => {
 
   return idNumber;
 };
+
+export const extractCode = async (params: Promise<{ code: string }>) => {
+  const { code } = await params;
+
+  if (!code || typeof code !== 'string' || code.trim() === '') {
+    notFound();
+  }
+
+  return code;
+};

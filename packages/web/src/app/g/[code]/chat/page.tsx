@@ -1,157 +1,74 @@
-'use client';
-
 import { carService } from '@/services';
-import { CarInfo, CarMessageBody } from '@shared/car/car.types';
-import { useParams } from 'next/navigation';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { handleEvent } from '@/utils/log';
-import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
-import Button from '@/ui/Button/Button';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { extractCode } from '@/utils/params';
+import { CarMessagePage } from '@/components/CarInfo/CarMessage';
 
-import {
-  ModelRow,
-  CarModelBrand,
-  BrandLogo,
-  CarModel,
-  CarNumber,
-  Nickname
-} from '@/components/CarDetails';
-import styled from 'styled-components';
-import FormField from '@/ui/FormField/FormField';
-import { Form } from '@/ui/FormContainer/FormContainer';
-import { FormApi } from 'final-form';
+export async function generateMetadata({
+  params
+}: PromiseParams<{ code: string }>): Promise<Metadata> {
+  const { code } = await params;
 
-const InputContainer = styled.div`
-  margin: 20px 0;
-  width: 100%;
-  max-width: 600px;
-`;
+  // Проверяем что code является валидной строкой
+  if (!code || typeof code !== 'string' || code.trim() === '') {
+    return {
+      title: 'Ссылка не действительна',
+      description: 'Ссылка на автомобиль не действительна или устарела'
+    };
+  }
 
-const ChatContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  min-height: 100%;
-`;
+  try {
+    const info = await carService.info(code);
 
-const Field = FormField<CarMessageBody>;
+    const title = `${info.no}: связаться с владельцем автомобиля`;
+    const description = `Связаться с владельцем автомобиля ${info.no}, ${info.brandRaw || info.brand?.title} ${
+      info.model || ''
+    }. Уведомление в Telegram, сообщение или звонок.`;
 
-const ChatDriverPage = () => {
-  const params = useParams();
-  const code = params.code as string;
-
-  const [requested, setRequested] = useState(false);
-  const [info, setInfo] = useState<CarInfo | null>(null);
-
-  useEffect(() => {
-    carService
-      .info(code)
-      .then(info => {
-        setRequested(true);
-        setInfo(info);
-      })
-      .catch(() => {
-        setRequested(true);
-      });
-  }, [code]);
-
-  const eventData = useMemo(() => ({ carId: info?.id, code }), [info, code]);
-
-  const sendHandler = useCallback(
-    async (data: CarMessageBody, form: FormApi<CarMessageBody>) => {
-      if (!data.text) {
-        showErrorMessage('Ошибка', 'Введите текст сообщения!');
-        return;
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description
       }
+    };
+  } catch {
+    return {
+      title: 'Ссылка не действительна',
+      description: 'Ссылка на автомобиль не действительна или устарела'
+    };
+  }
+}
 
-      await new Promise<void>((resolve, reject) => {
-        const send = (location?: GeolocationPosition) => {
-          carService
-            .sendMessage(
-              {
-                coords: location && {
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude
-                },
-                text: data.text
-              },
-              code
-            )
-            .then(() => {
-              handleEvent('send_message_success', eventData);
-              resolve();
-              showSuccessMessage('Успех', 'Сообщение отправлено!');
-            })
-            .catch(res => {
-              reject(res);
-              showResponseMessage(res);
-              handleEvent('send_message_error', { ...eventData, res });
-            });
-        };
+export async function generateStaticParams() {
+  try {
+    const cars = await carService.list();
 
-        if (navigator?.geolocation) {
-          navigator.geolocation.getCurrentPosition(send, () => send());
-        } else {
-          send();
-        }
-      });
+    // Фильтруем только те машины у которых есть code
+    return cars
+      .filter(car => car && car.code.trim().length > 0)
+      .map(car => ({
+        code: car.code
+      }));
+  } catch (error) {
+    console.error('Error in generateStaticParams:', error);
+    return [];
+  }
+}
 
-      form.change('text', '');
-    },
-    [code, eventData]
-  );
+export default async function Page({ params }: PromiseParams<{ code: string }>) {
+  const code = await extractCode(params);
 
-  return (
-    <Form onSubmit={sendHandler}>
-      {({ values, dirtySinceLastSubmit, submitSucceeded }) => (
-        <ChatContainer>
-          {requested && !info && <div>Ошибка: ссылка недействительна</div>}
+  if (!code) {
+    return;
+  }
 
-          {info && (
-            <>
-              {!!(info.owner.nickname || info.owner.firstName || info.owner.lastName) && (
-                <Nickname>
-                  {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
-                </Nickname>
-              )}
+  try {
+    const info = await carService.info(code);
 
-              {info.brand && (
-                <ModelRow>
-                  <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
-                  {info.brand.logoUrl && (
-                    <BrandLogo alt={info.brand.title} src={info.brand.logoUrl} />
-                  )}
-                  <CarModel>{info.model}</CarModel>
-                </ModelRow>
-              )}
-
-              {info.no && <CarNumber>{info.no}</CarNumber>}
-
-              <InputContainer>
-                <Field
-                  name='text'
-                  label='Сообщение'
-                  type='textarea'
-                  placeholder='Введите ваше сообщение...'
-                />
-              </InputContainer>
-
-              <Button
-                type='submit'
-                event='send_message'
-                eventParams={eventData}
-                disabled={!values.text || (submitSucceeded && !dirtySinceLastSubmit)}
-              >
-                {submitSucceeded && !dirtySinceLastSubmit ? 'Отправлено!' : 'Отправить'}
-              </Button>
-            </>
-          )}
-        </ChatContainer>
-      )}
-    </Form>
-  );
-};
-
-export default ChatDriverPage;
+    return <CarMessagePage info={info} code={code} />;
+  } catch {
+    notFound();
+  }
+}

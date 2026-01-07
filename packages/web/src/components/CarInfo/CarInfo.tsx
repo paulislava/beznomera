@@ -2,7 +2,6 @@
 
 import Button from '@/ui/Button/Button';
 import { carService } from '@/services';
-import { CarInfo } from '@shared/car/car.types';
 
 import React, { useCallback, useMemo, useState } from 'react';
 
@@ -22,11 +21,7 @@ import {
 import { ButtonsColumn } from '@/ui/Styled';
 import Link from 'next/link';
 import { isTelegramWebApp } from '@/utils/telegram';
-
-interface CarInfoProps {
-  info: CarInfo;
-  code: string;
-}
+import { CarInfoProps } from './CarInfo.types';
 
 export const CarInfoPage = ({ info, code }: CarInfoProps) => {
   const [called, setCalled] = useState(false);
