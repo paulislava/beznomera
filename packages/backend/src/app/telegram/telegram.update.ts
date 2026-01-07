@@ -60,7 +60,7 @@ export class TelegramUpdate {
       const chatHashtag = `\n\n#чат${forwardedMessage.chatId}`;
 
       const tgMessage = await this.telegramService.sendMessage(
-        `Вам ответили по автомобилю ${forwardedMessage.car.no}:\n${messageText}${chatHashtag}`,
+        `${messageText}\n\nНовое сообщение по автомобилю ${forwardedMessage.car.no}\n${chatHashtag}`,
         forwardedMessage.user,
         forwardedMessage.sourceTelegramId &&
           Number(forwardedMessage.sourceTelegramId),
