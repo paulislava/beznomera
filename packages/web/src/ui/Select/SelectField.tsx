@@ -24,12 +24,17 @@ export function FinalSelect<
 export function SelectField<
   FormData = any,
   OptionData extends Record<string, React.ReactNode> = Record<string, React.ReactNode>
->({ name, validators: rawValidators, ...selectProps }: SelectFieldProps<FormData, OptionData>) {
+>({
+  name,
+  defaultValue,
+  validators: rawValidators,
+  ...selectProps
+}: SelectFieldProps<FormData, OptionData>) {
   const validators = useValidators(rawValidators, { ...selectProps });
   const { submitErrors } = useFormState();
 
   return (
-    <Field validate={validators} name={name} type='select'>
+    <Field validate={validators} defaultValue={defaultValue} name={name} type='select'>
       {({ input, meta }) => (
         <FinalSelect input={input} meta={meta} errors={submitErrors?.[name]} {...selectProps} />
       )}

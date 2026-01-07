@@ -134,7 +134,12 @@ export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
                 placeholder='Введите ваше сообщение...'
               />
 
-              <Select name='answerType' options={answerTypesOptions} label='Получить ответ' />
+              <Select
+                name='answerType'
+                options={answerTypesOptions}
+                defaultValue={answerTypesOptions[0]?.value}
+                label='Получить ответ'
+              />
             </InputContainer>
 
             <Button

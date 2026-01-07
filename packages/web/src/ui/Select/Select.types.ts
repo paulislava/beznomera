@@ -33,6 +33,7 @@ export type SelectFieldProps<
 > = ValidatorsProps &
   RawSelectProps<OptionData> & {
     name: Leaves<FormData>;
+    defaultValue?: string | number;
   };
 
 export type FinalSelectProps<
