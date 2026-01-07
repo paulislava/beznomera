@@ -22,69 +22,141 @@ export class TelegramUpdate {
 
   @Start()
   async onStart(@Ctx() ctx: Scenes.SceneContext) {
-    const message = ctx.message;
-    if (isTextMessage(message) && message.text.startsWith('/start msg_')) {
-      const code = message.text.replace('/start msg_', '');
-      const car = await this.carRepository.findOne({
-        where: { code },
-        relations: ['owner'],
-      });
-      await ctx.scene.enter('message', { car });
+    try {
+      const message = ctx.message;
+      if (isTextMessage(message) && message.text.startsWith('/start msg_')) {
+        const code = message.text.replace('/start msg_', '');
+        const car = await this.carRepository.findOne({
+          where: { code },
+          relations: ['owner'],
+        });
+        await ctx.scene.enter('message', { car });
+      }
+    } catch (error) {
+      console.error('Error in TelegramUpdate.onStart:', error);
+      try {
+        await ctx.reply('Произошла ошибка при обработке команды');
+      } catch (replyError) {
+        console.error('Error sending error message in onStart:', replyError);
+      }
     }
   }
 
   @On('text')
   async onMessage(@Ctx() ctx: Context) {
-    const message = ctx.message;
+    try {
+      const message = ctx.message;
 
-    if (isTextMessage(message) && message.reply_to_message) {
-      const messageText = message.text;
+      if (isTextMessage(message) && message.reply_to_message) {
+        const messageText = message.text;
 
-      const forwardedMessage = await this.chatMessageRepository.findOne({
-        where: {
-          telegramId: message.reply_to_message.message_id.toString(),
-        },
-        relations: ['user', 'car', 'forwardedMessage'],
-      });
+        const forwardedMessage = await this.chatMessageRepository.findOne({
+          where: {
+            telegramId: message.reply_to_message.message_id.toString(),
+          },
+          relations: ['user', 'car', 'forwardedMessage'],
+        });
 
-      if (!forwardedMessage) {
-        await ctx.reply('Не удалось найти сообщение');
-        return;
+        if (!forwardedMessage) {
+          try {
+            await ctx.reply('Не удалось найти сообщение');
+          } catch (replyError) {
+            console.error(
+              'Error sending "message not found" reply:',
+              replyError,
+            );
+          }
+          return;
+        }
+
+        if (!forwardedMessage.user) {
+          try {
+            await ctx.reply('Не удалось найти пользователя');
+          } catch (replyError) {
+            console.error('Error sending "user not found" reply:', replyError);
+          }
+          return;
+        }
+
+        const chatHashtag = `\n\n#чат${forwardedMessage.chatId}`;
+
+        let tgMessage;
+        try {
+          tgMessage = await this.telegramService.sendMessage(
+            `${messageText}\n\nНовое сообщение по автомобилю ${forwardedMessage.car.no}\n${chatHashtag}`,
+            forwardedMessage.user,
+            forwardedMessage.sourceTelegramId &&
+              Number(forwardedMessage.sourceTelegramId),
+          );
+        } catch (sendError) {
+          console.error('Error sending message via Telegram API:', sendError);
+          try {
+            await ctx.reply(
+              'Не удалось отправить сообщение. Возможно, проблема с подключением к Telegram API.',
+            );
+          } catch (replyError) {
+            console.error('Error sending error notification:', replyError);
+          }
+          return;
+        }
+
+        let sender;
+        try {
+          sender = await this.userRepository.findOneByOrFail({
+            telegramID: message.from.id.toString(),
+          });
+        } catch (findError) {
+          console.error('Error finding sender user:', findError);
+          try {
+            await ctx.reply('Не удалось найти информацию об отправителе');
+          } catch (replyError) {
+            console.error(
+              'Error sending "sender not found" reply:',
+              replyError,
+            );
+          }
+          return;
+        }
+
+        try {
+          await this.chatMessageRepository.save(
+            this.chatMessageRepository.create({
+              text: messageText,
+              chatId: forwardedMessage.chatId,
+              forwardedMessage,
+              userId: sender.id,
+              telegramId: tgMessage.message_id.toString(),
+              car: forwardedMessage.car,
+              sourceTelegramId: message.message_id.toString(),
+            }),
+          );
+        } catch (saveError) {
+          console.error('Error saving chat message:', saveError);
+          try {
+            await ctx.reply(
+              'Сообщение отправлено, но не удалось сохранить его в базе данных',
+            );
+          } catch (replyError) {
+            console.error('Error sending save error notification:', replyError);
+          }
+          return;
+        }
+
+        try {
+          await ctx.reply('Сообщение отправлено' + chatHashtag, {
+            reply_to_message_id: message.message_id,
+          });
+        } catch (replyError) {
+          console.error('Error sending success reply:', replyError);
+        }
       }
-
-      if (!forwardedMessage.user) {
-        await ctx.reply('Не удалось найти пользователя');
-        return;
+    } catch (error) {
+      console.error('Error in TelegramUpdate.onMessage:', error);
+      try {
+        await ctx.reply('Произошла ошибка при обработке сообщения');
+      } catch (replyError) {
+        console.error('Error sending error message in onMessage:', replyError);
       }
-
-      const chatHashtag = `\n\n#чат${forwardedMessage.chatId}`;
-
-      const tgMessage = await this.telegramService.sendMessage(
-        `${messageText}\n\nНовое сообщение по автомобилю ${forwardedMessage.car.no}\n${chatHashtag}`,
-        forwardedMessage.user,
-        forwardedMessage.sourceTelegramId &&
-          Number(forwardedMessage.sourceTelegramId),
-      );
-
-      const sender = await this.userRepository.findOneByOrFail({
-        telegramID: message.from.id.toString(),
-      });
-
-      const chatMessage = await this.chatMessageRepository.save(
-        this.chatMessageRepository.create({
-          text: messageText,
-          chatId: forwardedMessage.chatId,
-          forwardedMessage,
-          userId: sender.id,
-          telegramId: tgMessage.message_id.toString(),
-          car: forwardedMessage.car,
-          sourceTelegramId: message.message_id.toString(),
-        }),
-      );
-
-      await ctx.reply('Сообщение отправлено' + chatHashtag, {
-        reply_to_message_id: message.message_id,
-      });
     }
   }
 }
