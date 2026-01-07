@@ -57,8 +57,10 @@ export class TelegramUpdate {
         return;
       }
 
+      const chatHashtag = `\n\n#чат${forwardedMessage.chatId}`;
+
       const tgMessage = await this.telegramService.sendMessage(
-        `Вам ответили по автомобилю ${forwardedMessage.car.no}:\n${messageText}`,
+        `Вам ответили по автомобилю ${forwardedMessage.car.no}:\n${messageText}${chatHashtag}`,
         forwardedMessage.user,
         forwardedMessage.sourceTelegramId &&
           Number(forwardedMessage.sourceTelegramId),
@@ -80,7 +82,7 @@ export class TelegramUpdate {
         }),
       );
 
-      await ctx.reply('Сообщение отправлено', {
+      await ctx.reply('Сообщение отправлено' + chatHashtag, {
         reply_to_message_id: message.message_id,
       });
     }
