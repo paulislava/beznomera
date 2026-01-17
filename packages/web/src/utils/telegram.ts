@@ -30,16 +30,16 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
     console.log('ready');
     initData.restore();
 
-    const startParam = initData.startParam();
+    // const startParam = initData.startParam();
 
-    if (startParam) {
-      const params = JSON.parse(startParam);
-      const path = params.get('path');
-      if (path) {
-        console.log(`Redirect to ${path}`);
-        router.push(path);
-      }
-    }
+    // if (startParam) {
+    //   const params = JSON.parse(startParam);
+    //   const path = params.get('path');
+    //   if (path) {
+    //     console.log(`Redirect to ${path}`);
+    //     router.push(path);
+    //   }
+    // }
 
     console.log('restore');
     expandViewport();
@@ -71,7 +71,7 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
 
 export const transferLinkToTelegram = (path: string) => {
   const params = { path };
-  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${encodeURIComponent(JSON.stringify(params))}`;
+  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${btoa(JSON.stringify(params)}`;
 };
 
 export { requestContactPromise };
