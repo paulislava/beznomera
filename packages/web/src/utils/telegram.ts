@@ -71,7 +71,7 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
 
 export const transferLinkToTelegram = (path: string) => {
   const params = { path };
-  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${btoa(JSON.stringify(params)}`;
+  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${btoa(JSON.stringify(params))}`;
 };
 
 export { requestContactPromise };
