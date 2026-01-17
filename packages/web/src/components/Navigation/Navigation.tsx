@@ -128,7 +128,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
               onClick={handleMenuToggle}
             />
             <Spacer />
-            <Button size='sm' href={telegramAppLink}>
+            <Button size='sm' targetBlank href={telegramAppLink}>
               Продолжить в Telegram
             </Button>
           </NavbarContent>

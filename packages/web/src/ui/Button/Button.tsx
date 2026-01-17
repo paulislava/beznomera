@@ -17,6 +17,7 @@ interface ButtonProps extends Pick<RawProps, 'variant' | 'size' | 'color'> {
   href?: string;
   to?: string;
   disabled?: boolean;
+  targetBlank?: boolean;
   view?: ButtonView;
   onClick?(): any;
   event?: string;
@@ -136,6 +137,7 @@ export const Button = forwardRef<any, ButtonProps>(
       noFollowNoIndex,
       fullWidth,
       type = 'button',
+      targetBlank,
       ...buttonProps
     },
     ref
@@ -165,6 +167,7 @@ export const Button = forwardRef<any, ButtonProps>(
     const content = externalHref ? (
       <StyledLink
         href={externalHref}
+        target={targetBlank ? '_blank' : undefined}
         rel={noFollowNoIndex ? 'nofollow noopener noreferrer' : undefined}
       >
         <StyledText>{children}</StyledText>

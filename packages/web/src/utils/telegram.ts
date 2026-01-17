@@ -30,8 +30,10 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
     console.log('ready');
     initData.restore();
 
-    if (initData.startParam) {
-      const params = new URLSearchParams(initData.startParam());
+    const startParam = initData.startParam();
+
+    if (startParam) {
+      const params = new URLSearchParams(decodeURIComponent(startParam));
       const path = params.get('path');
       if (path) {
         console.log(`Redirect to ${path}`);
