@@ -34,7 +34,7 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
 
     if (startParam) {
       const params = JSON.parse(atob(startParam));
-      const path = params.get('path');
+      const path = params.path;
       if (path) {
         console.log(`Redirect to ${path}`);
         router.push(path);
