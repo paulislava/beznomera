@@ -146,7 +146,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       )}
 
       <PageContainer>{children}</PageContainer>
-      <QRCode onClick={handleQrCodeScan} />
+      {isTelegramWebApp && <QRCode onClick={handleQrCodeScan} />}
     </div>
   );
 };
