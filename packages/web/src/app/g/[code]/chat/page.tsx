@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { extractCode } from '@/utils/params';
 import { CarMessagePage } from '@/components/CarInfo/CarMessage';
-import { AuthProps } from '@/context/Auth/withUser';
 
 export async function generateMetadata({
   params
