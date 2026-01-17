@@ -49,20 +49,7 @@ const QRCode = styled(qrCodeSvg)`
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
-  // const router = useRouter();
-  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Отслеживаем изменения пути
-  useEffect(() => {
-    setNavigationHistory(prev => {
-      // Если это первый переход или путь изменился
-      if (prev.length === 0 || prev[prev.length - 1] !== pathname) {
-        return [...prev, pathname];
-      }
-      return prev;
-    });
-  }, [pathname]);
 
   // Закрываем меню при изменении пути
   useEffect(() => {
@@ -110,9 +97,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const telegramAppLink = useMemo(() => transferLinkToTelegram(pathname), [pathname]);
 
-  // Показываем кнопку "Назад" только если есть история навигации и мы не на главной странице
-  const showBackButton = navigationHistory.length > 1 && pathname !== '/';
-
   return (
     <div className='min-h-screen flex flex-col'>
       {isTelegramWebApp ? (
@@ -145,16 +129,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
               </NavbarItem>
             ))}
           </NavbarContent>
-
-          {showBackButton && (
-            <NavbarContent justify='end'>
-              <NavbarItem>
-                <Button variant='flat' color='default' size='sm'>
-                  ← Назад
-                </Button>
-              </NavbarItem>
-            </NavbarContent>
-          )}
 
           <NavbarMenu>
             {filteredMenuItems.map(item => (
