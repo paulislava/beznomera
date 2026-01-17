@@ -33,7 +33,7 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
     const startParam = initData.startParam();
 
     if (startParam) {
-      const params = new URLSearchParams(decodeURIComponent(startParam));
+      const params = JSON.parse(startParam);
       const path = params.get('path');
       if (path) {
         console.log(`Redirect to ${path}`);
@@ -70,8 +70,8 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
 };
 
 export const transferLinkToTelegram = (path: string) => {
-  const params = new URLSearchParams({ path });
-  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${encodeURIComponent(params.toString())}`;
+  const params = { path };
+  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${encodeURIComponent(JSON.stringify(params))}`;
 };
 
 export { requestContactPromise };
