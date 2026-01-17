@@ -58,7 +58,7 @@ export async function generateStaticParams() {
   }
 }
 
-export default async function Page({ params }: PromiseParams<{ code: string }> & AuthProps) {
+export default async function Page({ params }: PromiseParams<{ code: string }>) {
   const code = await extractCode(params);
 
   if (!code) {
