@@ -11,6 +11,7 @@ import {
   backButton
 } from '@telegram-apps/sdk-react';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { TELEGRAM_BOT_NAME } from './env';
 
 export const isTelegramWebApp = isTMA();
 
@@ -28,6 +29,16 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
     miniApp.ready();
     console.log('ready');
     initData.restore();
+
+    if (initData.startParam) {
+      const params = new URLSearchParams(initData.startParam());
+      const path = params.get('path');
+      if (path) {
+        console.log(`Redirect to ${path}`);
+        router.push(path);
+      }
+    }
+
     console.log('restore');
     expandViewport();
     console.log('expandViewport');
@@ -54,6 +65,11 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
   } catch (error) {
     console.error(error);
   }
+};
+
+export const transferLinkToTelegram = (path: string) => {
+  const params = new URLSearchParams({ path });
+  return `https://t.me/${TELEGRAM_BOT_NAME}?startapp=${encodeURIComponent(params.toString())}`;
 };
 
 export { requestContactPromise };

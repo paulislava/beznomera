@@ -25,6 +25,7 @@ interface ButtonProps {
   noFollowNoIndex?: boolean;
   fullWidth?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 type ViewConfig = {
@@ -67,7 +68,7 @@ const StyledText = styled.div`
   font-weight: 100;
 `;
 
-const StyledPressable = styled(RawButton)<{
+const StyledButton = styled(RawButton)<{
   $view: ButtonView;
   $theme: ColorSchemeName;
   $fullWidth?: boolean;
@@ -78,14 +79,17 @@ const StyledPressable = styled(RawButton)<{
   border-radius: 35px;
   overflow: hidden;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
-  ${({ $hasLink }) =>
+  ${({ $hasLink, size }) =>
     $hasLink &&
     css`
       padding: 0;
 
       & ${StyledText} {
-        padding-left: 40px;
-        padding-right: 40px;
+        ${size !== 'sm' &&
+        css`
+          padding-left: 40px;
+          padding-right: 40px;
+        `}
       }
     `}
 
@@ -132,7 +136,8 @@ export const Button = forwardRef<any, ButtonProps>(
       className,
       noFollowNoIndex,
       fullWidth,
-      type = 'button'
+      type = 'button',
+      size
     },
     ref
   ) => {
@@ -170,7 +175,7 @@ export const Button = forwardRef<any, ButtonProps>(
     );
 
     return (
-      <StyledPressable
+      <StyledButton
         $theme={theme}
         ref={ref}
         $fullWidth={fullWidth}
@@ -180,12 +185,13 @@ export const Button = forwardRef<any, ButtonProps>(
         onClick={handleClick}
         type={type}
         isLoading={isLoading}
+        size={size}
         $hasLink={!!externalHref}
       >
         {view === 'glass' && <Glass />}
 
         <StyledContainer>{content}</StyledContainer>
-      </StyledPressable>
+      </StyledButton>
     );
   }
 );

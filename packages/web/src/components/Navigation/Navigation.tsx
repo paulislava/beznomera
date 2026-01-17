@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -10,18 +10,18 @@ import {
   NavbarItem,
   NavbarMenu,
   NavbarMenuItem,
-  NavbarMenuToggle,
-  Button
+  NavbarMenuToggle
 } from '@heroui/react';
 import styled from 'styled-components';
-import { PageContainer, pagePaddingTop } from '@/ui/Styled';
-import { isTelegramWebApp } from '@/utils/telegram';
+import { PageContainer, pagePaddingTop, Spacer } from '@/ui/Styled';
+import { isTelegramWebApp, transferLinkToTelegram } from '@/utils/telegram';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import qrCodeSvg from '@/assets/images/qrcode.svg';
 import { useToggle } from '@/hooks/booleans';
 import { showErrorMessage } from '@/utils/messages';
 import { PRODUCTION_URL } from '@/constants/site';
 import { themeable } from '@/themes/utils';
+import { Button } from '@/ui/Button';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -109,6 +109,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
     }
   }, [router]);
 
+  const telegramAppLink = useMemo(() => transferLinkToTelegram(pathname), [pathname]);
+
   // Показываем кнопку "Назад" только если есть история навигации и мы не на главной странице
   const showBackButton = navigationHistory.length > 1 && pathname !== '/';
 
@@ -126,11 +128,10 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
               className='sm:hidden'
               onClick={handleMenuToggle}
             />
-            <NavbarBrand>
-              <Link href='/' className='font-bold text-inherit'>
-                BEZNOMERA
-              </Link>
-            </NavbarBrand>
+            <Spacer />
+            <Button size='sm' href={telegramAppLink}>
+              Продолжить в Telegram
+            </Button>
           </NavbarContent>
 
           <NavbarContent className='hidden sm:flex gap-4' justify='center'>

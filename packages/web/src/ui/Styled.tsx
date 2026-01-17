@@ -35,6 +35,10 @@ export const ImageContainer = styled.div`
   margin: 20px 0;
 `;
 
+export const Spacer = styled.div`
+  flex: 1;
+`;
+
 export const safeAreaInsetTop = () => (isTelegramWebApp ? `env(safe-area-inset-top, 44px)` : '0px');
 
 export const pagePaddingTop = isTelegramWebApp ? '60px' : '0';
