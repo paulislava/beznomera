@@ -7,12 +7,12 @@ import { ExternalLink } from '../../components/ExternalLink';
 
 import { Glass } from '@/ui/Glass';
 import { handleEvent } from '@/utils/log';
-import { Button as RawButton } from '@heroui/react';
+import { Button as RawButton, ButtonProps as RawProps } from '@heroui/react';
 import { useThemeName } from '@/themes/utils';
 
 type ButtonView = 'primary' | 'secondary' | 'glass' | 'danger';
 
-interface ButtonProps {
+interface ButtonProps extends Pick<RawProps, 'variant' | 'size' | 'color'> {
   children?: React.ReactNode;
   href?: string;
   to?: string;
@@ -25,7 +25,6 @@ interface ButtonProps {
   noFollowNoIndex?: boolean;
   fullWidth?: boolean;
   type?: 'button' | 'submit' | 'reset';
-  size?: 'sm' | 'md' | 'lg';
 }
 
 type ViewConfig = {
@@ -137,7 +136,7 @@ export const Button = forwardRef<any, ButtonProps>(
       noFollowNoIndex,
       fullWidth,
       type = 'button',
-      size
+      ...buttonProps
     },
     ref
   ) => {
@@ -185,8 +184,8 @@ export const Button = forwardRef<any, ButtonProps>(
         onClick={handleClick}
         type={type}
         isLoading={isLoading}
-        size={size}
         $hasLink={!!externalHref}
+        {...buttonProps}
       >
         {view === 'glass' && <Glass />}
 
