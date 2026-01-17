@@ -37,6 +37,7 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
       const path = params.path;
       if (path) {
         console.log(`Redirect to ${path}`);
+        alert(document.location);
         router.push(path);
       }
     }
