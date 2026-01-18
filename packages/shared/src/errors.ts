@@ -10,7 +10,8 @@ export enum ResponseCode {
 export enum ValidationCode {
   UNKNOWN = 'UNKNOWN',
   DUPLICATE_NUMBER = 'DUPLICATE_NUMBER',
-  DUPLICATE_CODE = 'DUPLICATE_CODE'
+  DUPLICATE_CODE = 'DUPLICATE_CODE',
+  INVALID_VALUE = 'INVALID_VALUE'
 }
 
 export type SubmissionError = {

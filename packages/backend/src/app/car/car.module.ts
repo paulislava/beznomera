@@ -15,6 +15,7 @@ import { ChatModule } from '../chat/chat.module';
 import { Brand } from '../entities/car/brand.entity';
 import { Model } from '../entities/car/model.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
+import { CarRating } from '../entities/car/car-rating.entity';
 import { UserModule } from '../users/user.module';
 
 @Module({
@@ -29,6 +30,7 @@ import { UserModule } from '../users/user.module';
       Chat,
       ChatMessage,
       CarDriver,
+      CarRating,
     ]),
     TelegramModule,
     ConfigModule,

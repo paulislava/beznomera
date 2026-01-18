@@ -70,6 +70,12 @@ export class Car extends BaseEntity implements Omit<CarInfo, 'image'> {
   @Column({ nullable: true, type: 'float' })
   imageRatio: number | null;
 
+  @Column({ nullable: true, type: 'float' })
+  rating: number | null;
+
+  @Column({ default: 0 })
+  ratesCount: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

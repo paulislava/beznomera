@@ -22,6 +22,7 @@ import { FormApi } from 'final-form';
 import { CarInfoProps } from './CarInfo.types';
 import { SelectField } from '@/ui/Select/SelectField';
 import { AuthContext } from '@/context/Auth/Auth.context';
+import { CarRating } from '../CarRating';
 
 const InputContainer = styled.div`
   margin: 20px 0;
@@ -125,6 +126,15 @@ export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
             )}
 
             {info.no && <CarNumber>{info.no}</CarNumber>}
+
+            {info.owner.id && (
+              <CarRating
+                carId={info.id}
+                rating={info.rating ?? null}
+                ratesCount={info.ratesCount ?? 0}
+                ownerId={info.owner.id}
+              />
+            )}
 
             <InputContainer>
               <Field

@@ -18,7 +18,6 @@ import {
   ShortCarInfoApi,
   DriverInfo,
   AddDriverBody,
-  RemoveDriverBody,
   CarDriversInfo,
   AddDriverByUsernameBody,
 } from '@paulislava/shared/car/car.types';
@@ -49,6 +48,7 @@ import { Brand } from '../entities/car/brand.entity';
 import { Model } from '../entities/car/model.entity';
 import { User } from '../entities/user/user.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
+import { CarRating } from '../entities/car/car-rating.entity';
 import { UserService } from '../users/user.service';
 @Injectable()
 export class CarService {
@@ -66,6 +66,8 @@ export class CarService {
     private readonly modelRepository: Repository<Model>,
     @InjectRepository(CarDriver)
     private readonly carDriverRepository: Repository<CarDriver>,
+    @InjectRepository(CarRating)
+    private readonly carRatingRepository: Repository<CarRating>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly telegramService: TelegramService,
     private readonly configService: ConfigService,
@@ -96,6 +98,7 @@ export class CarService {
         lastName: car.owner.lastName,
         nickname: car.owner.nickname,
         tel: car.owner.tel,
+        id: car.owner.id,
       },
       code: car.code,
     }));
@@ -116,6 +119,8 @@ export class CarService {
       imageUrl,
       image,
       imageRatio: imageRatio,
+      rating,
+      ratesCount,
     } = await this.carRepository.findOneOrFail({
       where: { code },
       relations: ['owner', 'brand', 'color', 'image'],
@@ -134,7 +139,10 @@ export class CarService {
       imageUrl,
       imageRatio: imageRatio,
       image: image?.info(),
+      rating,
+      ratesCount,
       owner: {
+        id: owner.id,
         firstName: owner.firstName,
         lastName: owner.lastName,
         nickname: owner.nickname,
@@ -259,6 +267,8 @@ export class CarService {
       messagesCount,
       callsCount,
       chatsCount,
+      rating: car.rating,
+      ratesCount: car.ratesCount,
       owner: {
         firstName: car.owner.firstName,
         lastName: car.owner.lastName,
@@ -649,6 +659,80 @@ export class CarService {
     });
 
     await this.carDriverRepository.save(carDriver);
+  }
+
+  async rateCar(carId: number, userId: number, rating: number): Promise<void> {
+    // Валидация рейтинга
+    if (rating < 1 || rating > 5 || !Number.isInteger(rating)) {
+      throw new ValidationException({
+        rating: [
+          {
+            message: 'Рейтинг должен быть целым числом от 1 до 5',
+            code: ValidationCode.INVALID_VALUE,
+          },
+        ],
+      });
+    }
+
+    // Получаем машину с водителями
+    const car = await this.carRepository.findOne({
+      where: { id: carId },
+      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
+    });
+
+    if (!car) {
+      throw new CarNotFoundException(carId);
+    }
+
+    // Проверяем, что пользователь не является владельцем
+    if (car.ownerId === userId) {
+      throw new ForbiddenException(
+        'Вы не можете оценить свой собственный автомобиль',
+      );
+    }
+
+    // Проверяем, что пользователь не является водителем
+    const isDriver = car.carDrivers.some((cd) => cd.driverId === userId);
+    if (isDriver) {
+      throw new ForbiddenException(
+        'Вы не можете оценить автомобиль, в котором вы являетесь водителем',
+      );
+    }
+
+    // Ищем существующий рейтинг
+    let carRating = await this.carRatingRepository.findOne({
+      where: { carId, userId },
+    });
+
+    if (carRating) {
+      // Обновляем существующий рейтинг
+      carRating.rating = rating;
+      await this.carRatingRepository.save(carRating);
+    } else {
+      // Создаем новый рейтинг
+      carRating = this.carRatingRepository.create({
+        carId,
+        userId,
+        rating,
+      });
+      await this.carRatingRepository.save(carRating);
+    }
+
+    // Пересчитываем средний рейтинг и количество оценок
+    const ratings = await this.carRatingRepository.find({
+      where: { carId },
+    });
+
+    const totalRating = ratings.reduce((sum, r) => sum + r.rating, 0);
+    const averageRating =
+      ratings.length > 0 ? totalRating / ratings.length : null;
+    const ratesCount = ratings.length;
+
+    // Обновляем машину
+    await this.carRepository.update(carId, {
+      rating: averageRating,
+      ratesCount,
+    });
   }
 
   private async validateCarData(

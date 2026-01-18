@@ -35,6 +35,7 @@ import {
   AddDriverBody,
   CarDriversInfo,
   AddDriverByUsernameBody,
+  RateCarBody,
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -46,6 +47,9 @@ import {
   ValidateNested,
   IsNotEmpty,
   IsObject,
+  IsInt,
+  Min,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
@@ -196,6 +200,13 @@ export class AddDriverDto implements AddDriverBody {
 
   @IsNotEmpty()
   carId: number;
+}
+
+export class RateCarDto implements RateCarBody {
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  rating: number;
 }
 
 @Controller(CAR_API.path)
@@ -396,5 +407,15 @@ export class CarController implements CarApi {
   @Get(CAR_API.backendRoutes.models)
   async models(): Promise<ModelInfo[]> {
     return this.carService.getModels();
+  }
+
+  @Post(CAR_API.backendRoutes.rate)
+  @UseGuards(JwtAuthGuard)
+  async rate(
+    @Body() body: RateCarDto,
+    @Param(ID_PARAM, ParseIntPipe) id: number,
+    @CurrentUser() user: RequestUser,
+  ): Promise<void> {
+    return this.carService.rateCar(id, user.userId, body.rating);
   }
 }

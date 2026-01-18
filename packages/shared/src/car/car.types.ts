@@ -44,6 +44,8 @@ export type ShortCarInfo = CarInfoBase & {
   color: ColorInfo | null;
   rawColor: RgbColor | null;
   imageUrl: Maybe<string>;
+  rating?: number | null;
+  ratesCount?: number;
 };
 
 export type ShortCarInfoApi = ShortCarInfo & {
@@ -52,6 +54,8 @@ export type ShortCarInfoApi = ShortCarInfo & {
 
 export type CarInfo = ShortCarInfo & {
   owner: UserProfile;
+  rating: number | null;
+  ratesCount: number;
 };
 
 export type FullCarInfo = ShortCarInfo & {
@@ -60,7 +64,9 @@ export type FullCarInfo = ShortCarInfo & {
   chatsCount: number;
   code: string;
   owner: UserProfile;
-  drivers: DriverInfo[];  
+  drivers: DriverInfo[];
+  rating: number | null;
+  ratesCount: number;
 };
 
 export type EditCarInfo = CarInfoBase & {
@@ -147,4 +153,8 @@ export interface UserSearchResult {
   firstName: string;
   lastName?: string;
   telegramID?: string;
+}
+
+export interface RateCarBody {
+  rating: number; // 1-5
 }

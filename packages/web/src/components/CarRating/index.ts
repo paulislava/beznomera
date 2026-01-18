@@ -1,0 +1,2 @@
+export { CarRating } from './CarRating';
+

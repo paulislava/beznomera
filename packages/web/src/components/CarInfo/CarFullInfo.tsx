@@ -16,6 +16,7 @@ import { Button } from '@/ui/Button';
 import { pluralize } from '@/utils/strings';
 import { CarDrivers } from '../CarDrivers';
 import { RequestUser } from '@shared/user/user.types';
+import { CarRating } from '../CarRating';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -82,6 +83,14 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
       )}
 
       {info.no && <CarNumber>{info.no}</CarNumber>}
+
+      <CarRating
+        carId={info.id}
+        rating={info.rating ?? null}
+        ratesCount={info.ratesCount ?? 0}
+        ownerId={info.owner.id}
+        driverIds={info.drivers?.map(d => d.id) ?? []}
+      />
 
       {!!info.imageUrl || !!info.image?.url ? (
         <CarExternalImage

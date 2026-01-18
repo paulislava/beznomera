@@ -24,6 +24,7 @@ export interface CarApi {
   addDriver(body: T.AddDriverBody, ...args: any[]): Promise<void>;
   addDriverByUsername(body: T.AddDriverByUsernameBody, id: number, ...args: any[]): Promise<void>;
   removeDriver(carId: number, driverId: number, ...args: any[]): Promise<void>;
+  rate(body: T.RateCarBody, id: number, ...args: any[]): Promise<void>;
 }
 
 export const CODE_PARAM = 'code';
@@ -87,6 +88,10 @@ const CAR_ROUTES: APIRoutes<CarApi> = {
   removeDriver: {
     path: (carId, driverId) => `${carId || `:${ID_PARAM}`}/drivers/${driverId || `:driverId`}`,
     method: 'DELETE'
+  },
+  rate: {
+    path: id => `${id || `:${ID_PARAM}`}/rate`,
+    method: 'POST'
   }
 };
 

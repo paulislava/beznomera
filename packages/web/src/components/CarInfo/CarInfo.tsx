@@ -22,6 +22,7 @@ import { ButtonsColumn } from '@/ui/Styled';
 import Link from 'next/link';
 import { isTelegramWebApp } from '@/utils/telegram';
 import { CarInfoProps } from './CarInfo.types';
+import { CarRating } from '../CarRating';
 
 export const CarInfoPage = ({ info, code }: CarInfoProps) => {
   const [called, setCalled] = useState(false);
@@ -87,6 +88,15 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
       )}
 
       {info.no && <CarNumber>{info.no}</CarNumber>}
+
+      {info.owner.id && (
+        <CarRating
+          carId={info.id}
+          rating={info.rating ?? null}
+          ratesCount={info.ratesCount ?? 0}
+          ownerId={info.owner.id}
+        />
+      )}
 
       {!!info.imageUrl || !!info.image?.url ? (
         <CarExternalImage
