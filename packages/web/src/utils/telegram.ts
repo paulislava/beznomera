@@ -30,15 +30,22 @@ export const initWebApp = async (router: AppRouterInstance, pathname: string) =>
     console.log('ready');
     initData.restore();
 
-    const startParam = initData.startParam();
+    // Обрабатываем startParam только один раз при первой загрузке
+    // Проверяем, что мы еще не обрабатывали startParam (через sessionStorage)
+    const startParamProcessed = sessionStorage.getItem('startParamProcessed');
 
-    if (startParam) {
-      const params = JSON.parse(atob(startParam));
-      const path = params.path;
-      if (path) {
-        console.log(`Redirect to ${path}`);
-        alert(document.location);
-        router.push(path);
+    if (!startParamProcessed) {
+      const startParam = initData.startParam();
+
+      if (startParam) {
+        const params = JSON.parse(atob(startParam));
+        const path = params.path;
+        if (path && path !== pathname) {
+          console.log(`Redirect to ${path}`);
+          sessionStorage.setItem('startParamProcessed', 'true');
+
+          router.push(path);
+        }
       }
     }
 
