@@ -55,7 +55,7 @@ export const ThemeProvider: FC<ChildrenProps> = ({ children }) => {
 
     setThemeIfNotManual(theme);
 
-    setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+    setSystemTheme(theme);
     mediaQuery.addEventListener('change', handleChange);
 
     return () => mediaQuery.removeEventListener('change', handleChange);

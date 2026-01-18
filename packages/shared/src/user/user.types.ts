@@ -18,7 +18,7 @@ export interface UserProfile {
   avatarUrl?: string;
   nickname?: string;
   tel?: string;
-  id?: number;
+  id: number;
 }
 
 export interface RequestUser {

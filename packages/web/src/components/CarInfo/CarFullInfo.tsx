@@ -1,5 +1,14 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure
+} from '@heroui/react';
 import { CarImage } from '../CarImage/CarImage';
 import { TextL } from '../Themed';
 import { CenterContainer } from '@/ui/Styled';
@@ -17,6 +26,9 @@ import { pluralize } from '@/utils/strings';
 import { CarDrivers } from '../CarDrivers';
 import { RequestUser } from '@shared/user/user.types';
 import { CarRating } from '../CarRating';
+import { carService } from '@/services';
+import { revalidateCarPages } from '@/utils/paths';
+import { showSuccessMessage, showErrorMessage } from '@/utils/messages';
 
 const StyledCarImage = styled(CarImage)`
   margin: 40px 0;
@@ -71,6 +83,25 @@ const ActionsContainer = styled.div`
 
 export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUser }) => {
   const isOwner = user?.userId === info.owner.id;
+  const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleDeleteClick = () => {
+    onOpen();
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await carService.delete(info.id);
+      await revalidateCarPages(info.id, info.code);
+      showSuccessMessage('Успех', 'Автомобиль успешно удален');
+      onClose();
+      router.push('/');
+    } catch (error: any) {
+      console.error('Failed to delete car:', error);
+      showErrorMessage('Ошибка', 'Не удалось удалить автомобиль');
+    }
+  };
 
   return (
     <>
@@ -131,11 +162,28 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
           <Button href={`/g/${info.code}`} view='glass'>
             Страница авто
           </Button>
-          <Button view='danger' onClick={() => {}}>
+          <Button view='danger' onClick={handleDeleteClick}>
             Удалить
           </Button>
         </ButtonsContainer>
       </ActionsContainer>
+
+      <Modal isOpen={isOpen} onClose={onClose} placement='center'>
+        <ModalContent>
+          <ModalHeader>Подтвердите удаление</ModalHeader>
+          <ModalBody>
+            Вы уверены, что хотите удалить этот автомобиль? Это действие нельзя отменить.
+          </ModalBody>
+          <ModalFooter>
+            <Button view='secondary' onClick={onClose}>
+              Отмена
+            </Button>
+            <Button view='danger' onClick={handleDeleteConfirm}>
+              Удалить
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
