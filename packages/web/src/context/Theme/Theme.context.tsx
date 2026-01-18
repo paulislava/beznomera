@@ -8,7 +8,7 @@ export type Theme = 'light' | 'dark' | 'system';
 
 export const DEFAULT_THEME: Theme = 'system';
 
-const THEME_LOCAL_STORAGE_KEY = 'theme';
+const THEME_LOCAL_STORAGE_KEY = 'site_theme';
 const THEME_LOCAL_STORAGE_KEY_MANUAL = 'theme_manual';
 
 type ThemeContextProps = { theme: ThemeValues; setTheme(theme: Theme): void };
