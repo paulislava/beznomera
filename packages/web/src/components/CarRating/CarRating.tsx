@@ -5,7 +5,9 @@ import styled from 'styled-components';
 import { carService } from '@/services';
 import { AuthContext } from '@/context/Auth/Auth.context';
 import { showResponseMessage, showSuccessMessage } from '@/utils/messages';
+import { ResponseWithCode } from '@shared/responses';
 import { TextL } from '../Themed';
+import { pluralize } from '@/utils/strings';
 
 const RatingContainer = styled.div`
   display: flex;
@@ -21,13 +23,11 @@ const StarsContainer = styled.div`
   align-items: center;
 `;
 
-const StarButton = styled.button<{ $filled: boolean; $disabled: boolean }>`
-  background: none;
-  border: none;
-  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
-  padding: 0;
+const StarWrapper = styled.div<{ $disabled: boolean }>`
+  position: relative;
+  display: inline-block;
   font-size: 24px;
-  color: ${({ $filled }) => ($filled ? '#FFD700' : '#ccc')};
+  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
   transition: transform 0.2s;
   user-select: none;
 
@@ -40,16 +40,52 @@ const StarButton = styled.button<{ $filled: boolean; $disabled: boolean }>`
   `}
 `;
 
-const RatingText = styled(TextL)`
-  font-size: 14px;
-  color: #666;
-  text-align: center;
+const StarButton = styled.button<{ $disabled: boolean }>`
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: ${({ $disabled }) => ($disabled ? 'default' : 'pointer')};
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
-const RatingValue = styled.div`
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
+const StarEmpty = styled.span`
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #ccc;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StarFilled = styled.span<{ $fillPercent: number }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #ffd700;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: inset(0 ${({ $fillPercent }) => 100 - $fillPercent * 100}% 0 0);
+  overflow: hidden;
+`;
+
+const RatingText = styled(TextL)``;
+
+const RatingValue = styled(TextL)``;
+
+const RatesCount = styled(TextL)`
+  opacity: 0.6;
+  font-size: 14px;
 `;
 
 interface CarRatingProps {
@@ -65,7 +101,7 @@ export const CarRating: React.FC<CarRatingProps> = ({
   rating,
   ratesCount,
   ownerId,
-  driverIds = [],
+  driverIds = []
 }) => {
   const { user } = useContext(AuthContext);
   const [currentRating, setCurrentRating] = useState(rating);
@@ -98,48 +134,61 @@ export const CarRating: React.FC<CarRatingProps> = ({
         }
         showSuccessMessage('Успех', 'Оценка сохранена!');
       } catch (error) {
-        showResponseMessage(error);
+        if (error && typeof error === 'object' && 'code' in error) {
+          showResponseMessage(error as ResponseWithCode);
+        }
       } finally {
         setIsSubmitting(false);
       }
     },
-    [canRate, isSubmitting, carId, currentRating],
+    [canRate, isSubmitting, carId, currentRating]
   );
 
   const displayRating = hoveredStar !== null ? hoveredStar : currentRating;
 
+  const getStarFillPercent = (starIndex: number, rating: number | null): number => {
+    if (rating === null) return 0;
+    if (starIndex <= rating) return 1;
+    if (starIndex - 1 < rating && rating < starIndex) return rating - (starIndex - 1);
+    return 0;
+  };
+
   return (
     <RatingContainer>
       <StarsContainer>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <StarButton
-            key={star}
-            $filled={star <= Math.round(displayRating || 0)}
-            $disabled={!canRate || isSubmitting}
-            onClick={() => handleStarClick(star)}
-            onMouseEnter={() => canRate && !isSubmitting && setHoveredStar(star)}
-            onMouseLeave={() => setHoveredStar(null)}
-            disabled={!canRate || isSubmitting}
-            type="button"
-          >
-            ★
-          </StarButton>
-        ))}
+        {[1, 2, 3, 4, 5].map(star => {
+          const fillPercent = getStarFillPercent(star, displayRating);
+          return (
+            <StarWrapper
+              key={star}
+              $disabled={!canRate || isSubmitting}
+              onMouseEnter={() => canRate && !isSubmitting && setHoveredStar(star)}
+              onMouseLeave={() => setHoveredStar(null)}
+            >
+              <StarButton
+                $disabled={!canRate || isSubmitting}
+                onClick={() => handleStarClick(star)}
+                disabled={!canRate || isSubmitting}
+                type='button'
+              >
+                <StarEmpty>★</StarEmpty>
+                <StarFilled $fillPercent={fillPercent}>★</StarFilled>
+              </StarButton>
+            </StarWrapper>
+          );
+        })}
       </StarsContainer>
       {currentRating !== null && (
-        <RatingValue>
-          {currentRating.toFixed(1)} ({currentRatesCount}{' '}
-          {currentRatesCount === 1 ? 'оценка' : currentRatesCount < 5 ? 'оценки' : 'оценок'})
-        </RatingValue>
+        <>
+          <RatingValue>{currentRating.toFixed(1)}</RatingValue>
+          <RatesCount>{pluralize(currentRatesCount, ['оценка', 'оценки', 'оценок'])}</RatesCount>
+        </>
       )}
       {currentRating === null && currentRatesCount === 0 && (
         <RatingText>Пока нет оценок</RatingText>
       )}
-      {canRate && !isSubmitting && (
-        <RatingText>Нажмите на звезду, чтобы оценить</RatingText>
-      )}
+      {canRate && !isSubmitting && <RatingText>Нажмите на звезду, чтобы оценить</RatingText>}
       {isSubmitting && <RatingText>Сохранение...</RatingText>}
     </RatingContainer>
   );
 };
-
