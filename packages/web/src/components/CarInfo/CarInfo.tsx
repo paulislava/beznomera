@@ -92,6 +92,7 @@ export const CarInfoPage = ({ info, code }: CarInfoProps) => {
       {info.owner.id && (
         <CarRating
           carId={info.id}
+          carCode={code}
           rating={info.rating ?? null}
           ratesCount={info.ratesCount ?? 0}
           ownerId={info.owner.id}

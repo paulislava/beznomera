@@ -8,6 +8,7 @@ import { showResponseMessage, showSuccessMessage } from '@/utils/messages';
 import { ResponseWithCode } from '@shared/responses';
 import { TextL } from '../Themed';
 import { pluralize } from '@/utils/strings';
+import { revalidateCarPages } from '@/utils/paths';
 
 const RatingContainer = styled.div`
   display: flex;
@@ -90,6 +91,7 @@ const RatesCount = styled(TextL)`
 
 interface CarRatingProps {
   carId: number;
+  carCode: string;
   rating: number | null;
   ratesCount: number;
   ownerId: number;
@@ -98,6 +100,7 @@ interface CarRatingProps {
 
 export const CarRating: React.FC<CarRatingProps> = ({
   carId,
+  carCode,
   rating,
   ratesCount,
   ownerId,
@@ -133,6 +136,7 @@ export const CarRating: React.FC<CarRatingProps> = ({
           setCurrentRating(starValue);
         }
         showSuccessMessage('Успех', 'Оценка сохранена!');
+        await revalidateCarPages(carId, carCode);
       } catch (error) {
         if (error && typeof error === 'object' && 'code' in error) {
           showResponseMessage(error as ResponseWithCode);
@@ -141,7 +145,7 @@ export const CarRating: React.FC<CarRatingProps> = ({
         setIsSubmitting(false);
       }
     },
-    [canRate, isSubmitting, carId, currentRating]
+    [canRate, isSubmitting, carId, currentRating, carCode]
   );
 
   const displayRating = hoveredStar !== null ? hoveredStar : currentRating;

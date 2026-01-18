@@ -117,6 +117,7 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
 
       <CarRating
         carId={info.id}
+        carCode={info.code}
         rating={info.rating ?? null}
         ratesCount={info.ratesCount ?? 0}
         ownerId={info.owner.id}
