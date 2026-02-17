@@ -76,10 +76,11 @@ export class ChatService {
   private async sendTelegramMessage(
     car: Car,
     text: string,
+    chatId: number,
     userAgentString?: string,
     coords?: { latitude: number; longitude: number },
   ) {
-    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''}\nОтветьте на это сообщение, чтобы отправить ответ отправителю.`;
+    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''}\nОтветьте на это сообщение, чтобы отправить ответ отправителю.\n\n#чат${chatId}`;
 
     const tgMessage = await this.telegramService.sendMessage(tgText, car.owner);
 
@@ -103,6 +104,7 @@ export class ChatService {
     const tgMessage = await this.sendTelegramMessage(
       car,
       text,
+      chat.id,
       userAgentString,
       coords,
     );
@@ -126,7 +128,7 @@ export class ChatService {
     car: Car,
     { coords, text }: ChatMessageData,
     userAgent: string,
-    ip: string,
+    ip?: string,
     user?: RequestUser,
     res?: Response,
     req?: Request,
@@ -149,6 +151,7 @@ export class ChatService {
     const tgMessage = await this.sendTelegramMessage(
       car,
       text,
+      chat.id,
       userAgentString,
       coords,
     );
