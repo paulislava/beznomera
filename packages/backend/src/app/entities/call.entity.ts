@@ -13,8 +13,8 @@ export class Call extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Car)
-  car: Car;
+  @ManyToOne(() => Car, { onDelete: 'SET NULL' })
+  car?: Car;
 
   @CreateDateColumn()
   date: Date;

@@ -32,7 +32,7 @@ export class ChatMessage extends BaseEntity {
   @ManyToOne(() => User, { nullable: true })
   user?: User;
 
-  @ManyToOne(() => Car)
+  @ManyToOne(() => Car, { onDelete: 'SET NULL' })
   car?: Car;
 
   @CreateDateColumn()
