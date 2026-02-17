@@ -59,7 +59,7 @@ export class ChatService {
     }
 
     const existingChat = await this.chatRepository.findOneBy({
-      reciever: car.owner,
+      reciever: { id: car.owner.id },
       ...senderInfo,
     });
 
