@@ -20,7 +20,7 @@ export class ChatMessage extends BaseEntity {
   @Column()
   chatId: number;
 
-  @ManyToOne(() => Chat)
+  @ManyToOne(() => Chat, { onDelete: 'CASCADE' })
   chat: Chat;
 
   @Column({ type: 'text' })
