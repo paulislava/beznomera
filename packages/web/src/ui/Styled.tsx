@@ -41,4 +41,4 @@ export const Spacer = styled.div`
 
 export const safeAreaInsetTop = () => (isTelegramWebApp ? `env(safe-area-inset-top, 44px)` : '0px');
 
-export const pagePaddingTop = isTelegramWebApp ? '60px' : '0';
+export const pagePaddingTop = isTelegramWebApp ? '70px' : '0';
