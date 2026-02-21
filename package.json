@@ -24,7 +24,6 @@
     "start:frontend:dev": "cd packages/frontend; npm start",
     "start:frontend:web": "cd packages/frontend; npm run web",
     "start:frontend:ios": "cd packages/frontend; npm run ios",
-    
     "db:upload": "./scripts/uploadBase.sh",
     "db:dump": "./scripts/dumpBase.sh",
     "db:refresh": "./scripts/refreshBase.sh",
@@ -60,7 +59,7 @@
     "stylelint": "13.13.1",
     "stylelint-config-prettier": "8.0.2",
     "stylelint-prettier": "1.2.0",
-    "typescript": "4.3.4",
+    "typescript": "5.3.3",
     "wait-port": "0.2.9"
   },
   "stylelint": {
