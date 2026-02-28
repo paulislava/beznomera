@@ -33,7 +33,7 @@ export class AdminModule {
   constructor(private readonly adminSite: DefaultAdminSite) {
     adminSite.register('Administration', AdminUserEntity);
     adminSite.register('Пользователи', User);
-    adminSite.register('автомобили', Car);
+    adminSite.register('Автомобили', Car);
     adminSite.register('Бренды', Brand);
     adminSite.register('Модели', Model);
     adminSite.register('Цвета', Color);
