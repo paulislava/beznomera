@@ -20,7 +20,7 @@ function AuthPageContent() {
     (data: TelegramUser) => {
       authService
         .authTelegram(data)
-        .then((token) => {
+        .then(token => {
           if (token) setStoredAuthToken(token);
           router.replace(to);
         })
@@ -44,7 +44,7 @@ function AuthPageContent() {
     if (raw) {
       authService
         .authTelegramWebApp({ data: raw })
-        .then((token) => {
+        .then(token => {
           if (token) setStoredAuthToken(token);
           console.log('authTelegramWebApp success');
           router.replace(to);
