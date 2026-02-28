@@ -9,6 +9,7 @@ import type { TelegramUser } from 'telegram-login-button';
 import { TelegramLoginButtonWrapper } from '@/components/TelegramLoginButtonWrapper';
 import { showErrorMessage } from '@/utils/messages';
 import { isTelegramWebApp } from '@/utils/telegram';
+import { setStoredAuthToken } from '@/utils/auth-storage';
 
 function AuthPageContent() {
   const router = useRouter();
@@ -19,7 +20,8 @@ function AuthPageContent() {
     (data: TelegramUser) => {
       authService
         .authTelegram(data)
-        .then(() => {
+        .then((token) => {
+          if (token) setStoredAuthToken(token);
           router.replace(to);
         })
         .catch((error: Error) => {
@@ -42,7 +44,8 @@ function AuthPageContent() {
     if (raw) {
       authService
         .authTelegramWebApp({ data: raw })
-        .then(() => {
+        .then((token) => {
+          if (token) setStoredAuthToken(token);
           console.log('authTelegramWebApp success');
           router.replace(to);
         })

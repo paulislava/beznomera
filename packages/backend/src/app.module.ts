@@ -14,6 +14,7 @@ import { TelegramModule } from './app/telegram/telegram.module';
 import { FileModule } from './app/file/file.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ChatModule } from './app/chat/chat.module';
+import { AdminModule } from './app/admin/admin.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ChatModule } from './app/chat/chat.module';
     TelegramModule,
     ChatModule,
     CarModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

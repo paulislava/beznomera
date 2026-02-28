@@ -9,7 +9,6 @@ import { AuthCode } from '../entities/auth-code.entity';
 import { User } from '../entities/user/user.entity';
 import { UserDraft } from '../entities/user/user-draft.entity';
 import { ConfigService } from '../config/config.service';
-import { AdminUser } from '../entities/admin-user.entity';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -29,7 +28,7 @@ import { JwtStrategy } from './jwt.strategy';
     }),
     MailModule,
     HttpClientsModule,
-    TypeOrmModule.forFeature([AuthCode, User, UserDraft, AdminUser]),
+    TypeOrmModule.forFeature([AuthCode, User, UserDraft]),
   ],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],

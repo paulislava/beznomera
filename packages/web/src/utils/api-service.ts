@@ -4,6 +4,7 @@ import { ResponseWithCode } from '@shared/responses';
 import { isClient } from './env';
 import React from 'react';
 import { AUTH_USER_TOKEN_HEADER } from '@shared/auth/auth.api';
+import { getStoredAuthToken } from './auth-storage';
 
 export const BACKEND_URL = isClient
   ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? '/api')
@@ -50,8 +51,9 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
       headers['Authorization'] = `Bearer ${this.apiToken}`;
     }
 
-    if (this.userToken) {
-      headers[AUTH_USER_TOKEN_HEADER] = this.userToken;
+    const token = (isClient ? getStoredAuthToken() : null) ?? this.userToken;
+    if (token) {
+      headers[AUTH_USER_TOKEN_HEADER] = token;
     }
 
     const res = await fetch(

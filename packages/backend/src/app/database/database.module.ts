@@ -10,6 +10,7 @@ import { ConfigService } from '../config/config.service';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import { addTransactionalDataSource } from 'typeorm-transactional';
+import { AdminUserEntity } from 'nestjs-admin';
 
 @Module({
   imports: [
@@ -25,7 +26,10 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
           username: config.database.username,
           password: config.database.password,
           synchronize: true,
-          entities: [join(__dirname, '../', 'entities', '**')],
+          entities: [
+            join(__dirname, '../', 'entities', '**'),
+            AdminUserEntity,
+          ],
           migrationsRun: true,
           migrations: [join(__dirname, '../', 'migrations', '**')],
           namingStrategy: new SnakeNamingStrategy(),

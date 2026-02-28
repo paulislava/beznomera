@@ -14,7 +14,6 @@ import { User } from '../entities/user/user.entity';
 import { UserDraft } from '../entities/user/user-draft.entity';
 import { UserCore } from '../entities/user/user-core.entity';
 import { RequestUser } from '@paulislava/shared/user/user.types';
-import { AdminUser } from '../entities/admin-user.entity';
 
 import { AuthMode } from './auth.types';
 import {
@@ -28,7 +27,10 @@ import { randomDigitsString } from '~/common/utils/randomDigitsString';
 import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
 import { createHash, createHmac } from 'crypto';
 import querystring from 'querystring';
-import { AUTH_TOKEN_EXPIRATION_TIME, WebAppUser } from '@paulislava/shared/auth/auth.api';
+import {
+  AUTH_TOKEN_EXPIRATION_TIME,
+  WebAppUser,
+} from '@paulislava/shared/auth/auth.api';
 
 @Injectable()
 export class AuthService {
@@ -43,9 +45,7 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserDraft)
     private readonly userDraftRepository: Repository<UserDraft>,
-    @InjectRepository(AdminUser)
-    private readonly adminUserRepository: Repository<AdminUser>,
-  ) { }
+  ) {}
 
   @Transactional()
   async authFinish(
@@ -57,7 +57,10 @@ export class AuthService {
     const authCode = await this.authCheck(authMode, identifier, code);
     const user = await this.getOrCreateUserByAuthCode(authCode);
 
-    return this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
+    return this.saveAuthCookie(
+      { userId: user.id, telegramID: user.telegramID },
+      res,
+    );
   }
 
   @Transactional()
@@ -120,14 +123,17 @@ export class AuthService {
     const user = await this.userRepository.save(
       this.userRepository.create({
         firstName: data.first_name,
-        // @ts-ignore
+        // @ts-expect-error last_name doesn't exists in type. Why?
         lastName: data.last_name,
         nickname: data.username,
         telegramID: data.id.toString(),
       }),
     );
 
-    return this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
+    return this.saveAuthCookie(
+      { userId: user.id, telegramID: user.telegramID },
+      res,
+    );
   }
 
   async authTelegramWebApp(data: string, res: Response): Promise<string> {
@@ -159,7 +165,10 @@ export class AuthService {
       }),
     );
 
-    return this.saveAuthCookie({ userId: user.id, telegramID: user.telegramID }, res);
+    return this.saveAuthCookie(
+      { userId: user.id, telegramID: user.telegramID },
+      res,
+    );
   }
 
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
@@ -192,10 +201,11 @@ export class AuthService {
   }
 
   private saveAuthCookie(requestUser: RequestUser, res: Response) {
-
     const expires = new Date(Date.now() + AUTH_TOKEN_EXPIRATION_TIME);
 
-    const token = this.jwtService.sign(requestUser, { expiresIn: AUTH_TOKEN_EXPIRATION_TIME });
+    const token = this.jwtService.sign(requestUser, {
+      expiresIn: AUTH_TOKEN_EXPIRATION_TIME,
+    });
     res.cookie(this.configService.auth.jwtCookie, token, {
       expires,
       httpOnly: true,
