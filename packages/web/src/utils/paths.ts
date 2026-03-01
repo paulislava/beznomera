@@ -21,7 +21,7 @@ export const revalidateHome = async () => {
 
 export async function revalidateCarPages(carId: number, code: string) {
   revalidateHome();
-  console.log('revalidated /car/${carId}/edit');
+  console.log(`Car ${carId} revalidated`);
   revalidatePath(`/car/${carId}`);
   revalidatePath(`/car/${carId}/qr`);
   revalidatePath(`/g/${code}`);
