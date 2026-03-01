@@ -13,7 +13,7 @@ const CarEditPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ param
     const hasMainOwnerRights = info.ownerId === user.userId || !user.isAdmin;
 
     const driverInfo = !hasMainOwnerRights
-      ? info.drivers.find(driver => driver.id === user.userId)
+      ? info.drivers?.find(driver => driver.id === user.userId)
       : null;
 
     if (!hasMainOwnerRights && !driverInfo?.isOwner) {

@@ -5,13 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
-import {
-  Equal,
-  FindOptionsRelations,
-  FindOptionsWhere,
-  Not,
-  Repository,
-} from 'typeorm';
+import { Equal, FindOptionsWhere, Not, Repository } from 'typeorm';
 import {
   CarInfo,
   EditCarInfo,
@@ -292,7 +286,7 @@ export class CarService {
   ): Promise<EditCarInfoApi> {
     const car = await this.carRepository.findOne({
       where: { id, owner: user ? { id: user.userId } : undefined },
-      relations: ['brand', 'color', 'owner', 'image', 'drivers'],
+      relations: ['brand', 'color', 'owner', 'image', 'carDrivers'],
     });
 
     if (!car) {
@@ -758,12 +752,12 @@ export class CarService {
   private formatDrivers(carDrivers?: CarDriver[]): DriverInfo[] {
     const drivers: DriverInfo[] =
       carDrivers?.map((cd) => ({
-        id: cd.driver.id,
-        firstName: cd.driver.firstName,
-        lastName: cd.driver.lastName,
-        nickname: cd.driver.nickname,
-        tel: cd.driver.tel,
-        telegramID: cd.driver.telegramID,
+        id: cd.driverId,
+        firstName: cd.driver?.firstName,
+        lastName: cd.driver?.lastName,
+        nickname: cd.driver?.nickname,
+        tel: cd.driver?.tel,
+        telegramID: cd.driver?.telegramID,
         isOwner: cd.isOwner,
         addedAt: cd.createdAt,
       })) ?? [];
