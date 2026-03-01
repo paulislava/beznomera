@@ -14,10 +14,10 @@ export const generateCarsStaticParams = async () => {
   }
 };
 
-export const revalidateHome = async () => {
+export async function revalidateHome() {
   revalidatePath('/');
   revalidatePath('/panel');
-};
+}
 
 export async function revalidateCarPages(carId: number, code: string) {
   revalidateHome();
