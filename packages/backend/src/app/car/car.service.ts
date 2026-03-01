@@ -20,6 +20,7 @@ import {
   CarDriversInfo,
   AddDriverByUsernameBody,
   DriverRole,
+  PublicCarInfo,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
@@ -110,7 +111,7 @@ export class CarService {
     }));
   }
 
-  async getInfo(code: string): Promise<CarInfo> {
+  async getInfo(code: string): Promise<PublicCarInfo> {
     const {
       id,
       no,
@@ -127,9 +128,10 @@ export class CarService {
       imageRatio: imageRatio,
       rating,
       ratesCount,
+      ...car
     } = await this.carRepository.findOneOrFail({
       where: { code },
-      relations: ['owner', 'brand', 'color', 'image'],
+      relations: ['owner', 'brand', 'color', 'image', 'carDrivers'],
     });
 
     return {
@@ -148,13 +150,9 @@ export class CarService {
       rating,
       ratesCount,
       code,
-      owner: {
-        id: owner.id,
-        firstName: owner.firstName,
-        lastName: owner.lastName,
-        nickname: owner.nickname,
-        tel: owner.tel,
-      },
+      ownerId: owner.id,
+      tel: owner.tel,
+      driverIds: car.carDrivers.map((e) => e.driverId),
     };
   }
 

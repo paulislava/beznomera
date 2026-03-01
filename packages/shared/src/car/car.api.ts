@@ -2,7 +2,7 @@ import { APIRoutes, apiInfo } from '../api-routes';
 import * as T from './car.types';
 
 export interface CarApi {
-  info(code: string, ...args: any[]): Promise<T.CarInfo>;
+  info(code: string, ...args: any[]): Promise<T.PublicCarInfo>;
   call(body: T.CarCallBody, code: string, ...args: any[]): Promise<void>;
   list(...args: any[]): Promise<T.CarInfo[]>;
   my(...args: any[]): Promise<T.ShortCarInfo[]>;

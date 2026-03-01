@@ -36,6 +36,7 @@ import {
   AddDriverByUsernameBody,
   RateCarBody,
   DriverRole,
+  PublicCarInfo,
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -224,7 +225,7 @@ export class CarController implements CarApi {
   constructor(private readonly carService: CarService) {}
 
   @Get(CAR_API.backendRoutes.info)
-  info(@Param(CODE_PARAM) code: string): Promise<CarInfo> {
+  info(@Param(CODE_PARAM) code: string): Promise<PublicCarInfo> {
     return this.carService.getInfo(code);
   }
 

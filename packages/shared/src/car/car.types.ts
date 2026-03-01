@@ -53,6 +53,12 @@ export type CarInfo = ShortCarInfo & {
   owner: UserProfile;
 };
 
+export type PublicCarInfo = ShortCarInfo & {
+  ownerId: number;
+  driverIds: number[];
+  tel?: string;
+}
+
 export type ExtendedCarInfo = CarInfo & {
   drivers: DriverInfo[];
 }

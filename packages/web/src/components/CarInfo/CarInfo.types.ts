@@ -1,6 +1,6 @@
-import { CarInfo } from '@shared/car/car.types';
+import { PublicCarInfo } from '@shared/car/car.types';
 
 export interface CarInfoProps {
-  info: CarInfo;
+  info: PublicCarInfo;
   code: string;
 }

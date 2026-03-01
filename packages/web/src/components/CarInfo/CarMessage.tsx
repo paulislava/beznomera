@@ -109,12 +109,6 @@ export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
       {({ values, dirtySinceLastSubmit, submitSucceeded }) => (
         <ChatContainer>
           <>
-            {!!(info.owner.nickname || info.owner.firstName || info.owner.lastName) && (
-              <Nickname>
-                {info.owner.nickname ?? `${info.owner.firstName} ${info.owner.lastName}`}
-              </Nickname>
-            )}
-
             {info.brand && (
               <ModelRow>
                 <CarModelBrand>{info.brandRaw || info.brand.title}</CarModelBrand>
@@ -127,15 +121,14 @@ export const CarMessagePage: FC<CarInfoProps> = ({ code, info }) => {
 
             {info.no && <CarNumber>{info.no}</CarNumber>}
 
-            {info.owner.id && (
-              <CarRating
-                carId={info.id}
-                carCode={code}
-                rating={info.rating ?? null}
-                ratesCount={info.ratesCount ?? 0}
-                ownerId={info.owner.id}
-              />
-            )}
+            <CarRating
+              carId={info.id}
+              carCode={code}
+              rating={info.rating ?? null}
+              ratesCount={info.ratesCount ?? 0}
+              ownerId={info.ownerId}
+              driverIds={info.driverIds}
+            />
 
             <InputContainer>
               <Field
