@@ -5,7 +5,10 @@ import { Strategy } from 'passport-jwt';
 
 import { ConfigService } from '../config/config.service';
 import { RequestUser } from '@paulislava/shared/user/user.types';
-import { AUTH_USER_TOKEN_HEADER } from '@paulislava/shared/auth/auth.api';
+import {
+  AUTH_USER_TOKEN_HEADER,
+  TOKEN_VERSION,
+} from '@paulislava/shared/auth/auth.api';
 
 export const COOKIE_NAME = 'auth';
 
@@ -30,7 +33,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: null | RequestUser): null | RequestUser {
-    if (!payload.telegramID) {
+    if (!payload.telegramID || (payload.tokenVersion ?? 0) < TOKEN_VERSION) {
       return null;
     }
     return payload;

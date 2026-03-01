@@ -3,6 +3,7 @@ import { RequestUser } from '../../../shared/src/user/user.types';
 
 import { AUTH_COOKIE_NAME } from '@/helpers/constants';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
+import { TOKEN_VERSION } from '@shared/auth/auth.api';
 
 // JWT секрет должен быть таким же как в backend
 const JWT_SECRET = process.env.JWT_SECRET || 'MY_SECRET';
@@ -18,7 +19,7 @@ export function decodeUserFromToken(
     const decoded = jwt.verify(token, JWT_SECRET) as RequestUser;
 
     // Проверяем что у пользователя есть telegramID (как в backend стратегии)
-    if (decoded && decoded.telegramID) {
+    if (decoded && decoded.telegramID && (decoded.tokenVersion ?? 0) >= TOKEN_VERSION) {
       return decoded;
     }
 

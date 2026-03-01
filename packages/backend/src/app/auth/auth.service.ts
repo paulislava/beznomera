@@ -30,6 +30,7 @@ import querystring from 'querystring';
 import {
   AUTH_TOKEN_EXPIRATION_TIME,
   WebAppUser,
+  TOKEN_VERSION,
 } from '@paulislava/shared/auth/auth.api';
 
 @Injectable()
@@ -57,10 +58,7 @@ export class AuthService {
     const authCode = await this.authCheck(authMode, identifier, code);
     const user = await this.getOrCreateUserByAuthCode(authCode);
 
-    return this.saveAuthCookie(
-      { userId: user.id, telegramID: user.telegramID, isAdmin: user.isAdmin },
-      res,
-    );
+    return this.saveAuthCookie(user, res);
   }
 
   @Transactional()
@@ -113,14 +111,7 @@ export class AuthService {
     });
 
     if (findUser) {
-      return this.saveAuthCookie(
-        {
-          userId: findUser.id,
-          telegramID: findUser.telegramID,
-          isAdmin: findUser.isAdmin,
-        },
-        res,
-      );
+      return this.saveAuthCookie(findUser, res);
       return;
     }
 
@@ -134,10 +125,7 @@ export class AuthService {
       }),
     );
 
-    return this.saveAuthCookie(
-      { userId: user.id, telegramID: user.telegramID, isAdmin: user.isAdmin },
-      res,
-    );
+    return this.saveAuthCookie(user, res);
   }
 
   async authTelegramWebApp(data: string, res: Response): Promise<string> {
@@ -154,14 +142,7 @@ export class AuthService {
     });
 
     if (findUser) {
-      return this.saveAuthCookie(
-        {
-          userId: findUser.id,
-          telegramID: findUser.telegramID,
-          isAdmin: findUser.isAdmin,
-        },
-        res,
-      );
+      return this.saveAuthCookie(findUser, res);
     }
 
     const user = await this.userRepository.save(
@@ -173,10 +154,7 @@ export class AuthService {
       }),
     );
 
-    return this.saveAuthCookie(
-      { userId: user.id, telegramID: user.telegramID, isAdmin: user.isAdmin },
-      res,
-    );
+    return this.saveAuthCookie(user, res);
   }
 
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
@@ -208,8 +186,18 @@ export class AuthService {
     return user;
   }
 
-  private saveAuthCookie(requestUser: RequestUser, res: Response) {
+  private saveAuthCookie(user: User, res: Response) {
     const expires = new Date(Date.now() + AUTH_TOKEN_EXPIRATION_TIME);
+
+    const requestUser: RequestUser = {
+      userId: user.id,
+      telegramID: user.telegramID,
+      tokenVersion: TOKEN_VERSION,
+    };
+
+    if (user.isAdmin) {
+      requestUser.isAdmin = true;
+    }
 
     const token = this.jwtService.sign(requestUser, {
       expiresIn: AUTH_TOKEN_EXPIRATION_TIME,
