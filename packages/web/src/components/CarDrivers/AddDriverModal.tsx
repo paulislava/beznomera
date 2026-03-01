@@ -44,9 +44,11 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
 }) => {
   const onSubmit = useCallback(
     async (data: FormData, form: FormApi<FormData>) => {
+      const username = data.username.trim();
+
       try {
         // Сначала ищем пользователя по нику или ID
-        const user = await userService.checkUsername(data.username.trim()).catch(() => false);
+        const user = await userService.checkUsername(username).catch(() => false);
 
         if (!user) {
           showErrorMessage('Ошибка', 'Пользователь с таким ником или ID не найден');
@@ -55,14 +57,14 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
         // Добавляем пользователя как водителя
         await carService.addDriverByUsername(
           {
-            username: data.username.trim()
+            username
           },
           carId
         );
 
         handleEvent('add_driver_success', {
           carId,
-          username: data.username.trim(),
+          username,
           // role: data.role.value,
           ...eventData
         });
@@ -79,7 +81,7 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
         console.error('Failed to add driver:', error);
         handleEvent('add_driver_error', {
           carId,
-          username: data.username.trim(),
+          username,
           // role: data.role.value,
           error,
           ...eventData

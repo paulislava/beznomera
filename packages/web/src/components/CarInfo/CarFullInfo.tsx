@@ -82,8 +82,15 @@ const ActionsContainer = styled.div`
   gap: 20px;
 `;
 
-export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUser }) => {
-  const isOwner = user?.userId === info.owner.id;
+export const CarFullInfo = ({
+  info,
+  hasOwnerRights,
+  user
+}: {
+  info: FullCarInfo;
+  hasOwnerRights: boolean;
+  user: RequestUser;
+}) => {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -157,7 +164,7 @@ export const CarFullInfo = ({ info, user }: { info: FullCarInfo; user: RequestUs
         </InfoContainer>
 
         {/* Секция водителей */}
-        {isOwner && <CarDrivers info={info} isOwner={isOwner} />}
+        {hasOwnerRights && <CarDrivers info={info} user={user} />}
 
         <ButtonsContainer>
           <Button href={`/car/${info.id}/edit`}>Редактировать</Button>

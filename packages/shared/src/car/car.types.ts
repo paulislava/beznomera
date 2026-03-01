@@ -53,13 +53,15 @@ export type CarInfo = ShortCarInfo & {
   owner: UserProfile;
 };
 
-export type FullCarInfo = ShortCarInfo & {
+export type ExtendedCarInfo = CarInfo & {
+  drivers: DriverInfo[];
+}
+
+export type FullCarInfo = ExtendedCarInfo & {
   messagesCount: number;
   callsCount: number;
   chatsCount: number;
   code: string;
-  owner: UserProfile;
-  drivers: DriverInfo[];
   rating: number | null;
   ratesCount: number;
 };
@@ -73,6 +75,7 @@ export type EditCarInfo = CarInfoBase & {
 
 export type EditCarInfoApi = EditCarInfo & {
   ownerId: number;
+  drivers: DriverInfo[]
 };
 
 export type LocationInfo = { latitude: number; longitude: number };
@@ -124,6 +127,11 @@ export interface DriverInfo {
 export interface AddDriverBody {
   contact: TelegramContact;
   carId: number;
+}
+
+export enum DriverRole {
+  OWNER='owner',
+  DRIVER='driver'
 }
 
 export interface AddDriverByUsernameBody {

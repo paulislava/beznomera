@@ -26,6 +26,7 @@ interface ButtonProps extends Pick<RawProps, 'variant' | 'size' | 'color'> {
   noFollowNoIndex?: boolean;
   fullWidth?: boolean;
   type?: 'button' | 'submit' | 'reset';
+  rounded?: boolean;
 }
 
 type ViewConfig = {
@@ -73,12 +74,19 @@ const StyledButton = styled(RawButton)<{
   $theme: ColorSchemeName;
   $fullWidth?: boolean;
   $hasLink: boolean;
+  $rounded?: boolean;
 }>`
   position: relative;
   cursor: pointer;
   border-radius: 35px;
   overflow: hidden;
+  min-width: unset;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'max-content')};
+
+  max-width: 300px;
+
+  height: max-content;
+
   ${({ $hasLink, size }) =>
     $hasLink &&
     css`
@@ -90,6 +98,18 @@ const StyledButton = styled(RawButton)<{
           padding-left: 40px;
           padding-right: 40px;
         `}
+      }
+    `}
+
+  ${({ $rounded }) =>
+    $rounded &&
+    css`
+      border-radius: 50%;
+      padding: 15px;
+      aspect-ratio: 1;
+
+      & ${StyledText} {
+        padding: 0;
       }
     `}
 
@@ -112,10 +132,6 @@ const StyledButton = styled(RawButton)<{
       `}
     `;
   }}
-
-  max-width: 300px;
-
-  height: max-content;
 `;
 
 const StyledLink = styled(ExternalLink)`
@@ -138,6 +154,7 @@ export const Button = forwardRef<any, ButtonProps>(
       fullWidth,
       type = 'button',
       targetBlank,
+      rounded,
       ...buttonProps
     },
     ref
@@ -188,6 +205,7 @@ export const Button = forwardRef<any, ButtonProps>(
         type={type}
         isLoading={isLoading}
         $hasLink={!!externalHref}
+        $rounded={rounded}
         {...buttonProps}
       >
         {view === 'glass' && <Glass />}

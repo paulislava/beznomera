@@ -31,6 +31,7 @@ export const AddDriverButton: React.FC<AddDriverButtonProps> = ({
     <>
       <Button
         view='secondary'
+        rounded
         onClick={handleAddDriver}
         event='add_driver'
         eventParams={{ carId, ...eventData }}

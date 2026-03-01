@@ -11,6 +11,8 @@ import { showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { formatDate } from '@/utils/date';
 import { AddDriverButton } from './AddDriverButton';
 import { forThemeValue, themeable } from '@/themes/utils';
+import { revalidateCarPages } from '@/utils/paths';
+import { RequestUser } from '@shared/user/user.types';
 
 const DriversContainer = styled.div`
   margin: 20px 0;
@@ -24,6 +26,7 @@ const DriverItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px;
+  gap: 8px;
   margin: 8px 0;
   background-color: ${themeable('bodyBackgroundColor')};
   border-radius: 6px;
@@ -77,10 +80,10 @@ const TelegramIdText = styled.div`
 
 interface CarDriversProps {
   info: FullCarInfo;
-  isOwner: boolean;
+  user: RequestUser;
 }
 
-export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
+export const CarDrivers: React.FC<CarDriversProps> = ({ info, user: { userId, isAdmin } }) => {
   const { id: carId } = info;
   const [driversInfo, setDriversInfo] = useState<CarDriversInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,11 +110,17 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
       await carService.removeDriver(carId, driverId);
       showSuccessMessage('Успех', 'Водитель успешно удален');
       await loadDrivers();
+      revalidateCarPages(carId, info.code);
     } catch (error: any) {
       console.error('Failed to remove driver:', error);
       showErrorMessage('Ошибка', 'Не удалось удалить водителя');
     }
   };
+
+  const handleSuccess = useCallback(() => {
+    loadDrivers();
+    revalidateCarPages(carId, info.code);
+  }, [carId, info.code, loadDrivers]);
 
   useEffect(() => {
     loadDrivers();
@@ -137,7 +146,11 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
     <DriversContainer>
       <Header>
         <TextL style={{ fontWeight: '600', color: 'inherit' }}>Водители автомобиля</TextL>
-        <AddDriverButton onSuccess={loadDrivers} carId={info.id} eventData={{ code: info.code }} />
+        <AddDriverButton
+          onSuccess={handleSuccess}
+          carId={info.id}
+          eventData={{ code: info.code }}
+        />
       </Header>
       {allDrivers.map(driver => (
         <DriverItem key={driver.id}>
@@ -156,10 +169,10 @@ export const CarDrivers: React.FC<CarDriversProps> = ({ info, isOwner }) => {
             <TelegramIdText>Telegram ID: {driver.telegramID}</TelegramIdText>
           </DriverInfo>
 
-          {isOwner && !driver.isOwner && (
+          {(driver.id !== userId || isAdmin) && (
             <DriverActions>
-              <Button view='danger' onClick={() => handleRemoveDriver(driver.id)}>
-                Удалить
+              <Button view='danger' rounded size='sm' onClick={() => handleRemoveDriver(driver.id)}>
+                ⨉
               </Button>
             </DriverActions>
           )}

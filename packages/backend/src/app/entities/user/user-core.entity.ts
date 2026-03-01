@@ -24,7 +24,7 @@ export abstract class UserCore extends BaseEntity {
   @Column({ nullable: true, unique: true })
   telegramID: string | null;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, unique: true })
   nickname: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

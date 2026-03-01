@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { carService } from '@/services';
-import { PageContainer } from '@/ui/Styled';
 import { QRCodePage } from '@/components/QRCode';
 import { AuthComponent, withUser } from '@/context/Auth/withUser';
 import { extractNumberId } from '@/utils/params';
+import { findUserInDrivers } from '@/utils/car';
 
 const CarQRPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ params, user }) => {
   const id = await extractNumberId(params);
@@ -11,15 +11,13 @@ const CarQRPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ params,
   try {
     const info = await carService.fullInfoApi(id);
 
-    if (info.owner.id !== user?.userId) {
+    const { driverInfo, hasMainOwnerRights } = findUserInDrivers(info, user);
+
+    if (!hasMainOwnerRights && !driverInfo) {
       return notFound();
     }
 
-    return (
-      <PageContainer>
-        <QRCodePage info={info} />
-      </PageContainer>
-    );
+    return <QRCodePage info={info} />;
   } catch (e) {
     console.error(e);
     return notFound();

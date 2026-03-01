@@ -25,6 +25,7 @@ import {
   AddDriverBody,
   CarDriversInfo,
   AddDriverByUsernameBody,
+  DriverRole,
 } from '@paulislava/shared/car/car.types';
 import { Call } from '../entities/call.entity';
 import { TelegramService } from '../telegram/telegram.service';
@@ -213,7 +214,7 @@ export class CarService {
 
   async userList(id: number): Promise<ShortCarInfo[]> {
     const cars = await this.carRepository.find({
-      where: { owner: { id } },
+      where: [{ ownerId: id }, { carDrivers: { driverId: id } }],
       relations: ['brand', 'color', 'image'],
     });
 
@@ -281,16 +282,7 @@ export class CarService {
         tel: car.owner.tel,
         id: car.owner.id,
       },
-      drivers: car.carDrivers.map((cd) => ({
-        id: cd.driver.id,
-        firstName: cd.driver.firstName,
-        lastName: cd.driver.lastName,
-        nickname: cd.driver.nickname,
-        tel: cd.driver.tel,
-        telegramID: cd.driver.telegramID,
-        isOwner: cd.isOwner,
-        addedAt: cd.createdAt,
-      })),
+      drivers: this.formatDrivers(car.carDrivers),
     };
   }
 
@@ -300,7 +292,7 @@ export class CarService {
   ): Promise<EditCarInfoApi> {
     const car = await this.carRepository.findOne({
       where: { id, owner: user ? { id: user.userId } : undefined },
-      relations: ['brand', 'color', 'owner', 'image'],
+      relations: ['brand', 'color', 'owner', 'image', 'drivers'],
     });
 
     if (!car) {
@@ -322,6 +314,7 @@ export class CarService {
       //   value: car.brand,
       //   newValue: car.brandRaw,
       // },
+      drivers: this.formatDrivers(car.carDrivers),
       year: car.year,
       imageRatio: car.imageRatio,
       ownerId: car.owner.id,
@@ -349,7 +342,7 @@ export class CarService {
     const code = data.code || data.no.toLowerCase().replace(/\s+/g, '');
 
     await this.carRepository.update(car.id, {
-      no: data.no,
+      no: data.no.toLocaleUpperCase(),
       model: data.model,
       version: data.version,
       color: data.color?.value && {
@@ -378,7 +371,7 @@ export class CarService {
     const code = data.code || data.no.toLowerCase().replace(/\s+/g, '');
 
     const car = this.carRepository.create({
-      no: data.no,
+      no: data.no.toLocaleUpperCase(),
       model: data.model,
       version: data.version,
       year: data.year,
@@ -570,7 +563,7 @@ export class CarService {
     });
 
     if (existingDriver) {
-      throw new Error('Этот водитель уже добавлен к автомобилю');
+      throw new CarServiceException('Этот водитель уже добавлен к автомобилю');
     }
 
     // Создаем связь водителя с автомобилем
@@ -639,7 +632,7 @@ export class CarService {
     const carDriver = this.carDriverRepository.create({
       carId: id,
       driverId: user.id,
-      isOwner: body.role === 'owner',
+      isOwner: body.role === DriverRole.OWNER,
     });
 
     await this.carDriverRepository.save(carDriver);
@@ -760,6 +753,22 @@ export class CarService {
     if (Object.keys(errors).length > 0) {
       throw new ValidationException(errors);
     }
+  }
+
+  private formatDrivers(carDrivers?: CarDriver[]): DriverInfo[] {
+    const drivers: DriverInfo[] =
+      carDrivers?.map((cd) => ({
+        id: cd.driver.id,
+        firstName: cd.driver.firstName,
+        lastName: cd.driver.lastName,
+        nickname: cd.driver.nickname,
+        tel: cd.driver.tel,
+        telegramID: cd.driver.telegramID,
+        isOwner: cd.isOwner,
+        addedAt: cd.createdAt,
+      })) ?? [];
+
+    return drivers;
   }
 
   private checkCarAccess(car: Car, user: RequestUser, ownerAccess?: boolean) {
