@@ -49,7 +49,7 @@ export async function generateStaticParams() {
     return cars
       .filter(car => car && car.code.trim().length > 0)
       .map(car => ({
-        code: car.code
+        code: car.code.trim()
       }));
   } catch (error) {
     console.error('Error in generateStaticParams:', error);
