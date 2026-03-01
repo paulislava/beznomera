@@ -243,6 +243,7 @@ export class CarController implements CarApi {
   }
 
   @Get(CAR_API.backendRoutes.list)
+  @UseGuards(ApiClientAuthGuard)
   list(): Promise<CarInfo[]> {
     return this.carService.getList();
   }
