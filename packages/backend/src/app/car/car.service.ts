@@ -451,6 +451,8 @@ export class CarService {
       throw new CarNotFoundException(id);
     }
 
+    this.checkCarAccess(car, user);
+
     await car.remove();
   }
 
@@ -659,7 +661,7 @@ export class CarService {
     // Получаем машину с водителями
     const car = await this.carRepository.findOne({
       where: { id: carId },
-      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
+      relations: carMainRelations,
     });
 
     if (!car) {
