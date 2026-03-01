@@ -6,7 +6,8 @@ export const messages: Partial<Record<ResponseCode, string>> = {
   [ResponseCode.USER_OR_DRAFT_NOT_FOUND]: 'Пользователь или черновик не найден.',
   [ResponseCode.WRONG_AUTH_CODE]: 'Неверный код авторизации.',
   [ResponseCode.NOT_FOUND]: 'Запрашиваемый ресурс не найден.',
-  [ResponseCode.WRONG_MIMETYPE]: 'Неверный тип файла.'
+  [ResponseCode.WRONG_MIMETYPE]: 'Неверный тип файла.',
+  [ResponseCode.FORBIDDEN]: 'Ошибка прав доступа'
 };
 
 const locale = {

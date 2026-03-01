@@ -239,10 +239,7 @@ export class CarController implements CarApi {
 
   @Get(CAR_API.backendRoutes.userList)
   @UseGuards(ApiClientAuthGuard)
-  userList(
-    @Param(ID_PARAM) id: number,
-    ...args: any[]
-  ): Promise<ShortCarInfo[]> {
+  userList(@Param(ID_PARAM) id: number): Promise<ShortCarInfo[]> {
     return this.carService.userList(id);
   }
 

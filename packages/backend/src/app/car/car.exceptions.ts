@@ -20,6 +20,18 @@ export class CarNotFoundException extends CarServiceException {
   }
 }
 
+export class CarForbiddenException extends CarServiceException {
+  constructor(carId: number) {
+    super(
+      {
+        message: `У вас недостаточно прав к автомобилю с ID ${carId}.`,
+        code: ResponseCode.FORBIDDEN,
+      },
+      404,
+    );
+  }
+}
+
 export class CallNeedTimeoutException extends CarServiceException {
   constructor(carId: number) {
     super(

@@ -10,12 +10,12 @@ export type AuthProps = {
 
 export type AuthComponent<T = unknown> = React.ComponentType<T & AuthProps>;
 
-export function withUser<T = unknown>(Component: AuthComponent<T>) {
+export function withUser<T = unknown>(Component: AuthComponent<T>, requireAdmin?: boolean) {
   // eslint-disable-next-line react/display-name
   return async (props: T) => {
     const user = await getUserFromRequest();
 
-    if (user) {
+    if (user && (!requireAdmin || user.isAdmin)) {
       return <Component user={user} {...props} />;
     }
 

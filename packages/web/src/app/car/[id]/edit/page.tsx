@@ -11,7 +11,7 @@ const CarEditPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ param
     const info = await carService.infoForUpdateApi(id);
 
     // Проверяем, что пользователь является владельцем автомобиля
-    if (info.ownerId !== user.userId) {
+    if (info.ownerId !== user.userId && !user.isAdmin) {
       return notFound();
     }
 

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { carService } from '@/services';
 import { CarFullInfo } from '@/components/CarInfo/CarFullInfo';
 import { AuthProps, withUser } from '@/context/Auth/withUser';
+
 async function CarPage({ params, user }: PromiseParams<{ id: string }> & AuthProps) {
   const { id } = await params;
   const idNumber = Number(id);
@@ -10,7 +11,7 @@ async function CarPage({ params, user }: PromiseParams<{ id: string }> & AuthPro
   try {
     const info = await carService.fullInfoApi(idNumber);
 
-    if (info.owner.id !== user?.userId) {
+    if (info.owner.id !== user.userId && !user.isAdmin) {
       return notFound();
     }
 

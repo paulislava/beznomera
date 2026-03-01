@@ -31,6 +31,7 @@ import { lookup } from 'ip-location-api';
 import { CALL_TIMEOUT_S } from '~/constants';
 import {
   CallNeedTimeoutException,
+  CarForbiddenException,
   CarNotFoundException,
   CarServiceException,
   ValidationException,
@@ -330,11 +331,15 @@ export class CarService {
     user: RequestUser,
   ): Promise<void> {
     const car = await this.carRepository.findOne({
-      where: { id, owner: { id: user.userId } },
+      where: { id },
     });
 
     if (!car) {
       throw new CarNotFoundException(id);
+    }
+
+    if (car.ownerId !== user.userId && !user.isAdmin) {
+      throw new CarForbiddenException(id);
     }
 
     await this.validateCarData(data, id);
