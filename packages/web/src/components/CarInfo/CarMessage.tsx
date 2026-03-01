@@ -7,14 +7,7 @@ import { handleEvent } from '@/utils/log';
 import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import Button from '@/ui/Button/Button';
 
-import {
-  ModelRow,
-  CarModelBrand,
-  BrandLogo,
-  CarModel,
-  CarNumber,
-  Nickname
-} from '@/components/CarDetails';
+import { ModelRow, CarModelBrand, BrandLogo, CarModel, CarNumber } from '@/components/CarDetails';
 import styled from 'styled-components';
 import FormField from '@/ui/FormField/FormField';
 import { Form } from '@/ui/FormContainer/FormContainer';
