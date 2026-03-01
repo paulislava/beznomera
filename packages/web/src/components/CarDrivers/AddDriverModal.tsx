@@ -9,11 +9,9 @@ import { carService, userService } from '@/services';
 import { showResponseMessage, showErrorMessage, showSuccessMessage } from '@/utils/messages';
 import { handleEvent } from '@/utils/log';
 import * as S from './AddDriverModal.styled';
-
-export interface DriverRole {
-  value: string;
-  label: string;
-}
+import { SelectField } from '@/ui/Select/SelectField';
+import { DriverRole } from '@shared/car/car.types';
+import { SelectOption } from '@/ui/Select/Select.types';
 
 interface AddDriverModalProps {
   isOpen: boolean;
@@ -28,12 +26,13 @@ interface FormData {
   role: DriverRole;
 }
 
-// const DRIVER_ROLES: DriverRole[] = [
-//   { value: 'driver', label: 'Водитель' },
-//   { value: 'owner', label: 'Владелец' }
-// ];
+const driverRoleOptions: SelectOption<DriverRole>[] = [
+  { value: DriverRole.DRIVER, label: 'Водитель' },
+  { value: DriverRole.OWNER, label: 'Владелец' }
+];
 
 const Field = FormField<FormData>;
+const Select = SelectField<FormData>;
 
 export const AddDriverModal: React.FC<AddDriverModalProps> = ({
   isOpen,
@@ -57,7 +56,8 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
         // Добавляем пользователя как водителя
         await carService.addDriverByUsername(
           {
-            username
+            username,
+            role: data.role
           },
           carId
         );
@@ -115,9 +115,14 @@ export const AddDriverModal: React.FC<AddDriverModalProps> = ({
                   label='Ник или ID пользователя'
                   placeholder='Введите ник или ID'
                   required
-                  disabled={submitting}
                 />
               </S.Field>
+              <Select
+                name='role'
+                options={driverRoleOptions}
+                defaultValue={DriverRole.DRIVER}
+                label='Права пользователя'
+              />
               <S.Actions>
                 <Button type='button' view='secondary' onClick={handleClose} disabled={submitting}>
                   Отмена

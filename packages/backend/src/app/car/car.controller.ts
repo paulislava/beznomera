@@ -35,6 +35,7 @@ import {
   CarDriversInfo,
   AddDriverByUsernameBody,
   RateCarBody,
+  DriverRole,
 } from '@paulislava/shared/car/car.types';
 import { CarService } from './car.service';
 import { CurrentUser } from '../users/user.decorator';
@@ -49,6 +50,7 @@ import {
   IsInt,
   Min,
   Max,
+  IsEnum,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import userAgentParser from 'useragent';
@@ -206,6 +208,15 @@ export class RateCarDto implements RateCarBody {
   @Min(1)
   @Max(5)
   rating: number;
+}
+
+export class AddDriverByUsernameDto implements AddDriverByUsernameBody {
+  @IsString()
+  username: string;
+
+  @IsOptional()
+  @IsEnum(DriverRole)
+  role?: DriverRole;
 }
 
 @Controller(CAR_API.path)

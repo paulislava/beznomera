@@ -136,7 +136,7 @@ export enum DriverRole {
 
 export interface AddDriverByUsernameBody {
   username: string;
-  role?: string;
+  role?: DriverRole;
 }
 
 export interface RemoveDriverBody {

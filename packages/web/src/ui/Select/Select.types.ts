@@ -3,9 +3,9 @@ import { FieldRenderProps } from 'react-final-form';
 import { Key } from 'react';
 import { ValidatorsProps } from '../FormField/FormField.types';
 
-export type SelectOption = {
+export type SelectOption<Value extends string | number = string | number> = {
   label: string;
-  value: string | number;
+  value: Value;
 };
 
 export type RawSelectProps<
