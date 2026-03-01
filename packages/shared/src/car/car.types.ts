@@ -35,6 +35,7 @@ type CarInfoBase = {
   imageUrl: Maybe<string>;
   year: Maybe<number>;
   image: Maybe<FileInfo>;
+  code: string;
 };
 
 export type ShortCarInfo = CarInfoBase & {
@@ -48,14 +49,8 @@ export type ShortCarInfo = CarInfoBase & {
   ratesCount?: number;
 };
 
-export type ShortCarInfoApi = ShortCarInfo & {
-  code: string;
-};
-
 export type CarInfo = ShortCarInfo & {
   owner: UserProfile;
-  rating: number | null;
-  ratesCount: number;
 };
 
 export type FullCarInfo = ShortCarInfo & {

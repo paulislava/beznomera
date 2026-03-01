@@ -4,7 +4,7 @@ import * as T from './car.types';
 export interface CarApi {
   info(code: string, ...args: any[]): Promise<T.CarInfo>;
   call(body: T.CarCallBody, code: string, ...args: any[]): Promise<void>;
-  list(...args: any[]): Promise<T.ShortCarInfoApi[]>;
+  list(...args: any[]): Promise<T.CarInfo[]>;
   my(...args: any[]): Promise<T.ShortCarInfo[]>;
   userList(id: number, ...args: any[]): Promise<T.ShortCarInfo[]>;
   sendMessage(body: T.CarMessageBody, code: string, ...args: any[]): Promise<void>;

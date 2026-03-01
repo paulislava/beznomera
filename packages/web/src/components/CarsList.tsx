@@ -3,7 +3,7 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { ShortCarInfo } from '@shared/car/car.types';
+import { CarInfo, ShortCarInfo } from '@shared/car/car.types';
 import { Glass } from '@/ui/Glass';
 import { Button } from '@/ui/Button';
 import { TextL } from './Themed';
@@ -69,13 +69,15 @@ const CarModel = styled.div`
   opacity: 0.8;
 `;
 
-export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
+const CarOwner = styled.div`
+  margin-left: auto;
+`;
+
+export const CarsList: FC<{ cars: CarInfo[]; showInfo?: boolean }> = ({ cars, showInfo }) => {
   if (!cars || cars.length === 0) {
     return (
       <Container>
-        <TextL style={{ textAlign: 'center', marginBottom: '20px' }}>
-          У вас пока нет автомобилей
-        </TextL>
+        <TextL style={{ textAlign: 'center', marginBottom: '20px' }}>Нет автомобилей</TextL>
         <AddButton href='/car/new' view='glass'>
           Добавить автомобиль
         </AddButton>
@@ -85,7 +87,7 @@ export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
 
   return (
     <Container>
-      {cars.map((car: ShortCarInfo) => (
+      {cars.map(car => (
         <CarItem key={car.no} href={`/car/${car.id}/`}>
           <Glass />
           <CarInfo>
@@ -94,6 +96,11 @@ export const CarsList: FC<{ cars: ShortCarInfo[] }> = ({ cars }) => {
               {car.brandRaw || car.brand?.title} {car.model}
             </CarModel>
           </CarInfo>
+          {showInfo && (
+            <CarOwner>
+              {car.owner.nickname ?? `${car.owner.firstName} ${car.owner.lastName}`}
+            </CarOwner>
+          )}
         </CarItem>
       ))}
       <AddButton href='/car/new' view='glass'>

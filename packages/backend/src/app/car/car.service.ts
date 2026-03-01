@@ -15,7 +15,6 @@ import {
   CarMessageBody,
   AddOwnerBody,
   EditCarInfoApi,
-  ShortCarInfoApi,
   DriverInfo,
   AddDriverBody,
   CarDriversInfo,
@@ -76,7 +75,7 @@ export class CarService {
     private readonly userService: UserService,
   ) {}
 
-  async getList(): Promise<ShortCarInfoApi[]> {
+  async getList(): Promise<CarInfo[]> {
     const cars = await this.carRepository.find({
       relations: ['owner', 'brand', 'color', 'image'],
     });
@@ -94,6 +93,8 @@ export class CarService {
       imageUrl: car.imageUrl,
       image: car.image?.info(),
       imageRatio: car.imageRatio,
+      ratesCount: car.ratesCount,
+      rating: car.rating,
       owner: {
         firstName: car.owner.firstName,
         lastName: car.owner.lastName,
@@ -142,6 +143,7 @@ export class CarService {
       image: image?.info(),
       rating,
       ratesCount,
+      code,
       owner: {
         id: owner.id,
         firstName: owner.firstName,
@@ -203,7 +205,7 @@ export class CarService {
   async userList(id: number): Promise<ShortCarInfo[]> {
     const cars = await this.carRepository.find({
       where: { owner: { id } },
-      relations: ['owner', 'brand', 'color', 'image'],
+      relations: ['brand', 'color', 'image'],
     });
 
     return cars.map((car) => ({ ...car, image: car.image?.info() }));

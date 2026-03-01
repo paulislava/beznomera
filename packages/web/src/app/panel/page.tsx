@@ -8,7 +8,7 @@ const Panel: AuthComponent<unknown> = async ({ user }) => {
 
   return (
     <>
-      <CarsList cars={cars} />
+      <CarsList cars={cars} showInfo />
       {user.isAdmin && <AdminButton />}
     </>
   );
