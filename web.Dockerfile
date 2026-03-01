@@ -18,6 +18,9 @@ RUN npm ci && \
 COPY packages/shared /app/packages/shared
 COPY packages/web /app/packages/web
 
+ARG BACKEND_API_TOKEN
+ENV BACKEND_API_TOKEN=$BACKEND_API_TOKEN
+
 ENV NEXT_TELEMETRY_DISABLED=1 \
     BACKEND_URL=https://beznomera.net/api
 RUN npm run build:web

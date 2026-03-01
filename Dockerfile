@@ -20,8 +20,6 @@ COPY packages/backend /app/packages/backend
 
 RUN cd /app/packages/shared && npm prune --production && cd /app/packages/backend
 
-# ARG BACKEND_API_TOKEN
-# ENV BACKEND_API_TOKEN=$BACKEND_API_TOKEN
 
 ENV NODE_ENV=production
 RUN npm run build:backend
@@ -34,6 +32,9 @@ EXPOSE 3000
 COPY --from=build-backend /app/packages/backend/node_modules /app/node_modules
 COPY --from=build-backend /app/packages/shared /app/node_modules/@paulislava/shared
 COPY --from=build-backend /app/packages/backend/dist /app
+
+ARG BACKEND_API_TOKEN
+ENV BACKEND_API_TOKEN=$BACKEND_API_TOKEN
 
 ENV NODE_ENV=production
 ENTRYPOINT [ "node" ]
