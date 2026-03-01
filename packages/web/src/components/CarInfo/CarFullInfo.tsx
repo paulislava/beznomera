@@ -52,6 +52,7 @@ const StatsContainer = styled.div`
   background-color: #f5f5f5;
   padding: 16px;
   border-radius: 8px;
+  gap: 24px;
 `;
 
 const StatsItem = styled(TextL)`

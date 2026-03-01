@@ -69,8 +69,13 @@ const CarModel = styled.div`
   opacity: 0.8;
 `;
 
-const CarOwner = styled.div`
+const CarSidebar = styled.div`
   margin-left: auto;
+  text-align: right;
+`;
+
+const CarRating = styled(TextL)`
+  font-weight: 500;
 `;
 
 export const CarsList: FC<{ cars: CarInfo[]; showInfo?: boolean }> = ({ cars, showInfo }) => {
@@ -96,11 +101,16 @@ export const CarsList: FC<{ cars: CarInfo[]; showInfo?: boolean }> = ({ cars, sh
               {car.brandRaw || car.brand?.title} {car.model}
             </CarModel>
           </CarInfo>
-          {showInfo && (
-            <CarOwner>
-              {car.owner.nickname ?? `${car.owner.firstName} ${car.owner.lastName}`}
-            </CarOwner>
-          )}
+          <CarSidebar>
+            {car.rating && (
+              <CarRating title='Рейтинг автомобиля (количество оценок)'>
+                {car.rating} ({car.ratesCount})
+              </CarRating>
+            )}
+            {showInfo && (
+              <div>{car.owner.nickname ?? `${car.owner.firstName} ${car.owner.lastName}`}</div>
+            )}
+          </CarSidebar>
         </CarItem>
       ))}
       <AddButton href='/car/new' view='glass'>
