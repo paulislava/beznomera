@@ -14,7 +14,7 @@ const StyledContainer = styled.div`
 export const AdminButton = () => {
   return (
     <StyledContainer>
-      <Button to='/panel'>Панель администратора</Button>
+      <Button href='/panel'>Панель администратора</Button>
     </StyledContainer>
   );
 };
