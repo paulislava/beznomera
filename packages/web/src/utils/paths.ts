@@ -16,12 +16,11 @@ export const generateCarsStaticParams = async () => {
 
 export const revalidateHome = async () => {
   revalidatePath('/');
+  revalidatePath('/panel');
 };
 
 export async function revalidateCarPages(carId: number, code: string) {
-  revalidatePath('/');
-  revalidatePath('/panel');
-  revalidatePath(`/car/${carId}/edit`);
+  revalidateHome();
   console.log('revalidated /car/${carId}/edit');
   revalidatePath(`/car/${carId}`);
   revalidatePath(`/car/${carId}/qr`);
