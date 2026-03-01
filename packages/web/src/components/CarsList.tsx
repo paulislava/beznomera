@@ -3,7 +3,7 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { CarInfo, ShortCarInfo } from '@shared/car/car.types';
+import { CarInfo } from '@shared/car/car.types';
 import { Glass } from '@/ui/Glass';
 import { Button } from '@/ui/Button';
 import { TextL } from './Themed';
@@ -51,7 +51,7 @@ const AddButton = styled(Button)`
   margin: 20px auto 0;
 `;
 
-const CarInfo = styled.div`
+const CarInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -95,12 +95,12 @@ export const CarsList: FC<{ cars: CarInfo[]; showInfo?: boolean }> = ({ cars, sh
       {cars.map(car => (
         <CarItem key={car.no} href={`/car/${car.id}/`}>
           <Glass />
-          <CarInfo>
+          <CarInfoContainer>
             <CarNumber>{car.no}</CarNumber>
             <CarModel>
               {car.brandRaw || car.brand?.title} {car.model}
             </CarModel>
-          </CarInfo>
+          </CarInfoContainer>
           <CarSidebar>
             {car.rating && (
               <CarRating title='Рейтинг автомобиля (количество оценок)'>
