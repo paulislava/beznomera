@@ -20,8 +20,8 @@ COPY packages/backend /app/packages/backend
 
 RUN cd /app/packages/shared && npm prune --production && cd /app/packages/backend
 
-ARG BACKEND_API_TOKEN
-ENV BACKEND_API_TOKEN=$BACKEND_API_TOKEN
+# ARG BACKEND_API_TOKEN
+# ENV BACKEND_API_TOKEN=$BACKEND_API_TOKEN
 
 ENV NODE_ENV=production
 RUN npm run build:backend
