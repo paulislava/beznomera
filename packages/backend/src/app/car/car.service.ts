@@ -5,7 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
-import { Equal, FindOptionsWhere, Not, Repository } from 'typeorm';
+import {
+  Equal,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  Not,
+  Repository,
+} from 'typeorm';
 import {
   CarInfo,
   EditCarInfo,
@@ -50,6 +56,9 @@ import { User } from '../entities/user/user.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
 import { CarRating } from '../entities/car/car-rating.entity';
 import { UserService } from '../users/user.service';
+
+const carMainRelations = ['owner', 'carDrivers', 'carDrivers.driver'];
+
 @Injectable()
 export class CarService {
   constructor(
@@ -163,7 +172,7 @@ export class CarService {
     const { id, no, owner, carDrivers } =
       await this.carRepository.findOneOrFail({
         where: { code },
-        relations: ['owner', 'carDrivers', 'carDrivers.driver'],
+        relations: carMainRelations,
       });
 
     const lastCall = await this.callRepository.findOne({
@@ -242,14 +251,7 @@ export class CarService {
   async getFullInfo(id: number, user?: RequestUser): Promise<FullCarInfo> {
     const car = await this.carRepository.findOne({
       where: { id, owner: user ? { id: user.userId } : undefined },
-      relations: [
-        'owner',
-        'brand',
-        'color',
-        'carDrivers',
-        'carDrivers.driver',
-        'image',
-      ],
+      relations: [...carMainRelations, 'brand', 'color', 'image'],
     });
 
     if (!car) {
@@ -340,9 +342,7 @@ export class CarService {
       throw new CarNotFoundException(id);
     }
 
-    if (car.ownerId !== user.userId && !user.isAdmin) {
-      throw new CarForbiddenException(id);
-    }
+    this.checkCarAccess(car, user, true);
 
     await this.validateCarData(data, id);
 
@@ -444,7 +444,7 @@ export class CarService {
 
   async delete(id: number, user: RequestUser): Promise<void> {
     const car = await this.carRepository.findOne({
-      where: { id, owner: { id: user.userId } },
+      where: { id },
     });
 
     if (!car) {
@@ -462,18 +462,13 @@ export class CarService {
     return this.modelRepository.find();
   }
 
-  async addOwner(body: AddOwnerBody, userId: number): Promise<void> {
+  async addOwner(body: AddOwnerBody, user: RequestUser): Promise<void> {
     const car = await this.carRepository.findOneOrFail({
       where: { id: body.carId },
       relations: ['owner'],
     });
 
-    // Проверяем, что пользователь является владельцем автомобиля
-    if (car.owner.id !== userId) {
-      throw new Error(
-        'Только владелец автомобиля может добавлять других владельцев',
-      );
-    }
+    this.checkCarAccess(car, user, true);
 
     // Ищем или создаем пользователя по Telegram ID
     const userRepo = this.carRepository.manager.getRepository(User);
@@ -497,23 +492,18 @@ export class CarService {
     await this.carRepository.save(car);
   }
 
-  async getDrivers(carId: number, userId: number): Promise<CarDriversInfo> {
+  async getDrivers(carId: number, user: RequestUser): Promise<CarDriversInfo> {
     const car = await this.carRepository.findOne({
       where: { id: carId },
-      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
+      relations: carMainRelations,
     });
 
     if (!car) {
-      throw new Error(`Автомобиль с ID ${carId} не найден`);
+      throw new CarNotFoundException(carId);
     }
 
     // Проверяем, что пользователь является владельцем или водителем
-    const isOwner = car.owner.id === userId;
-    const isDriver = car.carDrivers.some((cd) => cd.driverId === userId);
-
-    if (!isOwner && !isDriver) {
-      throw new Error('У вас нет доступа к информации об этом автомобиле');
-    }
+    this.checkCarAccess(car, user);
 
     const drivers: DriverInfo[] = car.carDrivers.map((cd) => ({
       id: cd.driver.id,
@@ -544,20 +534,17 @@ export class CarService {
     };
   }
 
-  async addDriver(body: AddDriverBody, userId: number): Promise<void> {
+  async addDriver(body: AddDriverBody, user: RequestUser): Promise<void> {
     const car = await this.carRepository.findOne({
       where: { id: body.carId },
-      relations: ['owner', 'carDrivers'],
+      relations: carMainRelations,
     });
 
     if (!car) {
-      throw new NotFoundException(`Автомобиль с ID ${body.carId} не найден`);
+      throw new CarNotFoundException(body.carId);
     }
 
-    // Проверяем, что пользователь является владельцем автомобиля
-    if (car.owner.id !== userId) {
-      throw new Error('Только владелец автомобиля может добавлять водителей');
-    }
+    this.checkCarAccess(car, user);
 
     // Ищем или создаем пользователя по Telegram ID
     let driver = await this.userRepository.findOne({
@@ -597,23 +584,18 @@ export class CarService {
   async removeDriver(
     carId: number,
     driverId: number,
-    userId: number,
+    user: RequestUser,
   ): Promise<void> {
     const car = await this.carRepository.findOne({
       where: { id: carId },
-      relations: ['owner', 'carDrivers', 'carDrivers.driver'],
+      relations: carMainRelations,
     });
 
     if (!car) {
       throw new CarNotFoundException(carId);
     }
 
-    if (
-      car.ownerId !== userId &&
-      !car.carDrivers.some((cd) => cd.driverId === userId && cd.isOwner)
-    ) {
-      throw new ForbiddenException('Нет доступа к этому автомобилю');
-    }
+    this.checkCarAccess(car, user, true);
 
     const carDriver = await this.carDriverRepository.findOne({
       where: { carId, driverId },
@@ -633,21 +615,14 @@ export class CarService {
   ): Promise<void> {
     const car = await this.carRepository.findOne({
       where: { id },
-      relations: ['carDrivers'],
+      relations: carMainRelations,
     });
 
     if (!car) {
       throw new CarNotFoundException(id);
     }
 
-    if (
-      car.ownerId !== currentUser.userId &&
-      !car.carDrivers.some(
-        (cd) => cd.driverId === currentUser.userId && cd.isOwner,
-      )
-    ) {
-      throw new ForbiddenException('Нет доступа к этому автомобилю');
-    }
+    this.checkCarAccess(car, currentUser);
 
     const user = await this.userService.findUserByUsername(body.username);
 
@@ -782,6 +757,20 @@ export class CarService {
 
     if (Object.keys(errors).length > 0) {
       throw new ValidationException(errors);
+    }
+  }
+
+  private checkCarAccess(car: Car, user: RequestUser, ownerAccess?: boolean) {
+    if (
+      !user.isAdmin &&
+      car.ownerId !== user.userId &&
+      (ownerAccess
+        ? false
+        : !car.carDrivers?.some(
+            (cd) => cd.driverId === user.userId && cd.isOwner,
+          ))
+    ) {
+      throw new CarForbiddenException(car.id);
     }
   }
 }

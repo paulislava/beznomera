@@ -27,7 +27,7 @@ export class CarForbiddenException extends CarServiceException {
         message: `У вас недостаточно прав к автомобилю с ID ${carId}.`,
         code: ResponseCode.FORBIDDEN,
       },
-      404,
+      403,
     );
   }
 }

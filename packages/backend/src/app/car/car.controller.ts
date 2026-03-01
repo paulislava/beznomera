@@ -345,7 +345,7 @@ export class CarController implements CarApi {
     @Body() body: AddOwnerDto,
     @CurrentUser() user: RequestUser,
   ): Promise<void> {
-    return this.carService.addOwner(body, user.userId);
+    return this.carService.addOwner(body, user);
   }
 
   @Post(CAR_API.backendRoutes.addDriver)
@@ -354,7 +354,7 @@ export class CarController implements CarApi {
     @Body() body: AddDriverDto,
     @CurrentUser() user: RequestUser,
   ): Promise<void> {
-    return this.carService.addDriver(body, user.userId);
+    return this.carService.addDriver(body, user);
   }
 
   @Post(CAR_API.backendRoutes.addDriverByUsername)
@@ -373,7 +373,7 @@ export class CarController implements CarApi {
     @Param(ID_PARAM, ParseIntPipe) id: number,
     @CurrentUser() user: RequestUser,
   ): Promise<CarDriversInfo> {
-    return this.carService.getDrivers(id, user.userId);
+    return this.carService.getDrivers(id, user);
   }
 
   @Delete(CAR_API.backendRoutes.removeDriver)
@@ -383,7 +383,7 @@ export class CarController implements CarApi {
     @Param('driverId', ParseIntPipe) driverId: number,
     @CurrentUser() user: RequestUser,
   ): Promise<void> {
-    return this.carService.removeDriver(carId, driverId, user.userId);
+    return this.carService.removeDriver(carId, driverId, user);
   }
 
   @Delete(CAR_API.backendRoutes.delete)
