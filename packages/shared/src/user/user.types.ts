@@ -24,4 +24,5 @@ export interface UserProfile {
 export interface RequestUser {
   userId: number;
   telegramID: string;
+  isAdmin: boolean;
 }

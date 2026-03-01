@@ -58,7 +58,7 @@ export class AuthService {
     const user = await this.getOrCreateUserByAuthCode(authCode);
 
     return this.saveAuthCookie(
-      { userId: user.id, telegramID: user.telegramID },
+      { userId: user.id, telegramID: user.telegramID, isAdmin: user.isAdmin },
       res,
     );
   }
@@ -114,7 +114,11 @@ export class AuthService {
 
     if (findUser) {
       return this.saveAuthCookie(
-        { userId: findUser.id, telegramID: findUser.telegramID },
+        {
+          userId: findUser.id,
+          telegramID: findUser.telegramID,
+          isAdmin: findUser.isAdmin,
+        },
         res,
       );
       return;
@@ -131,7 +135,7 @@ export class AuthService {
     );
 
     return this.saveAuthCookie(
-      { userId: user.id, telegramID: user.telegramID },
+      { userId: user.id, telegramID: user.telegramID, isAdmin: user.isAdmin },
       res,
     );
   }
@@ -151,7 +155,11 @@ export class AuthService {
 
     if (findUser) {
       return this.saveAuthCookie(
-        { userId: findUser.id, telegramID: findUser.telegramID },
+        {
+          userId: findUser.id,
+          telegramID: findUser.telegramID,
+          isAdmin: findUser.isAdmin,
+        },
         res,
       );
     }
@@ -166,7 +174,7 @@ export class AuthService {
     );
 
     return this.saveAuthCookie(
-      { userId: user.id, telegramID: user.telegramID },
+      { userId: user.id, telegramID: user.telegramID, isAdmin: user.isAdmin },
       res,
     );
   }

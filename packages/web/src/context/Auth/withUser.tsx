@@ -8,9 +8,9 @@ export type AuthProps = {
   user: RequestUser;
 };
 
-export type AuthComponent<T = any> = React.ComponentType<AuthProps & T>;
+export type AuthComponent<T = unknown> = React.ComponentType<T & AuthProps>;
 
-export function withUser<T = any>(Component: AuthComponent<T>) {
+export function withUser<T = unknown>(Component: AuthComponent<T>) {
   // eslint-disable-next-line react/display-name
   return async (props: T) => {
     const user = await getUserFromRequest();

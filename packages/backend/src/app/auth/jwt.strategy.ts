@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (req.headers[AUTH_USER_TOKEN_HEADER]) {
           return req.headers[AUTH_USER_TOKEN_HEADER] as string;
         }
-        
+
         const cookies: Record<string, string> = req.cookies as Record<
           string,
           string

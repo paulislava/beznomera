@@ -13,4 +13,7 @@ export class User extends UserCore {
 
   @OneToMany(() => Car, (car) => car.owner)
   cars: Car[];
+
+  @Column({ default: false })
+  isAdmin: boolean;
 }
