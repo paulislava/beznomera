@@ -1,0 +1,14 @@
+{
+  "name": "BezNomera",
+  "short_name": "BezNomera",
+  "start_url": "/",
+  "display": "standalone",
+  "description": "Социальная платформа для водителей",
+  "icons": [
+    {
+      "src": "https://cdn.beznomera.net/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
