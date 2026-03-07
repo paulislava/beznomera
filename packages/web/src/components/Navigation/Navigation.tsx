@@ -46,6 +46,7 @@ const QRCode = styled(qrCodeSvg)`
 `;
 
 const StyledMenu = styled(NavbarMenu)`
+  margin-top: env(safe-area-inset-top);
   display: flex;
   flex-flow: column;
   gap: 30px;
