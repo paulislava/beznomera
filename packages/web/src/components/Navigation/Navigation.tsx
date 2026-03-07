@@ -11,7 +11,7 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle
 } from '@heroui/react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PageContainer, pagePaddingTop, Spacer } from '@/ui/Styled';
 import { isTelegramWebApp, transferLinkToTelegram } from '@/utils/telegram';
 import { qrScanner } from '@telegram-apps/sdk-react';
@@ -43,6 +43,23 @@ const QRCode = styled(qrCodeSvg)`
   right: 24px;
   width: 32px;
   height: 32px;
+`;
+
+const StyledMenu = styled(NavbarMenu)`
+  display: flex;
+  flex-flow: column;
+  gap: 30px;
+  padding-top: 30px;
+`;
+
+const StyledItem = styled(NavbarMenuItem)<{ $active?: boolean }>`
+  font-size: 30px;
+
+  ${({ $active }) =>
+    $active &&
+    css`
+      font-weight: 700;
+    `}
 `;
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
@@ -125,18 +142,13 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
             ))}
           </NavbarContent>
 
-          <NavbarMenu>
+          <StyledNavbar>
             {filteredMenuItems.map(item => (
-              <NavbarMenuItem key={item.href}>
-                <Link
-                  href={item.href}
-                  className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
-                >
-                  {item.name}
-                </Link>
-              </NavbarMenuItem>
+              <StyledItem $active={pathname === item.href} key={item.href}>
+                <Link href={item.href}>{item.name}</Link>
+              </StyledItem>
             ))}
-          </NavbarMenu>
+          </StyledNavbar>
         </StyledNavbar>
       )}
 
