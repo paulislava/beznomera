@@ -142,14 +142,14 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
             ))}
           </NavbarContent>
 
-          <StyledNavbar>
+          <StyledMenu>
             {filteredMenuItems.map(item => (
               <StyledItem $active={pathname === item.href} key={item.href}>
                 <Link href={item.href}>{item.name}</Link>
               </StyledItem>
             ))}
           </StyledNavbar>
-        </StyledNavbar>
+        </StyledMenu>
       )}
 
       <PageContainer>{children}</PageContainer>
