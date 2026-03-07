@@ -148,8 +148,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                 <Link href={item.href}>{item.name}</Link>
               </StyledItem>
             ))}
-          </StyledNavbar>
-        </StyledMenu>
+          </StyledMenu>
+        </StyledNavbar>
       )}
 
       <PageContainer>{children}</PageContainer>
