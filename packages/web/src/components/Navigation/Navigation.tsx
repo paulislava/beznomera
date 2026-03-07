@@ -16,7 +16,6 @@ import { PageContainer, pagePaddingTop, Spacer } from '@/ui/Styled';
 import { isTelegramWebApp, transferLinkToTelegram } from '@/utils/telegram';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import qrCodeSvg from '@/assets/images/qrcode.svg';
-import { useToggle } from '@/hooks/booleans';
 import { showErrorMessage } from '@/utils/messages';
 import { PRODUCTION_URL } from '@/constants/site';
 import { themeable } from '@/themes/utils';
@@ -63,12 +62,6 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const filteredMenuItems = menuItems;
 
-  // const handleGoBack = () => {
-  //   router.back();
-  // };
-
-  const handleMenuToggle = useToggle(setIsMenuOpen);
-
   const handleQrCodeScan = useCallback(async () => {
     if (qrScanner.open.isAvailable()) {
       try {
@@ -104,13 +97,15 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
           <TgSpace />
         </>
       ) : (
-        <StyledNavbar isBordered maxWidth='xl' position='sticky' isMenuOpen={isMenuOpen}>
+        <StyledNavbar
+          isBordered
+          maxWidth='xl'
+          position='sticky'
+          onMenuOpenChange={setIsMenuOpen}
+          isMenuOpen={isMenuOpen}
+        >
           <NavbarContent>
-            <NavbarMenuToggle
-              aria-label='Открыть меню'
-              className='sm:hidden'
-              onClick={handleMenuToggle}
-            />
+            <NavbarMenuToggle aria-label='Открыть меню' className='sm:hidden' />
             <Spacer />
             <Button size='sm' targetBlank href={telegramAppLink}>
               Продолжить в Telegram
