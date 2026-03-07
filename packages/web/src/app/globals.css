@@ -25,6 +25,7 @@ body {
 }
 
 body {
+  padding-top: env(safe-area-inset-top);
   color: var(--foreground);
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
@@ -57,7 +58,8 @@ a {
   width: 100%;
 }
 
-textarea, input {
+textarea,
+input {
   border: none;
   overflow: auto;
   outline: none;
@@ -66,9 +68,10 @@ textarea, input {
   -moz-box-shadow: none;
   box-shadow: none;
 
-  resize: none; /*remove the resize handle on the bottom right*/
+  resize: none;
+  /*remove the resize handle on the bottom right*/
 }
 
-form { 
+form {
   width: 100%;
 }
