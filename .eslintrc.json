@@ -51,7 +51,7 @@
   "plugins": ["@typescript-eslint", "prettier", "import"],
   "rules": {
     "curly": "error",
-    "linebreak-style": ["error", "unix"],
+    "linebreak-style": "off",
     "lines-between-class-members": ["error", "always"],
     "sort-keys": "off",
     "sort-imports": "error",
