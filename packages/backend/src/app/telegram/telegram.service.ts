@@ -21,6 +21,34 @@ export class TelegramService implements OnModuleInit {
       return;
     }
     TelegramService.launched = true;
+
+    // Telegraf's startPolling вызывает loop() без await — Promise теряется,
+    // и 409/401 становятся unhandled rejection, роняя процесс.
+    // Патчим startPolling на экземпляре, добавляя .catch() к loop().
+    const bot = this.bot as any;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+    bot.startPolling = function (allowedUpdates: string[] = []) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { Polling } = require('telegraf/lib/core/network/polling');
+      bot.polling = new Polling(bot.telegram, allowedUpdates);
+      bot.polling
+        .loop(async (updates: any) => {
+          await bot.handleUpdates(updates);
+        })
+        .catch((err: any) => {
+          const code = err?.code ?? err?.response?.error_code;
+          if (code === 409) {
+            self.logger.error(
+              'Telegram 409 Conflict: работает другой экземпляр бота. Сервис Telegram отключён.',
+            );
+          } else {
+            self.logger.error('Ошибка polling-цикла Telegram, сервис отключён', err);
+          }
+          self.available = false;
+        });
+    };
+
     try {
       await this.bot.launch();
       this.available = true;
