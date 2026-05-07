@@ -33,5 +33,5 @@ export const extractCode = async (params: Promise<{ code: string }>) => {
     notFound();
   }
 
-  return code;
+  return code.trim();
 };
