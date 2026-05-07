@@ -22,7 +22,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params
 }: PromiseParams<{ code: string }>): Promise<Metadata> {
-  const { code } = await params;
+  const code = await extractCode(params);
 
   // Проверяем что code является валидной строкой
   if (!code || typeof code !== 'string' || code.trim() === '') {
