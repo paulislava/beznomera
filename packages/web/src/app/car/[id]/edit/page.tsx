@@ -10,7 +10,7 @@ const CarEditPage: AuthComponent<PromiseParams<{ id: number }>> = async ({ param
   try {
     const info = await carService.infoForUpdateApi(id);
 
-    const hasMainOwnerRights = info.ownerId === user.userId || !user.isAdmin;
+    const hasMainOwnerRights = info.ownerId === user.userId || user.isAdmin;
 
     const driverInfo = !hasMainOwnerRights
       ? info.drivers?.find(driver => driver.id === user.userId)
