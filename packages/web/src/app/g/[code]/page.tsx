@@ -4,6 +4,8 @@ import { CarInfoPage } from '@/components/CarInfo';
 import { notFound } from 'next/navigation';
 import { extractCode } from '@/utils/params';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({
   params
 }: PromiseParams<{ code: string }>): Promise<Metadata> {
@@ -38,22 +40,6 @@ export async function generateMetadata({
       title: 'Ссылка не действительна',
       description: 'Ссылка на автомобиль не действительна или устарела'
     };
-  }
-}
-
-export async function generateStaticParams() {
-  try {
-    const cars = await carService.list();
-
-    // Фильтруем только те машины у которых есть code
-    return cars
-      .filter(car => car && car.code.trim().length > 0)
-      .map(car => ({
-        code: car.code.trim()
-      }));
-  } catch (error) {
-    console.error('Error in generateStaticParams:', error);
-    return [];
   }
 }
 
