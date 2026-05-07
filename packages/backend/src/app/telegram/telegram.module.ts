@@ -27,6 +27,7 @@ import { User } from '../entities/user/user.entity';
             useFactory: (configService: ConfigService) => ({
               token: configService.telegram.token,
               middlewares: [session()],
+              launchOptions: false,
             }),
           }),
         ]),

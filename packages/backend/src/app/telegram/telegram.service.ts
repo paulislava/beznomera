@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectBot, On } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import { User } from '../entities/user/user.entity';
@@ -8,11 +8,22 @@ import { Buffer } from 'buffer';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 
 @Injectable()
-export class TelegramService {
-  constructor(@InjectBot() private readonly bot: Telegraf) {}
-  // private readonly bot: Telegraf;
+export class TelegramService implements OnModuleInit {
+  private readonly logger = new Logger(TelegramService.name);
+  private available = false;
 
-  // constructor() {}
+  constructor(@InjectBot() private readonly bot: Telegraf) {}
+
+  async onModuleInit() {
+    try {
+      await this.bot.launch();
+      this.available = true;
+      this.logger.log('Telegram bot launched successfully');
+    } catch (error) {
+      this.available = false;
+      this.logger.error('Telegram bot failed to launch, running without Telegram', error);
+    }
+  }
 
   @On('text')
   async handleMessage() {
@@ -24,10 +35,19 @@ export class TelegramService {
     recipient: User,
     replyToMessageId?: number,
   ) {
-    return this.bot.telegram.sendMessage(recipient.telegramID, message, {
-      parse_mode: 'HTML',
-      reply_to_message_id: replyToMessageId,
-    });
+    if (!this.available) {
+      this.logger.warn(`Telegram unavailable, skipping sendMessage to ${recipient.telegramID}`);
+      return null;
+    }
+    try {
+      return await this.bot.telegram.sendMessage(recipient.telegramID, message, {
+        parse_mode: 'HTML',
+        reply_to_message_id: replyToMessageId,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send Telegram message to ${recipient.telegramID}`, error);
+      return null;
+    }
   }
 
   async sendLocation(
@@ -35,12 +55,21 @@ export class TelegramService {
     recipient: User,
     extra?: ExtraLocation,
   ) {
-    return this.bot.telegram.sendLocation(
-      recipient.telegramID,
-      latitude,
-      longitude,
-      extra,
-    );
+    if (!this.available) {
+      this.logger.warn(`Telegram unavailable, skipping sendLocation to ${recipient.telegramID}`);
+      return null;
+    }
+    try {
+      return await this.bot.telegram.sendLocation(
+        recipient.telegramID,
+        latitude,
+        longitude,
+        extra,
+      );
+    } catch (error) {
+      this.logger.error(`Failed to send Telegram location to ${recipient.telegramID}`, error);
+      return null;
+    }
   }
 
   async sendPhoto(
@@ -49,19 +78,28 @@ export class TelegramService {
     filename: string,
     caption?: string,
   ) {
+    if (!this.available) {
+      this.logger.warn(`Telegram unavailable, skipping sendPhoto to ${recipient.telegramID}`);
+      return null;
+    }
     const buffer = Buffer.from(
       base64Image.replace(/^data:image\/\w+;base64,/, ''),
       'base64',
     );
-    return this.bot.telegram.sendDocument(
-      recipient.telegramID,
-      {
-        source: buffer,
-        filename: filename,
-      },
-      {
-        caption,
-      },
-    );
+    try {
+      return await this.bot.telegram.sendDocument(
+        recipient.telegramID,
+        {
+          source: buffer,
+          filename: filename,
+        },
+        {
+          caption,
+        },
+      );
+    } catch (error) {
+      this.logger.error(`Failed to send Telegram photo to ${recipient.telegramID}`, error);
+      return null;
+    }
   }
 }

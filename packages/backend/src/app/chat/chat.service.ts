@@ -84,7 +84,7 @@ export class ChatService {
 
     const tgMessage = await this.telegramService.sendMessage(tgText, car.owner);
 
-    if (coords) {
+    if (tgMessage && coords) {
       await this.telegramService.sendLocation(coords, car.owner, {
         reply_to_message_id: tgMessage.message_id,
       });
@@ -120,7 +120,7 @@ export class ChatService {
           }
         : undefined,
       userId,
-      telegramId: tgMessage.message_id.toString(),
+      telegramId: tgMessage?.message_id.toString() ?? null,
     });
   }
 
@@ -167,7 +167,7 @@ export class ChatService {
           }
         : undefined,
       userId,
-      telegramId: tgMessage.message_id.toString(),
+      telegramId: tgMessage?.message_id.toString() ?? null,
     });
 
     if (newAnonymousId) {
