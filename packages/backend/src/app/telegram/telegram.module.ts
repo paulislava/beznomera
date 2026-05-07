@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Global, Module, forwardRef } from '@nestjs/common';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { session } from 'telegraf';
 
@@ -13,6 +13,7 @@ import { ChatMessage } from '../entities/chat/message.entity';
 import { Car } from '../entities/car/car.entity';
 import { MessageScene } from './scenes/message.scene';
 import { User } from '../entities/user/user.entity';
+@Global()
 @Module({
   imports: [
     ConfigModule,

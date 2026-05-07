@@ -4,8 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Car } from '../entities/car/car.entity';
 import { CarService } from './car.service';
 import { Call } from '../entities/call.entity';
-import { TelegramModule } from '../telegram/telegram.module';
-import { TelegramService } from '../telegram/telegram.service';
 import { AnonymousUser } from '../entities/user/anonymous-user.entity';
 import { User } from '../entities/user/user.entity';
 import { Chat } from '../entities/chat/chat.entity';
@@ -32,13 +30,12 @@ import { UserModule } from '../users/user.module';
       CarDriver,
       CarRating,
     ]),
-    TelegramModule,
     ConfigModule,
     ChatModule,
     UserModule,
   ],
   controllers: [CarController],
-  providers: [CarService, TelegramService],
+  providers: [CarService],
   exports: [CarService],
 })
 export class CarModule {}

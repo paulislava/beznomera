@@ -11,17 +11,10 @@ import { RequestUser } from '@paulislava/shared/user/user.types';
 export class TelegramService implements OnModuleInit {
   private readonly logger = new Logger(TelegramService.name);
   private available = false;
-  private static launched = false;
 
   constructor(@InjectBot() private readonly bot: Telegraf) {}
 
   async onModuleInit() {
-    if (TelegramService.launched) {
-      this.logger.warn('Telegram bot already launched, skipping duplicate onModuleInit');
-      return;
-    }
-    TelegramService.launched = true;
-
     // Telegraf's startPolling вызывает loop() без await — Promise теряется,
     // и 409/401 становятся unhandled rejection, роняя процесс.
     // Патчим startPolling на экземпляре, добавляя .catch() к loop().
@@ -35,7 +28,10 @@ export class TelegramService implements OnModuleInit {
       const path = require('path');
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { Polling } = require(
-        path.join(path.dirname(require.resolve('telegraf')), 'core/network/polling'),
+        path.join(
+          path.dirname(require.resolve('telegraf')),
+          'core/network/polling',
+        ),
       );
       bot.polling = new Polling(bot.telegram, allowedUpdates);
       bot.polling
@@ -49,7 +45,10 @@ export class TelegramService implements OnModuleInit {
               'Telegram 409 Conflict: работает другой экземпляр бота. Сервис Telegram отключён.',
             );
           } else {
-            self.logger.error('Ошибка polling-цикла Telegram, сервис отключён', err);
+            self.logger.error(
+              'Ошибка polling-цикла Telegram, сервис отключён',
+              err,
+            );
           }
           self.available = false;
         });
@@ -60,9 +59,11 @@ export class TelegramService implements OnModuleInit {
       this.available = true;
       this.logger.log('Telegram bot launched successfully');
     } catch (error) {
-      TelegramService.launched = false;
       this.available = false;
-      this.logger.error('Telegram bot failed to launch, running without Telegram', error);
+      this.logger.error(
+        'Telegram bot failed to launch, running without Telegram',
+        error,
+      );
     }
   }
 
@@ -77,16 +78,25 @@ export class TelegramService implements OnModuleInit {
     replyToMessageId?: number,
   ) {
     if (!this.available) {
-      this.logger.warn(`Telegram unavailable, skipping sendMessage to ${recipient.telegramID}`);
+      this.logger.warn(
+        `Telegram unavailable, skipping sendMessage to ${recipient.telegramID}`,
+      );
       return null;
     }
     try {
-      return await this.bot.telegram.sendMessage(recipient.telegramID, message, {
-        parse_mode: 'HTML',
-        reply_to_message_id: replyToMessageId,
-      });
+      return await this.bot.telegram.sendMessage(
+        recipient.telegramID,
+        message,
+        {
+          parse_mode: 'HTML',
+          reply_to_message_id: replyToMessageId,
+        },
+      );
     } catch (error) {
-      this.logger.error(`Failed to send Telegram message to ${recipient.telegramID}`, error);
+      this.logger.error(
+        `Failed to send Telegram message to ${recipient.telegramID}`,
+        error,
+      );
       return null;
     }
   }
@@ -97,7 +107,9 @@ export class TelegramService implements OnModuleInit {
     extra?: ExtraLocation,
   ) {
     if (!this.available) {
-      this.logger.warn(`Telegram unavailable, skipping sendLocation to ${recipient.telegramID}`);
+      this.logger.warn(
+        `Telegram unavailable, skipping sendLocation to ${recipient.telegramID}`,
+      );
       return null;
     }
     try {
@@ -108,7 +120,10 @@ export class TelegramService implements OnModuleInit {
         extra,
       );
     } catch (error) {
-      this.logger.error(`Failed to send Telegram location to ${recipient.telegramID}`, error);
+      this.logger.error(
+        `Failed to send Telegram location to ${recipient.telegramID}`,
+        error,
+      );
       return null;
     }
   }
@@ -120,7 +135,9 @@ export class TelegramService implements OnModuleInit {
     caption?: string,
   ) {
     if (!this.available) {
-      this.logger.warn(`Telegram unavailable, skipping sendPhoto to ${recipient.telegramID}`);
+      this.logger.warn(
+        `Telegram unavailable, skipping sendPhoto to ${recipient.telegramID}`,
+      );
       return null;
     }
     const buffer = Buffer.from(
@@ -139,7 +156,10 @@ export class TelegramService implements OnModuleInit {
         },
       );
     } catch (error) {
-      this.logger.error(`Failed to send Telegram photo to ${recipient.telegramID}`, error);
+      this.logger.error(
+        `Failed to send Telegram photo to ${recipient.telegramID}`,
+        error,
+      );
       return null;
     }
   }
