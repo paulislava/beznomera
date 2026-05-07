@@ -33,5 +33,6 @@ import { User } from '../entities/user/user.entity';
         ]),
   ],
   providers: [Telegraf, MessageScene, TelegramService, TelegramUpdate],
+  exports: [TelegramService],
 })
 export class TelegramModule {}
