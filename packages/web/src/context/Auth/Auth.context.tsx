@@ -18,10 +18,10 @@ function parseUserFromToken(token: string): Maybe<RequestUser> {
 export const AuthContext = createContext<{ user: Maybe<RequestUser> }>({ user: null });
 
 export const AuthProvider: FC<ChildrenProps> = ({ children }) => {
-  const [user] = useState<Maybe<RequestUser>>(() => {
+  const user = useMemo(() => {
     const token = getStoredAuthToken();
     return token ? parseUserFromToken(token) : null;
-  });
+  }, []);
 
   const value = useMemo(() => ({ user }), [user]);
 
