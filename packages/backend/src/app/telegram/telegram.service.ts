@@ -29,8 +29,14 @@ export class TelegramService implements OnModuleInit {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     bot.startPolling = function (allowedUpdates: string[] = []) {
+      // telegraf/lib/core/network/polling не экспортируется в exports-поле package.json,
+      // поэтому используем resolve через основной entrypoint
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { Polling } = require('telegraf/lib/core/network/polling');
+      const path = require('path');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { Polling } = require(
+        path.join(path.dirname(require.resolve('telegraf')), 'core/network/polling'),
+      );
       bot.polling = new Polling(bot.telegram, allowedUpdates);
       bot.polling
         .loop(async (updates: any) => {
