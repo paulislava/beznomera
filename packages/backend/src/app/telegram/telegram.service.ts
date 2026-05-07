@@ -11,15 +11,22 @@ import { RequestUser } from '@paulislava/shared/user/user.types';
 export class TelegramService implements OnModuleInit {
   private readonly logger = new Logger(TelegramService.name);
   private available = false;
+  private static launched = false;
 
   constructor(@InjectBot() private readonly bot: Telegraf) {}
 
   async onModuleInit() {
+    if (TelegramService.launched) {
+      this.logger.warn('Telegram bot already launched, skipping duplicate onModuleInit');
+      return;
+    }
+    TelegramService.launched = true;
     try {
       await this.bot.launch();
       this.available = true;
       this.logger.log('Telegram bot launched successfully');
     } catch (error) {
+      TelegramService.launched = false;
       this.available = false;
       this.logger.error('Telegram bot failed to launch, running without Telegram', error);
     }

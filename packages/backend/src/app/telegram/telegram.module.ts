@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TelegrafModule } from 'nestjs-telegraf';
-import { session, Telegraf } from 'telegraf';
+import { session } from 'telegraf';
 
 import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
@@ -32,7 +32,7 @@ import { User } from '../entities/user/user.entity';
           }),
         ]),
   ],
-  providers: [Telegraf, MessageScene, TelegramService, TelegramUpdate],
+  providers: [MessageScene, TelegramService, TelegramUpdate],
   exports: [TelegramService],
 })
 export class TelegramModule {}
