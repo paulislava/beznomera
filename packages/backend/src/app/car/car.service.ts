@@ -112,6 +112,12 @@ export class CarService {
   }
 
   async getInfo(code: string): Promise<PublicCarInfo> {
+    const car = await this.carRepository.findOne({
+      where: { code },
+      relations: ['owner', 'brand', 'color', 'image', 'carDrivers'],
+    });
+    if (!car) throw new NotFoundException(`Автомобиль с кодом ${code} не найден`);
+
     const {
       id,
       no,
@@ -128,11 +134,8 @@ export class CarService {
       imageRatio: imageRatio,
       rating,
       ratesCount,
-      ...car
-    } = await this.carRepository.findOneOrFail({
-      where: { code },
-      relations: ['owner', 'brand', 'color', 'image', 'carDrivers'],
-    });
+      carDrivers,
+    } = car;
 
     return {
       id,
@@ -152,7 +155,7 @@ export class CarService {
       code,
       ownerId: owner.id,
       tel: owner.tel,
-      driverIds: car.carDrivers.map((e) => e.driverId),
+      driverIds: carDrivers.map((e) => e.driverId),
     };
   }
 
@@ -162,11 +165,12 @@ export class CarService {
     userAgent: Agent,
     ip: string,
   ): Promise<void> {
-    const { id, no, owner, carDrivers } =
-      await this.carRepository.findOneOrFail({
-        where: { code },
-        relations: carMainRelations,
-      });
+    const car = await this.carRepository.findOne({
+      where: { code },
+      relations: carMainRelations,
+    });
+    if (!car) throw new NotFoundException(`Автомобиль с кодом ${code} не найден`);
+    const { id, no, owner, carDrivers } = car;
 
     const lastCall = await this.callRepository.findOne({
       where: { car: { id }, ip },
@@ -197,7 +201,7 @@ export class CarService {
 
         if (coords) {
           await this.telegramService.sendLocation(coords, driver, {
-            reply_to_message_id: message.message_id,
+            ...(message && { reply_to_message_id: message.message_id }),
           });
         }
       }
