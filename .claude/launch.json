@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "all",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up"],
+      "port": 80
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "root", "database", "backend"],
+      "port": 4444
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "root", "database", "backend", "web"],
+      "port": 80
+    },
+    {
+      "name": "database",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "database"],
+      "port": 5440
+    }
+  ]
+}
