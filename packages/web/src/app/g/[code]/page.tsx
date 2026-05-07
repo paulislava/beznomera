@@ -64,7 +64,7 @@ export default async function Page({ params }: PromiseParams<{ code: string }>) 
   }
 
   try {
-    const info = await carService.info(code);
+    const info = await carService.info(code.trim());
 
     return <CarInfoPage info={info} code={code} />;
   } catch {
