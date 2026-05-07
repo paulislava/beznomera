@@ -3,19 +3,19 @@
 import { AUTH_PATHNAME } from '@/helpers/constants';
 import { RequestUser } from '@shared/user/user.types';
 import { redirect } from 'next/navigation';
-import React, { createContext, FC, useContext, useMemo } from 'react';
+import React, { createContext, FC, useContext, useEffect, useMemo, useState } from 'react';
 
 export const AuthContext = createContext<{ user: Maybe<RequestUser> }>({ user: null });
 
-export const AuthProvider: FC<ChildrenProps & { user: Maybe<RequestUser> }> = ({
-  children,
-  user
-}) => {
-  // const [user, setUser] = useState<RequestUser | null>();
+export const AuthProvider: FC<ChildrenProps> = ({ children }) => {
+  const [user, setUser] = useState<Maybe<RequestUser>>(null);
 
-  // useEffect(() => {
-  //   getUserFromRequest().then(setUser);
-  // }, []);
+  useEffect(() => {
+    fetch('/api/auth/user')
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => setUser(data?.user ?? null))
+      .catch(() => setUser(null));
+  }, []);
 
   const value = useMemo(() => ({ user }), [user]);
 

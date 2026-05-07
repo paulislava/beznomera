@@ -4,7 +4,20 @@ import { CarInfoPage } from '@/components/CarInfo';
 import { notFound } from 'next/navigation';
 import { extractCode } from '@/utils/params';
 
-export const dynamic = 'force-dynamic';
+export async function generateStaticParams() {
+  try {
+    const cars = await carService.list();
+
+    return cars
+      .filter(car => car && car.code.trim().length > 0)
+      .map(car => ({
+        code: car.code.trim()
+      }));
+  } catch (error) {
+    console.error('Error in generateStaticParams:', error);
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params
