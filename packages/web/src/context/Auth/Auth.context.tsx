@@ -4,7 +4,7 @@ import { AUTH_PATHNAME } from '@/helpers/constants';
 import { getStoredAuthToken } from '@/utils/auth-storage';
 import { RequestUser } from '@shared/user/user.types';
 import { redirect } from 'next/navigation';
-import React, { createContext, FC, useContext, useMemo, useState } from 'react';
+import React, { createContext, FC, useContext, useMemo } from 'react';
 
 function parseUserFromToken(token: string): Maybe<RequestUser> {
   try {
