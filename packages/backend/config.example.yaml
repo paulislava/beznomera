@@ -40,3 +40,9 @@ s3:
   endpoint: your_endpoint
   bucket: your_bucket_name
   region: your_region
+
+# Generate with: npx web-push generate-vapid-keys
+vapid:
+  subject: mailto:admin@example.com
+  publicKey: YOUR_VAPID_PUBLIC_KEY
+  privateKey: YOUR_VAPID_PRIVATE_KEY

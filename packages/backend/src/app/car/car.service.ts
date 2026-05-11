@@ -52,6 +52,8 @@ import { User } from '../entities/user/user.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
 import { CarRating } from '../entities/car/car-rating.entity';
 import { UserService } from '../users/user.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CarNotificationEvent } from '@paulislava/shared/notification/notification.types';
 
 const carMainRelations = ['owner', 'carDrivers', 'carDrivers.driver'];
 
@@ -78,6 +80,7 @@ export class CarService {
     private readonly configService: ConfigService,
     private readonly chatService: ChatService,
     private readonly userService: UserService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getList(): Promise<CarInfo[]> {
@@ -193,6 +196,15 @@ export class CarService {
 
     await this.callRepository.save({ car: { id }, ip });
 
+    this.eventEmitter.emit('car.call', {
+      type: 'call',
+      carId: id,
+      carCode: car.code,
+      carNo: no,
+      title: 'Вас вызвали',
+      body: `Водителя вызвали к автомобилю ${no}`,
+    } satisfies CarNotificationEvent);
+
     const drivers = [owner, ...carDrivers.map((cd) => cd.driver)];
 
     drivers.forEach(async (driver) => {
@@ -243,6 +255,15 @@ export class CarService {
       res,
       req,
     );
+
+    this.eventEmitter.emit('car.message', {
+      type: 'message',
+      carId: car.id,
+      carCode: car.code,
+      carNo: car.no,
+      title: 'Новое сообщение',
+      body: text.slice(0, 100),
+    } satisfies CarNotificationEvent);
   }
 
   async getFullInfo(id: number, user?: RequestUser): Promise<FullCarInfo> {
@@ -706,6 +727,15 @@ export class CarService {
       rating: averageRating,
       ratesCount,
     });
+
+    this.eventEmitter.emit('car.rating', {
+      type: 'rating',
+      carId,
+      carCode: car.code,
+      carNo: car.no,
+      title: 'Новая оценка',
+      body: `Автомобиль ${car.no} получил оценку ${'★'.repeat(rating)}`,
+    } satisfies CarNotificationEvent);
   }
 
   private async validateCarData(

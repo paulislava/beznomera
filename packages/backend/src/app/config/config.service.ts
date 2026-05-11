@@ -15,6 +15,7 @@ import {
   S3Config,
   SmsConfig,
   TelegramConfig,
+  VapidConfig,
   Version,
   WebdavConfig,
 } from './config.schema';
@@ -54,6 +55,10 @@ export class ConfigService implements ApplicationConfig {
 
   get s3(): S3Config {
     return this.config.s3;
+  }
+
+  get vapid(): VapidConfig {
+    return this.config.vapid;
   }
 
   get version(): Version {
