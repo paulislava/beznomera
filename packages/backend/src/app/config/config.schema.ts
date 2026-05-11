@@ -120,6 +120,20 @@ export class TelegramConfig {
   token: string;
 }
 
+export class VapidConfig {
+  @IsString()
+  @IsDefined()
+  readonly subject: string;
+
+  @IsString()
+  @IsDefined()
+  readonly publicKey: string;
+
+  @IsString()
+  @IsDefined()
+  readonly privateKey: string;
+}
+
 export class S3Config {
   @IsString()
   @IsDefined()
@@ -177,6 +191,11 @@ export class ApplicationConfig {
   @ValidateNested()
   @Type(() => S3Config)
   readonly s3: S3Config;
+
+  @IsDefined()
+  @ValidateNested()
+  @Type(() => VapidConfig)
+  readonly vapid: VapidConfig;
 }
 
 export interface Version {

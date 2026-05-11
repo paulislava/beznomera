@@ -15,6 +15,7 @@ import { FileModule } from './app/file/file.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ChatModule } from './app/chat/chat.module';
 import { AdminModule } from './app/admin/admin.module';
+import { NotificationModule } from './app/notification/notification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AdminModule } from './app/admin/admin.module';
     ChatModule,
     CarModule,
     AdminModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

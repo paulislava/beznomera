@@ -9,6 +9,7 @@ import { ProvidersContainer } from '@/components/ProvidersContainer/ProvidersCon
 import { Navigation } from '@/components/Navigation';
 import { InitWebApp } from '@/components/InitWebApp';
 import { AuthProvider } from '@/context/Auth/Auth.context';
+import { NotificationsInit } from '@/components/NotificationsInit/notifications-init';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -80,6 +81,7 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <ProvidersContainer>
             <AuthProvider>
+              <NotificationsInit />
               <Navigation>{children}</Navigation>
             </AuthProvider>
           </ProvidersContainer>
