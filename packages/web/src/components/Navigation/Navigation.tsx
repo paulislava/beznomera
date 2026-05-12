@@ -155,7 +155,9 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
       )}
 
       {pathname.startsWith('/messages') ? (
-        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>{children}</div>
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {children}
+        </div>
       ) : (
         <PageContainer>{children}</PageContainer>
       )}
