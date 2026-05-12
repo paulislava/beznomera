@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { notificationService } from '@/services';
 
+const PUSH_SESSION_KEY = 'push_notifications_init';
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -14,8 +16,11 @@ export function usePushNotifications() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    if (sessionStorage.getItem(PUSH_SESSION_KEY)) return;
 
     async function init() {
+      sessionStorage.setItem(PUSH_SESSION_KEY, '1');
+
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') return;
 
