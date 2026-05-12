@@ -40,7 +40,12 @@ export function usePushNotifications() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return;
+    if (
+      !('serviceWorker' in navigator) ||
+      !('PushManager' in window) ||
+      !('Notification' in window)
+    )
+      return;
     if (sessionStorage.getItem(PUSH_SESSION_KEY)) return;
 
     if (Notification.permission === 'granted') {
