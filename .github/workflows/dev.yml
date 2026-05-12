@@ -167,12 +167,107 @@ jobs:
             echo "Web failed health check after 10 attempts"
             exit 1
 
+
+            
+  deploy-nginx:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy nginx config
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+          source: nginx/production.conf
+          target: /tmp/beznomera-nginx/
+          strip_components: 1
+
+      - name: Backup nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
+            if [ -f "$NGINX_CONF" ]; then
+              cp "$NGINX_CONF" "$BACKUP_CONF"
+              echo "Резервная копия сохранена: $BACKUP_CONF"
+            fi
+
+      - name: Deploy nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            cp /tmp/beznomera-nginx/production.conf "${NGINX_CONF}.new"
+            mv "${NGINX_CONF}.new" "$NGINX_CONF"
+            echo "✓ Конфиг применён"
+
+      - name: Test nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
+            if nginx -t; then
+              echo "✓ Тест конфига успешен"
+            else
+              echo "✗ ОШИБКА: Тест конфига не прошел!"
+              if [ -f "$BACKUP_CONF" ]; then
+                mv "$BACKUP_CONF" "$NGINX_CONF"
+                echo "Откат к резервной копии выполнен"
+              else
+                rm -f "$NGINX_CONF"
+              fi
+              exit 1
+            fi
+
+      - name: Restart nginx
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
+            if systemctl restart nginx; then
+              echo "✓ Nginx успешно перезапущен"
+              rm -f "$BACKUP_CONF"
+              find "$(dirname "$NGINX_CONF")" -name "bak_nginx.ssl.conf_app.*" -type f -mtime +7 -delete 2>/dev/null || true
+            else
+              echo "✗ ОШИБКА: Не удалось перезапустить nginx!"
+              if [ -f "$BACKUP_CONF" ]; then
+                mv "$BACKUP_CONF" "$NGINX_CONF"
+                systemctl restart nginx || true
+                echo "Откат к резервной копии выполнен, nginx перезапущен"
+              fi
+              exit 1
+            fi
+
   clean:
     runs-on: ubuntu-latest
     environment: dev
     needs:
       - deploy-backend
       - deploy-web
+      - deploy-nginx
     if: always() && github.event_name == 'push'
     steps:
       - name: Clean up server
