@@ -7,13 +7,18 @@ import {
   MainContainer,
   Message,
   MessageInput,
-  MessageList,
+  MessageList
 } from '@chatscope/chat-ui-kit-react';
-import '@chatscope/chat-ui-kit-styles/dist/cjs/styles.min.css';
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import styled from 'styled-components';
 
 import { useChat } from '@/hooks/useChat';
-import { ChatContactBody, ChatDetails, ChatMessageInfo, MessageSource } from '@shared/chat/chat.types';
+import {
+  ChatContactBody,
+  ChatDetails,
+  ChatMessageInfo,
+  MessageSource
+} from '@shared/chat/chat.types';
 import { themeable } from '@/themes/utils';
 import { fileService, chatService } from '@/services';
 import { FileFolder } from '@shared/file/file.types';
@@ -104,18 +109,6 @@ const ContactInput = styled.input`
   min-width: 160px;
 `;
 
-const AttachButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px 8px;
-  color: ${themeable('primaryColor')};
-  font-size: 20px;
-  line-height: 1;
-  opacity: 0.8;
-  &:hover { opacity: 1; }
-`;
-
 const AttachmentImg = styled.img`
   max-width: 200px;
   max-height: 200px;
@@ -136,16 +129,15 @@ const CONTACT_OPTIONS = [
   { value: 'none', label: 'Без ответа' },
   { value: 'bot', label: 'Анонимно через бот' },
   { value: 'tel', label: 'По телефону' },
-  { value: 'email', label: 'На e-mail' },
+  { value: 'email', label: 'На e-mail' }
 ];
 
 export function ChatWindow({
   chatId,
   initialMessages,
-  currentUserId,
   isOwner = false,
   title,
-  initialContact,
+  initialContact
 }: ChatWindowProps) {
   const { messages, connected, sendMessage } = useChat({ chatId, initialMessages });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -161,14 +153,14 @@ export function ChatWindow({
       const body: ChatContactBody = { contactType: type, contactValue: value || undefined };
       await chatService.updateContact(body, chatId).catch(() => {});
     },
-    [chatId],
+    [chatId]
   );
 
   const handleSend = useCallback(
     (text: string) => {
       if (text.trim()) sendMessage(text.trim());
     },
-    [sendMessage],
+    [sendMessage]
   );
 
   const handleAttach = useCallback(async () => {
@@ -199,9 +191,9 @@ export function ChatWindow({
             <span>Способ связи:</span>
             <ContactSelect
               value={contactType}
-              onChange={(e) => handleContactChange(e.target.value, contactValue)}
+              onChange={e => handleContactChange(e.target.value, contactValue)}
             >
-              {CONTACT_OPTIONS.map((o) => (
+              {CONTACT_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
@@ -212,7 +204,7 @@ export function ChatWindow({
                 type={contactType === 'email' ? 'email' : 'tel'}
                 placeholder={contactType === 'email' ? 'your@email.com' : '+7...'}
                 value={contactValue}
-                onChange={(e) => setContactValue(e.target.value)}
+                onChange={e => setContactValue(e.target.value)}
                 onBlur={() => handleContactChange(contactType, contactValue)}
               />
             )}
@@ -228,18 +220,13 @@ export function ChatWindow({
             </ConversationHeader>
           )}
           <MessageList>
-            {messages.map((msg) => {
+            {messages.map(msg => {
               const direction =
-                (msg.source === MessageSource.Sender) !== isOwner
-                  ? 'incoming'
-                  : 'outgoing';
+                (msg.source === MessageSource.Sender) !== isOwner ? 'incoming' : 'outgoing';
 
               if (msg.attachmentUrl) {
                 return (
-                  <Message
-                    key={msg.id}
-                    model={{ direction, position: 'single' }}
-                  >
+                  <Message key={msg.id} model={{ direction, position: 'single' }}>
                     <Message.CustomContent>
                       <AttachmentImg src={msg.attachmentUrl} alt='attachment' />
                       {msg.text && <div>{msg.text}</div>}
@@ -255,7 +242,7 @@ export function ChatWindow({
                     message: msg.text,
                     direction,
                     position: 'single',
-                    sentTime: msg.createdAt,
+                    sentTime: msg.createdAt
                   }}
                 />
               );
@@ -265,24 +252,17 @@ export function ChatWindow({
             placeholder={connected ? 'Сообщение...' : 'Соединение...'}
             onSend={handleSend}
             disabled={!connected || uploading}
-            attachButton={false}
+            attachButton
+            onAttachClick={() => fileInputRef.current?.click()}
             sendButton
-          >
-            <AttachButton
-              as='label'
-              title='Прикрепить изображение'
-              style={{ cursor: 'pointer' }}
-            >
-              📎
-              <input
-                ref={fileInputRef}
-                type='file'
-                accept='image/*'
-                style={{ display: 'none' }}
-                onChange={handleAttach}
-              />
-            </AttachButton>
-          </MessageInput>
+          />
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='image/*'
+            style={{ display: 'none' }}
+            onChange={handleAttach}
+          />
         </ChatContainer>
       </MainContainer>
     </Wrapper>
