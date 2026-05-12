@@ -176,16 +176,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Encode nginx config
+        id: nginx-config
+        run: echo "content=$(base64 -w 0 nginx/production.conf)" >> $GITHUB_OUTPUT
+
       - name: Copy nginx config
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          NGINX_CONTENT: ${{ steps.nginx-config.outputs.content }}
         with:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
-          source: nginx/production.conf
-          target: /tmp/beznomera-nginx/
-          strip_components: 1
+          envs: NGINX_CONTENT
+          script: |
+            mkdir -p /tmp/beznomera-nginx
+            echo "$NGINX_CONTENT" | base64 -d > /tmp/beznomera-nginx/production.conf
 
       - name: Backup nginx config
         uses: appleboy/ssh-action@v1.2.0
@@ -193,7 +199,7 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
@@ -208,7 +214,7 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             cp /tmp/beznomera-nginx/production.conf "${NGINX_CONF}.new"
@@ -221,7 +227,7 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
@@ -244,7 +250,7 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
+
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
