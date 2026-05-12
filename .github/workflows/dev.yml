@@ -89,7 +89,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
           envs: GHCR_TOKEN,GHCR_ACTOR,IMAGE_TAG
           script: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
@@ -108,7 +107,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
           script: |
             for i in $(seq 1 10); do
               STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:4444/ 2>/dev/null || echo "000")
@@ -140,7 +138,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
           envs: GHCR_TOKEN,GHCR_ACTOR,IMAGE_TAG
           script: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
@@ -157,7 +154,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
           script: |
             for i in $(seq 1 10); do
               STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:4000/ 2>/dev/null || echo "000")
@@ -185,7 +181,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          fingerprint: ${{ secrets.SERVER_FINGERPRINT }}
           script: |
             docker image prune -f
             docker container prune -f
