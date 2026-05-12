@@ -52,4 +52,7 @@ export class ChatMessage extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true })
   location?: LocationInfo;
+
+  @Column({ nullable: true })
+  attachmentUrl: string | null;
 }

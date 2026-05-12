@@ -75,7 +75,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const menuItems = [
     { name: 'Мои авто', href: '/', requiresAuth: true },
-    { name: 'Добавить авто', href: '/car/new', requiresAuth: true }
+    { name: 'Добавить авто', href: '/car/new', requiresAuth: true },
+    { name: 'Сообщения', href: '/messages', requiresAuth: true }
   ];
 
   const filteredMenuItems = menuItems;

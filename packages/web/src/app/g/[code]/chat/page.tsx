@@ -2,7 +2,7 @@ import { carService } from '@/services';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { extractCode } from '@/utils/params';
-import { CarMessagePage } from '@/components/CarInfo/CarMessage';
+import { CarChatPage } from '@/components/CarInfo/CarChatPage';
 
 export async function generateStaticParams() {
   try {
@@ -66,7 +66,7 @@ export default async function Page({ params }: PromiseParams<{ code: string }>) 
   try {
     const info = await carService.info(code);
 
-    return <CarMessagePage info={info} code={code} />;
+    return <CarChatPage info={info} code={code} />;
   } catch {
     notFound();
   }
