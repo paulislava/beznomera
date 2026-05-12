@@ -32,9 +32,7 @@ export const CarChatPage: React.FC<CarInfoProps> = ({ info, code }) => {
       .finally(() => setLoading(false));
   }, [code]);
 
-  const title = [info.no, info.brandRaw ?? info.brand?.title, info.model]
-    .filter(Boolean)
-    .join(' ');
+  const title = [info.no, info.brandRaw ?? info.brand?.title, info.model].filter(Boolean).join(' ');
 
   if (loading) return null;
 
@@ -46,7 +44,10 @@ export const CarChatPage: React.FC<CarInfoProps> = ({ info, code }) => {
           chatId={chat.id}
           initialMessages={chat.messages}
           isOwner={false}
-          initialContact={{ contactType: chat.contactType ?? undefined, contactValue: chat.contactValue ?? undefined }}
+          initialContact={{
+            contactType: chat.contactType ?? undefined,
+            contactValue: chat.contactValue ?? undefined
+          }}
         />
       ) : (
         <div style={{ padding: 20 }}>Не удалось загрузить чат</div>

@@ -5,9 +5,9 @@ import {
   Conversation,
   ConversationList,
   MainContainer,
-  Sidebar,
+  Sidebar
 } from '@chatscope/chat-ui-kit-react';
-import '@chatscope/chat-ui-kit-styles/dist/cjs/styles.min.css';
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import styled from 'styled-components';
 
 import { ChatInfo, ChatMessageInfo } from '@shared/chat/chat.types';
@@ -36,7 +36,8 @@ const Wrapper = styled.div`
     background: ${themeable('secondaryBackground')};
     color: ${themeable('textColor')};
 
-    &:hover, &[data-active='true'] {
+    &:hover,
+    &[data-active='true'] {
       background: ${themeable('mainBackgroundColor')};
     }
   }
@@ -80,20 +81,16 @@ function lastMessageText(msg?: ChatMessageInfo): string {
 }
 
 export function ChatList({ initialChats, userId }: ChatListProps) {
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(
-    initialChats[0]?.id ?? null,
-  );
-  const [chatMessages, setChatMessages] = useState<Record<number, ChatMessageInfo[]>>({});
-
-  const selectedChat = initialChats.find((c) => c.id === selectedChatId);
-  const initialMessages = selectedChatId ? (chatMessages[selectedChatId] ?? []) : [];
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(initialChats[0]?.id ?? null);
+  const selectedChat = initialChats.find(c => c.id === selectedChatId);
+  const initialMessages: ChatMessageInfo[] = [];
 
   return (
     <Wrapper>
       <MainContainer style={{ width: '100%' }}>
         <Sidebar position='left' style={{ minWidth: '240px', maxWidth: '300px' }}>
           <ConversationList>
-            {initialChats.map((chat) => (
+            {initialChats.map(chat => (
               <Conversation
                 key={chat.id}
                 name={chat.senderName ?? `Чат #${chat.id}`}

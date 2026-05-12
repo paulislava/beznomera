@@ -24,7 +24,7 @@ export function useChat({ chatId, initialMessages = [] }: UseChatOptions) {
     const socket = io(`${socketUrl}/chat`, {
       path: BACKEND_URL.startsWith('/') ? `${BACKEND_URL}/socket.io` : '/socket.io',
       auth: token ? { token } : undefined,
-      withCredentials: true,
+      withCredentials: true
     });
 
     socketRef.current = socket;
@@ -37,8 +37,8 @@ export function useChat({ chatId, initialMessages = [] }: UseChatOptions) {
     socket.on('disconnect', () => setConnected(false));
 
     socket.on(CHAT_EVENTS.NEW_MESSAGE, (msg: ChatMessageInfo) => {
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === msg.id)) return prev;
+      setMessages(prev => {
+        if (prev.some(m => m.id === msg.id)) return prev;
         return [...prev, msg];
       });
     });
@@ -55,10 +55,10 @@ export function useChat({ chatId, initialMessages = [] }: UseChatOptions) {
       socketRef.current?.emit(CHAT_EVENTS.SEND_MESSAGE, {
         chatId,
         text,
-        attachmentUrl,
+        attachmentUrl
       });
     },
-    [chatId],
+    [chatId]
   );
 
   return { messages, connected, sendMessage };

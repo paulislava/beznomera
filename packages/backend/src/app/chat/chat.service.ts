@@ -52,7 +52,7 @@ export class ChatService {
 
   private mapChatToInfo(chat: Chat, messages: ChatMessage[]): ChatInfo {
     const senderName =
-      chat.sender?.name ??
+      chat.sender?.firstName ??
       chat.anonymousSender?.id?.slice(0, 8) ??
       'Анонимный';
 
@@ -79,7 +79,7 @@ export class ChatService {
 
   private mapChatToDetails(chat: Chat): ChatDetails {
     const senderName =
-      chat.sender?.name ??
+      chat.sender?.firstName ??
       chat.anonymousSender?.id?.slice(0, 8) ??
       'Анонимный';
 
