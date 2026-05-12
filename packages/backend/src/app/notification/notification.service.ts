@@ -53,6 +53,7 @@ export class NotificationService {
   async onCarMessage(event: CarNotificationEvent): Promise<void> {
     await this.sendToCarOwners(event.carId, {
       type: event.type,
+      carId: event.carId,
       carCode: event.carCode,
       title: event.title,
       body: event.body,
@@ -63,6 +64,7 @@ export class NotificationService {
   async onCarRating(event: CarNotificationEvent): Promise<void> {
     await this.sendToCarOwners(event.carId, {
       type: event.type,
+      carId: event.carId,
       carCode: event.carCode,
       title: event.title,
       body: event.body,
@@ -73,6 +75,7 @@ export class NotificationService {
   async onCarCall(event: CarNotificationEvent): Promise<void> {
     await this.sendToCarOwners(event.carId, {
       type: event.type,
+      carId: event.carId,
       carCode: event.carCode,
       title: event.title,
       body: event.body,
