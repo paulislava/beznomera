@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -26,6 +27,12 @@ export class Chat extends BaseEntity {
 
   @OneToMany(() => ChatMessage, (message) => message.chat)
   messages: ChatMessage[];
+
+  @Column({ nullable: true })
+  contactType: string | null;
+
+  @Column({ nullable: true })
+  contactValue: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

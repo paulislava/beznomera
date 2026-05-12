@@ -6,5 +6,6 @@ export type FileInfo = {
 
 export enum FileFolder {
   Cars = 'user-car',
-  Temp = 'temp'
+  Temp = 'temp',
+  Chat = 'chat'
 }
