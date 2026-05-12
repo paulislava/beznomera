@@ -29,7 +29,7 @@ self.addEventListener('notificationclick', function (event) {
       ? `/g/${carCode}/chat`
       : type === 'call' && carId
         ? `/car/${carId}`
-        : '/panel';
+        : '/';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
