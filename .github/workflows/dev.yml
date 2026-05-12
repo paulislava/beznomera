@@ -171,6 +171,7 @@ jobs:
             
   deploy-nginx:
     runs-on: ubuntu-latest
+    environment: dev
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
