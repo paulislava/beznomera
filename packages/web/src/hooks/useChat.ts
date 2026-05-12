@@ -22,7 +22,7 @@ export function useChat({ chatId, initialMessages = [] }: UseChatOptions) {
     const socketUrl = BACKEND_URL.startsWith('/') ? '' : BACKEND_URL;
 
     const socket = io(`${socketUrl}/chat`, {
-      path: BACKEND_URL.startsWith('/') ? `${BACKEND_URL}/socket.io` : '/socket.io',
+      path: '/socket.io',
       auth: token ? { token } : undefined,
       withCredentials: true
     });

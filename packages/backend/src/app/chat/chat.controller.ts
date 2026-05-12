@@ -15,7 +15,10 @@ import { ChatService } from './chat.service';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import { RequestUser } from '@paulislava/shared/user/user.types';
-import CHAT_API, { CHAT_CODE_PARAM, CHAT_ID_PARAM } from '@paulislava/shared/chat/chat.api';
+import CHAT_API, {
+  CHAT_CODE_PARAM,
+  CHAT_ID_PARAM,
+} from '@paulislava/shared/chat/chat.api';
 import {
   ChatContactBody,
   ChatDetails,
@@ -76,7 +79,8 @@ export class ChatController {
     @Req() req: Request,
     @CurrentUser(true) user?: RequestUser,
   ): Promise<ChatDetails> {
-    const anonymousId = req.cookies?.[this.configService.auth.anonymousIdCookie];
+    const anonymousId =
+      req.cookies?.[this.configService.auth.anonymousIdCookie];
     return this.chatService.getChatByCarCode(code, user?.userId, anonymousId);
   }
 
@@ -87,7 +91,12 @@ export class ChatController {
     @Param(CHAT_ID_PARAM, ParseIntPipe) chatId: number,
     @CurrentUser() user: RequestUser,
   ): Promise<ChatMessageInfo> {
-    return this.chatService.sendOwnerMessage(chatId, body.text, body.attachmentUrl, user.userId);
+    return this.chatService.sendOwnerMessage(
+      chatId,
+      body.text,
+      body.attachmentUrl,
+      user.userId,
+    );
   }
 
   @Post(CHAT_API.backendRoutes.updateContact)
@@ -98,7 +107,13 @@ export class ChatController {
     @Req() req: Request,
     @CurrentUser(true) user?: RequestUser,
   ): Promise<void> {
-    const anonymousId = req.cookies?.[this.configService.auth.anonymousIdCookie];
-    return this.chatService.updateContact(chatId, body, user?.userId, anonymousId);
+    const anonymousId =
+      req.cookies?.[this.configService.auth.anonymousIdCookie];
+    return this.chatService.updateContact(
+      chatId,
+      body,
+      user?.userId,
+      anonymousId,
+    );
   }
 }
