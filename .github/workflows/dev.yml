@@ -13,6 +13,7 @@ concurrency:
 jobs:
   build-backend:
     runs-on: ubuntu-latest
+    environment: dev
     permissions:
       contents: read
       packages: write
@@ -42,6 +43,7 @@ jobs:
 
   build-web:
     runs-on: ubuntu-latest
+    environment: dev
     permissions:
       contents: read
       packages: write
@@ -73,6 +75,7 @@ jobs:
 
   deploy-backend:
     runs-on: ubuntu-latest
+    environment: dev
     needs: build-backend
     if: github.event_name == 'push'
     steps:
@@ -121,6 +124,7 @@ jobs:
 
   deploy-web:
     runs-on: ubuntu-latest
+    environment: dev
     needs:
       - build-web
       - deploy-backend
@@ -169,6 +173,7 @@ jobs:
 
   clean:
     runs-on: ubuntu-latest
+    environment: dev
     needs:
       - deploy-backend
       - deploy-web
