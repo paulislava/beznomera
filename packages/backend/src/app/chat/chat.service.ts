@@ -239,19 +239,19 @@ export class ChatService {
     });
   }
 
-  private async getOrCreateAnonymousId(
+  async getOrCreateAnonymousId(
     anonymousId: string | undefined,
     userId: number | undefined,
-    ip: string,
-    userAgent: string,
+    ip?: string,
+    userAgent?: string,
   ): Promise<string | undefined> {
     if (anonymousId || userId) {
       return anonymousId;
     }
 
     const newAnonymousUser = await this.anonymousUserRepository.save({
-      ip,
-      userAgent,
+      ip: ip ?? '',
+      userAgent: userAgent ?? '',
     });
 
     return newAnonymousUser.id;
