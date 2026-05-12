@@ -150,21 +150,19 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
       </SidebarPanel>
 
       <MainArea>
-        {selectedChat ? (
+        {selectedChat && selectedDetails ? (
           <ChatWindow
+            key={selectedId}
             chatId={selectedChat.id}
-            initialMessages={selectedDetails?.messages ?? []}
+            initialMessages={selectedDetails.messages}
             currentUserId={userId}
             isOwner
             title={chatTitle(selectedChat)}
           />
+        ) : loading ? (
+          <EmptyState>Загрузка...</EmptyState>
         ) : (
           <EmptyState>Выберите чат</EmptyState>
-        )}
-        {loading && !selectedDetails && (
-          <EmptyState style={{ position: 'absolute', inset: 0, background: 'transparent' }}>
-            Загрузка...
-          </EmptyState>
         )}
       </MainArea>
     </Layout>

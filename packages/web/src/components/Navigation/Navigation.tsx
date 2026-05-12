@@ -154,7 +154,11 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         </StyledNavbar>
       )}
 
-      <PageContainer>{children}</PageContainer>
+      {pathname.startsWith('/messages') ? (
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>{children}</div>
+      ) : (
+        <PageContainer>{children}</PageContainer>
+      )}
       {isTelegramWebApp && <QRCode onClick={handleQrCodeScan} />}
     </div>
   );
