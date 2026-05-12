@@ -41,7 +41,8 @@ const ChatItem = styled.div<{ $active?: boolean }>`
   transition: background 0.15s;
 
   &:hover {
-    background: ${({ $active }) => ($active ? themeable('primaryColor') : themeable('mainBackgroundColor'))};
+    background: ${({ $active }) =>
+      $active ? themeable('primaryColor') : themeable('mainBackgroundColor')};
   }
 `;
 
@@ -118,33 +119,29 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
       setLoading(true);
       try {
         const details = await chatService.chatDetails(chatId);
-        setDetailsCache((prev) => ({ ...prev, [chatId]: details }));
+        setDetailsCache(prev => ({ ...prev, [chatId]: details }));
       } finally {
         setLoading(false);
       }
     },
-    [detailsCache],
+    [detailsCache]
   );
 
   useEffect(() => {
     if (selectedId != null) loadChat(selectedId);
   }, [selectedId, loadChat]);
 
-  const selectedChat = initialChats.find((c) => c.id === selectedId);
+  const selectedChat = initialChats.find(c => c.id === selectedId);
   const selectedDetails = selectedId != null ? detailsCache[selectedId] : undefined;
 
   return (
     <Layout>
       <SidebarPanel>
         <SidebarHeader>Сообщения</SidebarHeader>
-        {initialChats.map((chat) => {
+        {initialChats.map(chat => {
           const active = chat.id === selectedId;
           return (
-            <ChatItem
-              key={chat.id}
-              $active={active}
-              onClick={() => setSelectedId(chat.id)}
-            >
+            <ChatItem key={chat.id} $active={active} onClick={() => setSelectedId(chat.id)}>
               <ChatItemName $active={active}>{chat.senderName ?? `Чат #${chat.id}`}</ChatItemName>
               <ChatItemPreview $active={active}>{previewText(chat)}</ChatItemPreview>
             </ChatItem>
