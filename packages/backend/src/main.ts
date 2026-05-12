@@ -17,6 +17,7 @@ import {
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 import { AppModule } from './app.module';
 import { ASSETS_FILE_PATH, ASSETS_URI_PATH } from './constants';
@@ -53,6 +54,8 @@ async function bootstrap() {
     console.info(`Global route prefix: ${routePrefix}`);
     app.setGlobalPrefix(routePrefix);
   }
+
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   app.useGlobalPipes(new ValidationPipe());
 
