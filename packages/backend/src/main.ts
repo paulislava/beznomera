@@ -18,6 +18,16 @@ import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import type { ServerOptions } from 'socket.io';
+
+class CorsIoAdapter extends IoAdapter {
+  createIOServer(port: number, options?: ServerOptions) {
+    return super.createIOServer(port, {
+      ...options,
+      cors: { origin: true, credentials: true },
+    });
+  }
+}
 
 import { AppModule } from './app.module';
 import { ASSETS_FILE_PATH, ASSETS_URI_PATH } from './constants';
@@ -55,7 +65,7 @@ async function bootstrap() {
     app.setGlobalPrefix(routePrefix);
   }
 
-  app.useWebSocketAdapter(new IoAdapter(app));
+  app.useWebSocketAdapter(new CorsIoAdapter(app));
 
   app.useGlobalPipes(new ValidationPipe());
 

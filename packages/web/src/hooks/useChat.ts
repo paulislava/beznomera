@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { CHAT_EVENTS, ChatMessageInfo } from '@shared/chat/chat.types';
 import { getStoredAuthToken } from '@/utils/auth-storage';
-import { BACKEND_URL } from '@/utils/api-service';
+
+const socketPath = process.env.NEXT_PUBLIC_SOCKET_PATH;
 
 interface UseChatOptions {
   chatId: number;
@@ -19,9 +20,9 @@ export function useChat({ chatId, initialMessages = [] }: UseChatOptions) {
   useEffect(() => {
     const token = getStoredAuthToken();
 
-    const socketUrl = BACKEND_URL.startsWith('/') ? '' : BACKEND_URL;
+    const socketUrl = socketPath?.startsWith('/') ? '' : socketPath;
 
-    const socket = io(`${socketUrl}/chat`, {
+    const socket = io(`${socketUrl ?? ''}/chat`, {
       path: '/socket.io',
       auth: token ? { token } : undefined,
       withCredentials: true

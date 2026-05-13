@@ -19,19 +19,15 @@ import { User } from '../entities/user/user.entity';
     ConfigModule,
     forwardRef(() => ChatModule),
     TypeOrmModule.forFeature([ChatMessage, Car, User]),
-    ...(process.env.DISABLE_TELEGRAM === '1'
-      ? []
-      : [
-          TelegrafModule.forRootAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (configService: ConfigService) => ({
-              token: configService.telegram.token,
-              middlewares: [session()],
-              launchOptions: false,
-            }),
-          }),
-        ]),
+    TelegrafModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        token: configService.telegram.token,
+        middlewares: [session()],
+        launchOptions: false,
+      }),
+    }),
   ],
   providers: [MessageScene, TelegramService, TelegramUpdate],
   exports: [TelegramService],

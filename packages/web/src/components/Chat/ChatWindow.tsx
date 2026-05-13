@@ -2,6 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { Select as HeroSelect, SelectItem } from '@heroui/react';
+import { Input as HeroInput } from '@heroui/input';
 
 import { useChat } from '@/hooks/useChat';
 import {
@@ -17,7 +19,8 @@ import { FileFolder } from '@shared/file/file.types';
 // ─── Layout ──────────────────────────────────────────────────────────────────
 
 const Wrapper = styled.div`
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: ${themeable('mainBackgroundColor')};
@@ -115,38 +118,12 @@ const AttachImg = styled.img`
 const ContactPanel = styled.div`
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  padding: 8px 14px;
+  padding: 10px 14px;
   background: ${themeable('secondaryBackground')};
   border-bottom: 1px solid rgba(128, 128, 128, 0.12);
-  font-size: 13px;
-  color: ${themeable('textColor')};
   flex-shrink: 0;
-`;
-
-const ContactSelect = styled.select`
-  background: ${themeable('mainBackgroundColor')};
-  color: ${themeable('textColor')};
-  border: 1px solid rgba(128, 128, 128, 0.3);
-  border-radius: 8px;
-  padding: 4px 8px;
-  font-size: 13px;
-  cursor: pointer;
-`;
-
-const ContactInput = styled.input`
-  background: ${themeable('mainBackgroundColor')};
-  color: ${themeable('textColor')};
-  border: 1px solid rgba(128, 128, 128, 0.3);
-  border-radius: 8px;
-  padding: 4px 10px;
-  font-size: 13px;
-  flex: 1;
-  min-width: 140px;
-  &::placeholder {
-    opacity: 0.45;
-  }
 `;
 
 // ─── Input area ───────────────────────────────────────────────────────────────
@@ -331,26 +308,35 @@ export function ChatWindow({
         </Header>
       )}
 
-      {!isOwner && (
+      {!isOwner && messages.length === 0 && (
         <ContactPanel>
-          <span style={{ opacity: 0.65 }}>Способ связи:</span>
-          <ContactSelect
-            value={contactType}
-            onChange={e => handleContactChange(e.target.value, contactValue)}
+          <HeroSelect
+            label='Способ связи'
+            size='sm'
+            variant='faded'
+            selectedKeys={[contactType]}
+            onSelectionChange={keys => {
+              if (keys === 'all') return;
+              const selected = Array.from(keys)[0] as string;
+              handleContactChange(selected, contactValue);
+            }}
+            style={{ minWidth: 180 }}
           >
             {CONTACT_OPTIONS.map(o => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
+              <SelectItem key={o.value}>{o.label}</SelectItem>
             ))}
-          </ContactSelect>
+          </HeroSelect>
           {needsValue && (
-            <ContactInput
+            <HeroInput
               type={contactType === 'email' ? 'email' : 'tel'}
+              label={contactType === 'email' ? 'E-mail для ответа' : 'Телефон для ответа'}
               placeholder={contactType === 'email' ? 'your@email.com' : '+7...'}
               value={contactValue}
-              onChange={e => setContactValue(e.target.value)}
+              onValueChange={setContactValue}
               onBlur={() => handleContactChange(contactType, contactValue)}
+              size='sm'
+              variant='faded'
+              style={{ minWidth: 200 }}
             />
           )}
         </ContactPanel>

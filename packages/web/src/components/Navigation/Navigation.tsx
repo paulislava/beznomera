@@ -154,7 +154,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         </StyledNavbar>
       )}
 
-      {pathname.startsWith('/messages') ? (
+      {pathname.startsWith('/messages') || /^\/g\/[^/]+\/chat/.test(pathname) ? (
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>

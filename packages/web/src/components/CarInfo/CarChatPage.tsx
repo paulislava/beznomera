@@ -6,18 +6,37 @@ import { ChatDetails } from '@shared/chat/chat.types';
 import { chatService } from '@/services';
 import { ChatWindow } from '@/components/Chat/ChatWindow';
 import { CarInfoProps } from './CarInfo.types';
+import { themeable } from '@/themes/utils';
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 64px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 `;
 
-const Header = styled.div`
-  padding: 12px 16px;
-  font-weight: 600;
-  font-size: 15px;
-  border-bottom: 1px solid var(--cs-message-input-border-color, #e0e0e0);
+const ChatHeader = styled.div`
+  padding: 10px 16px;
+  background: ${themeable('secondaryBackground')};
+  border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+const CarPlate = styled.div`
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: ${themeable('textColor')};
+`;
+
+const CarMeta = styled.div`
+  font-size: 13px;
+  color: ${themeable('textColor')};
+  opacity: 0.55;
 `;
 
 export const CarChatPage: React.FC<CarInfoProps> = ({ info, code }) => {
@@ -32,13 +51,16 @@ export const CarChatPage: React.FC<CarInfoProps> = ({ info, code }) => {
       .finally(() => setLoading(false));
   }, [code]);
 
-  const title = [info.no, info.brandRaw ?? info.brand?.title, info.model].filter(Boolean).join(' ');
+  const brand = [info.brandRaw ?? info.brand?.title, info.model].filter(Boolean).join(' ');
 
   if (loading) return null;
 
   return (
     <Wrapper>
-      <Header>{title}</Header>
+      <ChatHeader>
+        <CarPlate>{info.no}</CarPlate>
+        {brand && <CarMeta>{brand}</CarMeta>}
+      </ChatHeader>
       {chat ? (
         <ChatWindow
           chatId={chat.id}

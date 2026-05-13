@@ -14,7 +14,8 @@ const SIDEBAR_MAX = 520;
 const MOBILE_BP = 640;
 
 const Layout = styled.div`
-  height: calc(100vh - 64px);
+  flex: 1;
+  min-height: 0;
   display: flex;
   overflow: hidden;
   position: relative;
@@ -45,17 +46,12 @@ const SidebarPanel = styled.div<{ $open: boolean; $width: number }>`
 `;
 
 const SidebarInner = styled.div`
-  width: ${SIDEBAR_DEFAULT}px;
+  width: 100%;
   min-width: ${SIDEBAR_MIN}px;
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
-  @media (max-width: ${MOBILE_BP - 1}px) {
-    width: min(85vw, 320px);
-    min-width: unset;
-  }
 `;
 
 const SidebarHeader = styled.div`
@@ -202,7 +198,7 @@ function formatContact(contactType?: string | null, contactValue?: string | null
   if (contactType === 'tel' && contactValue) return `Тел: ${contactValue}`;
   if (contactType === 'email' && contactValue) return `E-mail: ${contactValue}`;
   if (contactType === 'bot') return 'Через бот';
-  return 'Анонимно';
+  return '';
 }
 
 function previewText(chat: ChatInfo): string {
