@@ -23,6 +23,7 @@ export interface CarNotificationEvent {
 
 export interface PushPayload {
   type: CarNotificationType;
+  carId: number;
   carCode: string;
   title: string;
   body: string;
