@@ -75,7 +75,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const menuItems = [
     { name: 'Мои авто', href: '/', requiresAuth: true },
-    { name: 'Добавить авто', href: '/car/new', requiresAuth: true }
+    { name: 'Добавить авто', href: '/car/new', requiresAuth: true },
+    { name: 'Сообщения', href: '/messages', requiresAuth: true }
   ];
 
   const filteredMenuItems = menuItems;
@@ -153,7 +154,13 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         </StyledNavbar>
       )}
 
-      <PageContainer>{children}</PageContainer>
+      {pathname.startsWith('/messages') ? (
+        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {children}
+        </div>
+      ) : (
+        <PageContainer>{children}</PageContainer>
+      )}
       {isTelegramWebApp && <QRCode onClick={handleQrCodeScan} />}
     </div>
   );

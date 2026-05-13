@@ -4,67 +4,295 @@ on:
   push:
     branches:
       - master
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy after build'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
-# Добавляем конфигурацию concurrency
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build-backend:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Build backend Docker image
-        run: |
-          echo "Building backend Docker image..."
-          docker build --target backend --rm -t beznomera:backend https://github.com/paulislava/beznomera.git
-          docker stop beznomera_backend || true
-          docker rm -f beznomera_backend || true
+      - uses: actions/checkout@v4
 
-          docker run --name beznomera_backend -d -it --network host --env-file /home/user/web/beznomera.net/web.env -v /home/user/web/beznomera.net/config-backend.yaml:/config.yaml -v /home/user/web/beznomera.net/ip-location-data:/app/node_modules/ip-location-api/data beznomera:backend
-          docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_backend) || true
+      - uses: docker/setup-buildx-action@v3
 
-  # build-frontend:
-  #   runs-on: self-hosted
-  #   steps:
-  #     - name: Build frontend Docker image
-  #       run: |
-  #         echo "Building frontend Docker image..."
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #         # Собираем образ с переменными окружения
-  #         docker build --rm -f frontend.Dockerfile -t beznomera:frontend https://github.com/paulislava/beznomera.git
-          
-  #         docker stop beznomera_frontend || true
-  #         docker rm -f beznomera_frontend || true
-
-  #         docker run --name beznomera_frontend -it -d -p 3001:80 -v /home/user/web/beznomera.net/frontend.env:/.env beznomera:frontend
-  #         docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_frontend) || true
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          target: backend
+          push: true
+          tags: |
+            ghcr.io/paulislava/beznomera:backend-${{ github.sha }}
+            ghcr.io/paulislava/beznomera:backend-latest
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
 
   build-web:
-    runs-on: self-hosted
-    needs:
-      - build-backend
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Build web Docker image
-        run: |
-          echo "Building web Docker image..."
-          docker build --target web --rm -f web.Dockerfile -t beznomera:web --build-arg BACKEND_API_TOKEN=${{ secrets.BACKEND_API_TOKEN }} https://github.com/paulislava/beznomera.git
-          docker stop beznomera_web || true
-          docker rm -f beznomera_web || true
+      - uses: actions/checkout@v4
 
-          docker run --name beznomera_web -d -it -p 4000:3000 --env-file /home/user/web/beznomera.net/web.env beznomera:web
-          docker rmi $(docker images --filter "dangling=true" -q --no-trunc beznomera_web) || true
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: web.Dockerfile
+          target: web
+          push: true
+          tags: |
+            ghcr.io/paulislava/beznomera:web-${{ github.sha }}
+            ghcr.io/paulislava/beznomera:web-latest
+          build-args: |
+            BACKEND_API_TOKEN=${{ secrets.BACKEND_API_TOKEN }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: build-backend
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true')
+    steps:
+      - name: Deploy backend
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
+          IMAGE_TAG: ${{ github.sha }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: GHCR_TOKEN,GHCR_ACTOR,IMAGE_TAG
+          script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+            docker pull ghcr.io/paulislava/beznomera:backend-$IMAGE_TAG
+            docker stop beznomera_backend || true
+            docker rm -f beznomera_backend || true
+            docker run --name beznomera_backend -d --network host \
+              --env-file /home/user/web/beznomera.net/web.env \
+              -v /home/user/web/beznomera.net/config-backend.yaml:/config.yaml \
+              -v /home/user/web/beznomera.net/ip-location-data:/app/node_modules/ip-location-api/data \
+              ghcr.io/paulislava/beznomera:backend-$IMAGE_TAG
+
+      - name: Health check backend
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            for i in $(seq 1 10); do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:4444/ 2>/dev/null || echo "000")
+              if [ "$STATUS" != "000" ]; then
+                echo "Backend healthy (HTTP $STATUS) on attempt $i"
+                exit 0
+              fi
+              echo "Attempt $i/10: backend not ready, waiting 30s..."
+              sleep 30
+            done
+            echo "Backend failed health check after 10 attempts"
+            exit 1
+
+  deploy-web:
+    runs-on: ubuntu-latest
+    environment: dev
+    needs:
+      - build-web
+      - deploy-backend
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true')
+    steps:
+      - name: Deploy web
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
+          IMAGE_TAG: ${{ github.sha }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: GHCR_TOKEN,GHCR_ACTOR,IMAGE_TAG
+          script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+            docker pull ghcr.io/paulislava/beznomera:web-$IMAGE_TAG
+            docker stop beznomera_web || true
+            docker rm -f beznomera_web || true
+            docker run --name beznomera_web -d -p 4000:3000 \
+              --env-file /home/user/web/beznomera.net/web.env \
+              ghcr.io/paulislava/beznomera:web-$IMAGE_TAG
+
+      - name: Health check web
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            for i in $(seq 1 10); do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:4000/ 2>/dev/null || echo "000")
+              if [ "$STATUS" != "000" ]; then
+                echo "Web healthy (HTTP $STATUS) on attempt $i"
+                exit 0
+              fi
+              echo "Attempt $i/10: web not ready, waiting 30s..."
+              sleep 30
+            done
+            echo "Web failed health check after 10 attempts"
+            exit 1
+
+
+            
+  deploy-nginx:
+    runs-on: ubuntu-latest
+    environment: dev
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Encode nginx config
+        id: nginx-config
+        run: echo "content=$(base64 -w 0 nginx/production.conf)" >> $GITHUB_OUTPUT
+
+      - name: Copy nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          NGINX_CONTENT: ${{ steps.nginx-config.outputs.content }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: NGINX_CONTENT
+          script: |
+            mkdir -p /tmp/beznomera-nginx
+            echo "$NGINX_CONTENT" | base64 -d > /tmp/beznomera-nginx/production.conf
+
+      - name: Backup nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
+            if [ -f "$NGINX_CONF" ]; then
+              cp "$NGINX_CONF" "$BACKUP_CONF"
+              echo "Резервная копия сохранена: $BACKUP_CONF"
+            fi
+
+      - name: Deploy nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            cp /tmp/beznomera-nginx/production.conf "${NGINX_CONF}.new"
+            mv "${NGINX_CONF}.new" "$NGINX_CONF"
+            echo "✓ Конфиг применён"
+
+      - name: Test nginx config
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
+            if nginx -t; then
+              echo "✓ Тест конфига успешен"
+            else
+              echo "✗ ОШИБКА: Тест конфига не прошел!"
+              if [ -f "$BACKUP_CONF" ]; then
+                mv "$BACKUP_CONF" "$NGINX_CONF"
+                echo "Откат к резервной копии выполнен"
+              else
+                rm -f "$NGINX_CONF"
+              fi
+              exit 1
+            fi
+
+      - name: Restart nginx
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+
+          script: |
+            NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
+            BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
+            if systemctl restart nginx; then
+              echo "✓ Nginx успешно перезапущен"
+              rm -f "$BACKUP_CONF"
+              find "$(dirname "$NGINX_CONF")" -name "bak_nginx.ssl.conf_app.*" -type f -mtime +7 -delete 2>/dev/null || true
+            else
+              echo "✗ ОШИБКА: Не удалось перезапустить nginx!"
+              if [ -f "$BACKUP_CONF" ]; then
+                mv "$BACKUP_CONF" "$NGINX_CONF"
+                systemctl restart nginx || true
+                echo "Откат к резервной копии выполнен, nginx перезапущен"
+              fi
+              exit 1
+            fi
 
   clean:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    environment: dev
     needs:
-      # - build-frontend
-      - build-backend
-      - build-web
-    if: always()
+      - deploy-backend
+      - deploy-web
+      - deploy-nginx
+    if: always() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true'))
     steps:
-      - name: Clean unused containers and volumes
-        run: |
-          echo "Deleting unused containers, volumes..."
-          docker system prune -f
-
+      - name: Clean up server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker image prune -f
+            docker container prune -f
