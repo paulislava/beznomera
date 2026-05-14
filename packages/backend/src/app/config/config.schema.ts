@@ -6,6 +6,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   ValidateNested,
@@ -156,6 +157,64 @@ export class S3Config {
   readonly region: string;
 }
 
+export class OAuthProviderConfig {
+  @IsString()
+  @IsDefined()
+  readonly clientId: string;
+
+  @IsString()
+  @IsDefined()
+  readonly clientSecret: string;
+}
+
+export class AppleOAuthConfig {
+  @IsString()
+  @IsDefined()
+  readonly clientId: string;
+
+  @IsString()
+  @IsDefined()
+  readonly teamId: string;
+
+  @IsString()
+  @IsDefined()
+  readonly keyId: string;
+
+  @IsString()
+  @IsDefined()
+  readonly privateKey: string;
+}
+
+export class OAuthConfig {
+  @IsString()
+  @IsDefined()
+  readonly frontendUrl: string;
+
+  @IsString()
+  @IsDefined()
+  readonly backendUrl: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OAuthProviderConfig)
+  readonly google?: OAuthProviderConfig;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OAuthProviderConfig)
+  readonly yandex?: OAuthProviderConfig;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OAuthProviderConfig)
+  readonly vk?: OAuthProviderConfig;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => AppleOAuthConfig)
+  readonly apple?: AppleOAuthConfig;
+}
+
 export class ApplicationConfig {
   @IsDefined()
   @ValidateNested()
@@ -196,6 +255,11 @@ export class ApplicationConfig {
   @ValidateNested()
   @Type(() => VapidConfig)
   readonly vapid: VapidConfig;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OAuthConfig)
+  readonly oauth?: OAuthConfig;
 }
 
 export interface Version {

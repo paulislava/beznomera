@@ -1,5 +1,50 @@
 # Features
 
+## OAuth авторизация + профиль пользователя
+
+**Провайдеры:** Google, Yandex, VK, Apple + Email OTP (для новых пользователей)
+
+**Shared:**
+- `packages/shared/src/auth/auth.types.ts` — `OAuthProvider` enum, `LinkedAccount` interface, `allowRegistration` в `AuthStartData`
+- `packages/shared/src/auth/auth.api.ts` — `getLinkedAccounts`, `unlinkProvider` роуты
+- `packages/shared/src/user/user.types.ts` — `UserProfile` дополнен `email`, `linkedAccounts`, `avatarUrl`; `UserProfileUpdate`
+- `packages/shared/src/user/user.api.ts` — `me`, `getProfile(id)`, `updateMe`, `deleteAvatar` роуты
+
+**Backend entities:**
+- `packages/backend/src/app/entities/user/user-oauth.entity.ts` — связь пользователя с OAuth провайдером; уникальный индекс `[provider, providerUserId]`
+- `packages/backend/src/app/entities/user/user-core.entity.ts` — добавлено поле `avatarUrl`
+
+**Backend config:**
+- `packages/backend/src/app/config/config.schema.ts` — `OAuthProviderConfig`, `AppleOAuthConfig`, `OAuthConfig`; секция `oauth?` в `ApplicationConfig` (опциональна)
+- `packages/backend/config.example.yaml` — пример секции `oauth:`
+
+**Backend auth (OAuth стратегии + контроллер):**
+- `packages/backend/src/app/auth/strategies/google.strategy.ts`
+- `packages/backend/src/app/auth/strategies/yandex.strategy.ts`
+- `packages/backend/src/app/auth/strategies/vk.strategy.ts`
+- `packages/backend/src/app/auth/strategies/apple.strategy.ts`
+- `packages/backend/src/app/auth/auth.service.ts` — `authOAuth`, `unlinkOAuth`, `getLinkedAccounts`; `authStart` с `allowRegistration`
+- `packages/backend/src/app/auth/auth.controller.ts` — `GET /auth/{provider}`, `GET /auth/{provider}/callback`, `GET /auth/linked`, `DELETE /auth/linked/:provider`
+- `packages/backend/src/app/auth/auth.module.ts` — `PassportModule`, стратегии, `UserOAuth` entity
+
+**Backend user profile:**
+- `packages/backend/src/app/users/user.service.ts` — `getProfile`, `updateProfile`, `uploadAvatar` (S3), `deleteAvatar`
+- `packages/backend/src/app/users/user.controller.ts` — `GET /user/me`, `GET /user/profile/:id`, `PATCH /user/me`, `POST /user/me/avatar`, `DELETE /user/me/avatar`
+
+**Frontend:**
+- `packages/web/src/app/auth/page.tsx` — добавлены Email OTP форма + social кнопки (Google, Яндекс, VK, Apple)
+- `packages/web/src/app/profile/page.tsx` — server component: `withUser` + `createApi(token)` + `api.user.getProfile(user.userId)`
+- `packages/web/src/app/profile/ProfileClient.tsx` — client component: аватар, форма личных данных, контакты, список привязанных аккаунтов
+
+**Key behaviors:**
+- OAuth callback детектирует режим linking по JWT cookie: если пользователь уже залогинен — привязывает провайдер к аккаунту, иначе логинит/регистрирует
+- `authStart` с `allowRegistration: true` создаёт `UserDraft` для нового пользователя
+- Apple требует `clientId` (Service ID), `teamId`, `keyId`, `privateKey` (.p8 контент)
+- Аватары хранятся в S3; если S3 не настроен — метод выбрасывает ошибку
+- Серверная страница профиля загружает данные через `/user/profile/:id` (ID в URL для кэширования)
+
+
+
 ## Telegram-style Chat UX
 
 **Files:**

@@ -98,6 +98,37 @@ const CAR_API = apiInfo({ getInfo: (id) => `${id}` }, 'car');
 - Роуты в `packages/web/src/app/` — стандартная структура App Router
 - API-запросы к backend проксируются через Next.js: `BACKEND_URL` + `ROUTE_PREFIX` из env
 
+#### Серверный рендеринг и загрузка данных
+
+Всегда предпочитать серверные запросы данных. Паттерн для защищённых страниц:
+
+```tsx
+// page.tsx (server component)
+import { AuthComponent, withUser } from '@/context/Auth/withUser';
+import { createApi } from '@/services';
+import { AUTH_COOKIE_NAME } from '@/helpers/constants';
+import { cookies } from 'next/headers';
+
+const MyPage: AuthComponent = async ({ user }) => {
+  const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
+  const api = createApi(token);
+  const data = await api.user.getProfile(user.userId); // ID в URL, не /me
+  return <MyClientComponent initialData={data} />;
+};
+
+export default withUser(MyPage);
+```
+
+- `withUser(Page)` — защищает страницу, редиректит на `/auth` если нет сессии
+- `createApi(token)` — передаёт токен в серверные запросы
+- URL с ID (например `/user/profile/:id`) вместо `/me` — для корректного кэширования Next.js
+
+#### Формы и поля ввода
+
+- Всегда использовать `<Form>` из `@/ui/FormContainer/FormContainer` + `<FormField>` из `@/ui/FormField/FormField`
+- Не использовать нативный `<input>` или `<select>` напрямую
+- Для выпадающих списков — `Select` из `@heroui/react` (не нативный `<select>`)
+
 ### shared — типы и APIRoutes
 
 - `src/api-routes.ts` — утилита `apiInfo()`, тип `APIRoutes<T>`

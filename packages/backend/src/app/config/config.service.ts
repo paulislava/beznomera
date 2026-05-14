@@ -12,6 +12,7 @@ import {
   AuthConfig,
   DatabaseConfig,
   MailConfig,
+  OAuthConfig,
   S3Config,
   SmsConfig,
   TelegramConfig,
@@ -59,6 +60,10 @@ export class ConfigService implements ApplicationConfig {
 
   get vapid(): VapidConfig {
     return this.config.vapid;
+  }
+
+  get oauth(): OAuthConfig | undefined {
+    return this.config.oauth;
   }
 
   get version(): Version {

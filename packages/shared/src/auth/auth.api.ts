@@ -4,7 +4,9 @@ import {
   AuthCheckData,
   AuthStartData,
   AuthTelegramData,
-  AuthTelegramWebAppData
+  AuthTelegramWebAppData,
+  LinkedAccount,
+  OAuthProvider
 } from './auth.types';
 
 export interface AuthApi {
@@ -13,6 +15,8 @@ export interface AuthApi {
   authTelegram(data: AuthTelegramData, ...args: any): Promise<string>;
   authTelegramWebApp(data: AuthTelegramWebAppData, ...args: any): Promise<string>;
   checkAuthorized(...args: any): Promise<void>;
+  getLinkedAccounts(...args: any): Promise<LinkedAccount[]>;
+  unlinkProvider(provider: OAuthProvider, ...args: any): Promise<void>;
 }
 
 const AUTH_ROUTES: APIRoutes<AuthApi> = {
@@ -20,7 +24,12 @@ const AUTH_ROUTES: APIRoutes<AuthApi> = {
   authFinish: 'finish',
   authTelegram: { method: 'POST', path: 'telegram' },
   authTelegramWebApp: { method: 'POST', path: 'telegram-web-app' },
-  checkAuthorized: 'check'
+  checkAuthorized: 'check',
+  getLinkedAccounts: { method: 'GET', path: 'linked' },
+  unlinkProvider: {
+    method: 'DELETE',
+    path: (provider) => `linked/${provider || ':provider'}`
+  }
 };
 
 const AUTH_API = apiInfo(AUTH_ROUTES, 'auth');
