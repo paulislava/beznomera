@@ -77,15 +77,20 @@ const MsgList = styled.div`
   scroll-behavior: smooth;
 `;
 
-const MsgRow = styled.div<{ $out: boolean }>`
+const MsgRow = styled.div<{ $out: boolean; $selected?: boolean }>`
   display: flex;
   justify-content: ${({ $out }) => ($out ? 'flex-end' : 'flex-start')};
   align-items: flex-end;
   gap: 2px;
   position: relative;
+  border-radius: 6px;
+  margin: 0 -8px;
+  padding: 1px 8px;
+  background: ${({ $selected }) => ($selected ? 'rgba(43, 130, 229, 0.13)' : 'transparent')};
+  transition: background 0.1s;
 `;
 
-const Bubble = styled.div<{ $out: boolean; $deleted?: boolean }>`
+const Bubble = styled.div<{ $out: boolean; $deleted?: boolean; $selectionMode?: boolean }>`
   max-width: 75%;
   padding: 8px 12px 6px;
   border-radius: ${({ $out }) => ($out ? '18px 18px 4px 18px' : '18px 18px 18px 4px')};
@@ -99,7 +104,7 @@ const Bubble = styled.div<{ $out: boolean; $deleted?: boolean }>`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
   position: relative;
   opacity: ${({ $deleted }) => ($deleted ? 0.5 : 1)};
-  cursor: default;
+  cursor: ${({ $selectionMode }) => ($selectionMode ? 'pointer' : 'default')};
   user-select: none;
   -webkit-user-select: none;
 `;
@@ -156,6 +161,64 @@ const ContextMenuItem = styled.button<{ $danger?: boolean }>`
 
   & + & {
     border-top: 1px solid rgba(128, 128, 128, 0.12);
+  }
+`;
+
+// ─── Selection bar ────────────────────────────────────────────────────────────
+
+const SelectionBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: ${themeable('secondaryBackground')};
+  border-top: 1px solid rgba(128, 128, 128, 0.12);
+  flex-shrink: 0;
+`;
+
+const SelectionCount = styled.span`
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${themeable('textColor')};
+`;
+
+const SelectionActionBtn = styled.button<{ $danger?: boolean }>`
+  background: none;
+  border: 1px solid ${({ $danger }) => ($danger ? '#e53e3e' : themeable('primaryColor'))};
+  border-radius: 16px;
+  padding: 5px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: ${({ $danger }) => ($danger ? '#e53e3e' : themeable('primaryColor'))};
+  transition: background 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${({ $danger }) =>
+      $danger ? 'rgba(229,62,62,0.08)' : 'rgba(43,130,229,0.08)'};
+  }
+`;
+
+const SelectionCancelBtn = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  color: ${themeable('textColor')};
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+    background: ${themeable('mainBackgroundColor')};
   }
 `;
 
@@ -313,7 +376,9 @@ export function ChatWindow({
     sendTyping,
     partnerTyping,
     deleteMessageForAll,
-    deleteMessageForMe
+    deleteMessageForMe,
+    deleteMessagesForAll,
+    deleteMessagesForMe
   } = useChat({ chatId, initialMessages, isOwner });
   const listRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -325,8 +390,21 @@ export function ChatWindow({
   const [contactType, setContactType] = useState(initialContact?.contactType ?? 'none');
   const [contactValue, setContactValue] = useState(initialContact?.contactValue ?? '');
   const [menuState, setMenuState] = useState<MenuState | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const selectionMode = selectedIds.size > 0;
 
   const closeMenu = useCallback(() => setMenuState(null), []);
+
+  const exitSelection = useCallback(() => setSelectedIds(new Set()), []);
+
+  const toggleSelect = useCallback((msgId: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(msgId)) next.delete(msgId);
+      else next.add(msgId);
+      return next;
+    });
+  }, []);
 
   // Track whether user is at the bottom of the scroll
   const handleScroll = useCallback(() => {
@@ -367,26 +445,36 @@ export function ChatWindow({
     };
   }, []);
 
-  // Right-click opens menu
+  // Right-click: in selection mode toggles selection, otherwise opens context menu
   const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
     if (!msgId) return;
+    if (selectionMode) {
+      toggleSelect(msgId);
+      return;
+    }
     const x = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80);
     setMenuState({ id: msgId, x, y: e.clientY });
-  }, []);
+  }, [selectionMode, toggleSelect]);
 
-  // Long press opens menu on touch
+  // Click in selection mode toggles selection
+  const handleBubbleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!selectionMode) return;
+    const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
+    if (!msgId) return;
+    toggleSelect(msgId);
+  }, [selectionMode, toggleSelect]);
+
+  // Long press enters selection mode
   const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
     const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
     if (!msgId) return;
-    const t = e.touches[0];
-    const x = Math.min(Math.max(t.clientX, 80), window.innerWidth - 80);
-    const y = t.clientY;
+    if (selectionMode) return;
     longPressTimerRef.current = setTimeout(() => {
-      setMenuState({ id: msgId, x, y });
+      toggleSelect(msgId);
     }, 500);
-  }, []);
+  }, [selectionMode, toggleSelect]);
 
   const handleTouchEnd = useCallback(() => {
     if (longPressTimerRef.current) {
@@ -456,6 +544,16 @@ export function ChatWindow({
     }
   }, [sendMessage]);
 
+  const handleDeleteSelectedForMe = useCallback(() => {
+    deleteMessagesForMe([...selectedIds]);
+    exitSelection();
+  }, [deleteMessagesForMe, selectedIds, exitSelection]);
+
+  const handleDeleteSelectedForAll = useCallback(() => {
+    deleteMessagesForAll([...selectedIds]);
+    exitSelection();
+  }, [deleteMessagesForAll, selectedIds, exitSelection]);
+
   const menuMsg = menuState ? messages.find(m => m.id === menuState.id) : null;
   const needsValue = contactType === 'tel' || contactType === 'email';
 
@@ -519,11 +617,13 @@ export function ChatWindow({
           const out = (msg.source === MessageSource.Sender) !== isOwner;
 
           return (
-            <MsgRow key={msg.id} $out={out}>
+            <MsgRow key={msg.id} $out={out} $selected={selectedIds.has(msg.id)}>
               <Bubble
                 $out={out}
                 $deleted={msg.isDeleted}
+                $selectionMode={selectionMode}
                 data-msgid={msg.id}
+                onClick={handleBubbleClick}
                 onContextMenu={handleContextMenu}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
@@ -571,39 +671,54 @@ export function ChatWindow({
         </ContextMenu>
       )}
 
-      <InputArea>
-        <RoundBtn
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          title='Прикрепить изображение'
-        >
-          📎
-        </RoundBtn>
-        <input
-          ref={fileInputRef}
-          type='file'
-          accept='image/*'
-          style={{ display: 'none' }}
-          onChange={handleAttach}
-        />
-        <TextInput
-          ref={textRef}
-          rows={1}
-          placeholder={connected ? 'Сообщение...' : 'Соединение...'}
-          value={text}
-          onChange={handleTextChange}
-          onKeyDown={handleKeyDown}
-          disabled={!connected}
-        />
-        <SendBtn
-          $active={!!text.trim() && connected}
-          onClick={handleSend}
-          disabled={!text.trim() || !connected}
-          title='Отправить'
-        >
-          ➤
-        </SendBtn>
-      </InputArea>
+      {selectionMode ? (
+        <SelectionBar>
+          <SelectionCancelBtn onClick={exitSelection} title='Отменить выделение'>
+            ✕
+          </SelectionCancelBtn>
+          <SelectionCount>{selectedIds.size} выбрано</SelectionCount>
+          <SelectionActionBtn onClick={handleDeleteSelectedForMe}>
+            Удалить у меня
+          </SelectionActionBtn>
+          <SelectionActionBtn $danger onClick={handleDeleteSelectedForAll}>
+            Удалить у всех
+          </SelectionActionBtn>
+        </SelectionBar>
+      ) : (
+        <InputArea>
+          <RoundBtn
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            title='Прикрепить изображение'
+          >
+            📎
+          </RoundBtn>
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='image/*'
+            style={{ display: 'none' }}
+            onChange={handleAttach}
+          />
+          <TextInput
+            ref={textRef}
+            rows={1}
+            placeholder={connected ? 'Сообщение...' : 'Соединение...'}
+            value={text}
+            onChange={handleTextChange}
+            onKeyDown={handleKeyDown}
+            disabled={!connected}
+          />
+          <SendBtn
+            $active={!!text.trim() && connected}
+            onClick={handleSend}
+            disabled={!text.trim() || !connected}
+            title='Отправить'
+          >
+            ➤
+          </SendBtn>
+        </InputArea>
+      )}
     </Wrapper>
   );
 }
