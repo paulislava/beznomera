@@ -29,7 +29,11 @@ function SocialButton({
 }) {
   return (
     <a href={href} className='w-full'>
-      <Button variant='bordered' className='w-full text-white border-white/30' startContent={icon}>
+      <Button
+        variant='bordered'
+        className='w-full border-default-200 text-default-700 hover:border-default-400'
+        startContent={icon}
+      >
         {label}
       </Button>
     </a>
@@ -77,7 +81,7 @@ function VkIcon() {
 
 function AppleIcon() {
   return (
-    <svg width='18' height='18' viewBox='0 0 24 24' fill='white'>
+    <svg width='18' height='18' viewBox='0 0 24 24' fill='currentColor'>
       <path d='M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z' />
     </svg>
   );
@@ -127,8 +131,8 @@ function EmailOtpForm({ onSuccess }: { onSuccess: () => void }) {
   if (step === 'code') {
     return (
       <div className='space-y-3'>
-        <p className='text-white/70 text-sm text-center'>
-          Код отправлен на <span className='text-white font-medium'>{email}</span>
+        <p className='text-default-500 text-sm text-center'>
+          Код отправлен на <span className='text-default-900 font-medium'>{email}</span>
         </p>
         <Form onSubmit={handleCodeSubmit}>
           <FormField name='code' type='text' label='Код подтверждения' required />
@@ -137,7 +141,7 @@ function EmailOtpForm({ onSuccess }: { onSuccess: () => void }) {
           </Button>
         </Form>
         <button
-          className='text-white/50 text-xs underline w-full text-center'
+          className='text-default-400 text-xs underline w-full text-center'
           onClick={() => setStep('email')}
         >
           Изменить email
@@ -206,14 +210,14 @@ function AuthPageContent() {
   const backendBase = BACKEND_URL.replace(/\/api$/, '');
 
   return (
-    <div className='max-w-md w-full mx-4'>
-      <div className='bg-white/10 backdrop-blur-lg rounded-lg p-8 shadow-xl border border-white/20'>
+    <div className='max-w-sm w-full mx-4'>
+      <div className='bg-white rounded-2xl p-8 shadow-sm border border-default-100'>
         <div className='text-center mb-8'>
-          <h1 className='text-3xl font-bold text-white mb-2'>BEZNOMERA</h1>
-          <p className='text-white/80'>Войдите в систему</p>
+          <h1 className='text-2xl font-bold text-default-900 mb-1'>Beznomera</h1>
+          <p className='text-default-400 text-sm'>Войдите в аккаунт</p>
         </div>
 
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           {TELEGRAM_BOT_NAME && (
             <TelegramLoginButtonWrapper botName={TELEGRAM_BOT_NAME} dataOnauth={onTelegramAuth} />
           )}
@@ -233,10 +237,10 @@ function AuthPageContent() {
             <SocialButton href={`${backendBase}/auth/apple`} icon={<AppleIcon />} label='Apple' />
           </div>
 
-          <div className='flex items-center gap-3'>
-            <Divider className='flex-1 bg-white/20' />
-            <span className='text-white/50 text-xs'>или по email</span>
-            <Divider className='flex-1 bg-white/20' />
+          <div className='flex items-center gap-3 py-1'>
+            <Divider className='flex-1' />
+            <span className='text-default-400 text-xs'>или по email</span>
+            <Divider className='flex-1' />
           </div>
 
           <EmailOtpForm onSuccess={onSuccess} />

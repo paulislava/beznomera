@@ -230,7 +230,7 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
     '?';
 
   return (
-    <div className='max-w-2xl mx-auto px-4 py-8 space-y-8'>
+    <div style={{ width: '100%' }} className='mx-auto px-4 py-8 space-y-8'>
       {linkedStatus === 'ok' && linkedProvider && (
         <Chip color='success' variant='flat'>
           Аккаунт {PROVIDER_LABELS[linkedProvider as OAuthProvider] ?? linkedProvider} успешно
