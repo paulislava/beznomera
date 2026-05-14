@@ -89,25 +89,33 @@ jobs:
     needs: build-backend
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.deploy == 'true')
     steps:
+      - name: Encode backend config
+        id: config
+        env:
+          BACKEND_CONFIG: ${{ vars.BACKEND_CONFIG }}
+        run: echo "b64=$(printf '%s' "$BACKEND_CONFIG" | base64 -w 0)" >> $GITHUB_OUTPUT
+
       - name: Deploy backend
         uses: appleboy/ssh-action@v1.2.0
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHCR_ACTOR: ${{ github.actor }}
           IMAGE_TAG: ${{ github.sha }}
+          CONFIG_B64: ${{ steps.config.outputs.b64 }}
         with:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: GHCR_TOKEN,GHCR_ACTOR,IMAGE_TAG
+          envs: GHCR_TOKEN,GHCR_ACTOR,IMAGE_TAG,CONFIG_B64
           script: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
             docker pull ghcr.io/paulislava/beznomera:backend-$IMAGE_TAG
             docker stop beznomera_backend || true
             docker rm -f beznomera_backend || true
+            echo "$CONFIG_B64" | base64 -d > /tmp/config-backend.yaml
             docker run --name beznomera_backend -d --network host \
               --env-file /home/user/web/beznomera.net/web.env \
-              -v /home/user/web/beznomera.net/config-backend.yaml:/config.yaml \
+              -v /tmp/config-backend.yaml:/config.yaml \
               -v /home/user/web/beznomera.net/ip-location-data:/app/node_modules/ip-location-api/data \
               ghcr.io/paulislava/beznomera:backend-$IMAGE_TAG
 
