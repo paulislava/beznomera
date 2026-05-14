@@ -31,7 +31,7 @@ function SocialButton({
     <a href={href} className='w-full'>
       <Button
         variant='bordered'
-        className='w-full border-default-200 text-default-700 hover:border-default-400'
+        className='w-full border-default-200 text-default-700 hover:border-default-400 dark:border-white/30 dark:text-white'
         startContent={icon}
       >
         {label}
@@ -131,8 +131,9 @@ function EmailOtpForm({ onSuccess }: { onSuccess: () => void }) {
   if (step === 'code') {
     return (
       <div className='space-y-3'>
-        <p className='text-default-500 text-sm text-center'>
-          Код отправлен на <span className='text-default-900 font-medium'>{email}</span>
+        <p className='text-default-500 dark:text-white/70 text-sm text-center'>
+          Код отправлен на{' '}
+          <span className='text-default-900 dark:text-white font-medium'>{email}</span>
         </p>
         <Form onSubmit={handleCodeSubmit}>
           <FormField name='code' type='text' label='Код подтверждения' required />
@@ -211,10 +212,10 @@ function AuthPageContent() {
 
   return (
     <div className='max-w-sm w-full mx-4'>
-      <div className='bg-white rounded-2xl p-8 shadow-sm border border-default-100'>
+      <div className='bg-white dark:bg-white/10 dark:backdrop-blur-lg rounded-2xl p-8 shadow-sm border border-default-100 dark:border-white/20'>
         <div className='text-center mb-8'>
-          <h1 className='text-2xl font-bold text-default-900 mb-1'>Beznomera</h1>
-          <p className='text-default-400 text-sm'>Войдите в аккаунт</p>
+          <h1 className='text-2xl font-bold text-default-900 dark:text-white mb-1'>Beznomera</h1>
+          <p className='text-default-400 dark:text-white/70 text-sm'>Войдите в аккаунт</p>
         </div>
 
         <div className='space-y-3'>
@@ -239,7 +240,7 @@ function AuthPageContent() {
 
           <div className='flex items-center gap-3 py-1'>
             <Divider className='flex-1' />
-            <span className='text-default-400 text-xs'>или по email</span>
+            <span className='text-default-400 dark:text-white/50 text-xs'>или по email</span>
             <Divider className='flex-1' />
           </div>
 
