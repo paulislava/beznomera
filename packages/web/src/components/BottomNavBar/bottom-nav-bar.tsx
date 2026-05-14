@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import styled from 'styled-components';
+import { forThemeValue } from '@/themes/utils';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import { showErrorMessage } from '@/utils/messages';
 import { PRODUCTION_URL } from '@/constants/site';
@@ -18,12 +19,12 @@ const Pill = styled.nav`
   align-items: center;
   padding: 10px 8px;
   padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-  background: rgba(255, 255, 255, 0.07);
+  background: ${forThemeValue('rgba(255,255,255,0.88)', 'rgba(255,255,255,0.07)')};
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid ${forThemeValue('rgba(0,0,0,0.08)', 'rgba(255,255,255,0.12)')};
   border-radius: 40px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: ${forThemeValue('0 8px 32px rgba(0,0,0,0.1)', '0 8px 40px rgba(0,0,0,0.5)')};
 
   @media (min-width: 1024px) {
     display: none;
@@ -42,10 +43,12 @@ const itemBase = `
   cursor: pointer;
 `;
 
+const inactiveColor = forThemeValue('rgba(0,0,0,0.35)', 'rgba(255,255,255,0.35)');
+
 const ItemLink = styled(Link)<{ $active: boolean }>`
   ${itemBase}
   svg {
-    stroke: ${({ $active }) => ($active ? '#6C8EFF' : 'rgba(255,255,255,0.35)')};
+    stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
     filter: ${({ $active }) =>
       $active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none'};
     transition: stroke 0.2s, filter 0.2s;
@@ -55,7 +58,7 @@ const ItemLink = styled(Link)<{ $active: boolean }>`
 const ItemButton = styled.button<{ $active: boolean }>`
   ${itemBase}
   svg {
-    stroke: ${({ $active }) => ($active ? '#6C8EFF' : 'rgba(255,255,255,0.35)')};
+    stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
     filter: ${({ $active }) =>
       $active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none'};
     transition: stroke 0.2s, filter 0.2s;
@@ -65,7 +68,7 @@ const ItemButton = styled.button<{ $active: boolean }>`
 const Label = styled.span<{ $active: boolean }>`
   font-size: 10px;
   letter-spacing: 0.3px;
-  color: ${({ $active }) => ($active ? '#6C8EFF' : 'rgba(255,255,255,0.35)')};
+  color: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
   font-weight: ${({ $active }) => ($active ? 700 : 400)};
   transition: color 0.2s;
 `;
