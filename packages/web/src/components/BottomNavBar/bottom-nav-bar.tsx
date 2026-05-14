@@ -50,7 +50,9 @@ const ItemLink = styled(Link)<{ $active: boolean }>`
   svg {
     stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
     filter: ${({ $active }) => ($active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none')};
-    transition: stroke 0.2s, filter 0.2s;
+    transition:
+      stroke 0.2s,
+      filter 0.2s;
   }
 `;
 
@@ -59,7 +61,9 @@ const ItemButton = styled.button<{ $active: boolean }>`
   svg {
     stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
     filter: ${({ $active }) => ($active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none')};
-    transition: stroke 0.2s, filter 0.2s;
+    transition:
+      stroke 0.2s,
+      filter 0.2s;
   }
 `;
 
