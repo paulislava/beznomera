@@ -55,12 +55,19 @@ export class ChatService {
     };
   }
 
-  private mapChatToInfo(chat: Chat, messages: ChatMessage[]): ChatInfo {
-    const senderName =
-      chat.sender?.firstName ??
-      (chat.anonymousNumber != null
-        ? `Аноним #${chat.anonymousNumber}`
-        : chat.anonymousSender?.id?.slice(0, 8) ?? 'Анонимный');
+  private mapChatToInfo(
+    chat: Chat,
+    messages: ChatMessage[],
+    viewerUserId?: number,
+  ): ChatInfo {
+    const isSender = viewerUserId != null && chat.sender?.id === viewerUserId;
+
+    const senderName = isSender
+      ? chat.reciever?.firstName ?? chat.reciever?.nickname ?? 'Получатель'
+      : chat.sender?.firstName ??
+        (chat.anonymousNumber != null
+          ? `Аноним #${chat.anonymousNumber}`
+          : chat.anonymousSender?.id?.slice(0, 8) ?? 'Анонимный');
 
     const lastMsg = messages[0];
     const lastMessage = lastMsg
@@ -137,7 +144,7 @@ export class ChatService {
         const sorted = (chat.messages ?? []).sort(
           (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
         );
-        return this.mapChatToInfo(chat, sorted);
+        return this.mapChatToInfo(chat, sorted, userId);
       })
       .sort((a, b) => {
         const aTime = new Date(a.lastMessageAt ?? a.createdAt).getTime();
@@ -526,7 +533,9 @@ export class ChatService {
     userAgentString?: string,
     coords?: { latitude: number; longitude: number },
   ) {
-    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''}\nОтветьте на это сообщение, чтобы отправить ответ отправителю.\n\n#чат${chatId}`;
+    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${
+      userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''
+    }\nОтветьте на это сообщение, чтобы отправить ответ отправителю.\n\n#чат${chatId}`;
 
     const tgMessage = await this.telegramService.sendMessage(tgText, car.owner);
 
