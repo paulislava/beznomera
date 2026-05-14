@@ -188,7 +188,7 @@ jobs:
                 docker logs beznomera_web --tail=100 2>&1 || true
                 exit 1
               fi
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:4000/ 2>/dev/null || echo "000")
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:4000/health 2>/dev/null || echo "000")
               if [ "$STATUS" = "200" ]; then
                 echo "Web healthy on attempt $i"
                 exit 0
