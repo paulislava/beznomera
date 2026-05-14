@@ -49,9 +49,10 @@ const ItemLink = styled(Link)<{ $active: boolean }>`
   ${itemBase}
   svg {
     stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
-    filter: ${({ $active }) =>
-      $active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none'};
-    transition: stroke 0.2s, filter 0.2s;
+    filter: ${({ $active }) => ($active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none')};
+    transition:
+      stroke 0.2s,
+      filter 0.2s;
   }
 `;
 
@@ -59,9 +60,10 @@ const ItemButton = styled.button<{ $active: boolean }>`
   ${itemBase}
   svg {
     stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
-    filter: ${({ $active }) =>
-      $active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none'};
-    transition: stroke 0.2s, filter 0.2s;
+    filter: ${({ $active }) => ($active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none')};
+    transition:
+      stroke 0.2s,
+      filter 0.2s;
   }
 `;
 
@@ -158,14 +160,14 @@ export const BottomNavBar: React.FC = () => {
         console.error('Error opening QR scanner:', error);
       }
     } else {
-      showErrorMessage('QR-сканнер недоступен', 'QR-сканнер доступен только в приложении Telegram.');
+      showErrorMessage(
+        'QR-сканнер недоступен',
+        'QR-сканнер доступен только в приложении Telegram.'
+      );
     }
   }, [router]);
 
-  if (
-    HIDDEN_ROUTES.includes(pathname) ||
-    HIDDEN_PREFIXES.some(p => pathname.startsWith(p))
-  ) {
+  if (HIDDEN_ROUTES.includes(pathname) || HIDDEN_PREFIXES.some(p => pathname.startsWith(p))) {
     return null;
   }
 
