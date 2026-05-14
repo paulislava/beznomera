@@ -6,6 +6,12 @@ export class ChatAnonymousNumberAndUnread1748000000000
   name = 'ChatAnonymousNumberAndUnread1748000000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "chat" ADD IF NOT EXISTS "reciever_read_at" TIMESTAMP`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "chat" ADD IF NOT EXISTS "anonymous_number" integer`,
+    );
     await queryRunner.query(`
       WITH ranked AS (
         SELECT id, "reciever_id",
