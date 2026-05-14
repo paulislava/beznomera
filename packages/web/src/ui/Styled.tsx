@@ -29,7 +29,7 @@ export const PageContainer = styled(CenterContainer).attrs({
   width: 100%;
 
   @media (max-width: 1023px) {
-    padding-bottom: 90px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
 `;
 

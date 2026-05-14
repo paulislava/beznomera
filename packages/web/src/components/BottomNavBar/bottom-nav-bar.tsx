@@ -11,14 +11,13 @@ import { PRODUCTION_URL } from '@/constants/site';
 
 const Pill = styled.nav`
   position: fixed;
-  bottom: 24px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 100;
   display: flex;
   align-items: center;
   padding: 10px 8px;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   background: ${forThemeValue('rgba(255,255,255,0.88)', 'rgba(255,255,255,0.07)')};
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
