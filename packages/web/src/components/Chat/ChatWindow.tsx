@@ -195,8 +195,7 @@ const SelectionActionBtn = styled.button<{ $danger?: boolean }>`
   white-space: nowrap;
 
   &:hover {
-    background: ${({ $danger }) =>
-      $danger ? 'rgba(229,62,62,0.08)' : 'rgba(43,130,229,0.08)'};
+    background: ${({ $danger }) => ($danger ? 'rgba(229,62,62,0.08)' : 'rgba(43,130,229,0.08)')};
   }
 `;
 
@@ -213,7 +212,9 @@ const SelectionCancelBtn = styled.button`
   align-items: center;
   justify-content: center;
   opacity: 0.6;
-  transition: opacity 0.15s, background 0.15s;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
   flex-shrink: 0;
 
   &:hover {
@@ -446,35 +447,44 @@ export function ChatWindow({
   }, []);
 
   // Right-click: in selection mode toggles selection, otherwise opens context menu
-  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
-    if (!msgId) return;
-    if (selectionMode) {
-      toggleSelect(msgId);
-      return;
-    }
-    const x = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80);
-    setMenuState({ id: msgId, x, y: e.clientY });
-  }, [selectionMode, toggleSelect]);
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
+      if (!msgId) return;
+      if (selectionMode) {
+        toggleSelect(msgId);
+        return;
+      }
+      const x = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80);
+      setMenuState({ id: msgId, x, y: e.clientY });
+    },
+    [selectionMode, toggleSelect]
+  );
 
   // Click in selection mode toggles selection
-  const handleBubbleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!selectionMode) return;
-    const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
-    if (!msgId) return;
-    toggleSelect(msgId);
-  }, [selectionMode, toggleSelect]);
+  const handleBubbleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!selectionMode) return;
+      const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
+      if (!msgId) return;
+      toggleSelect(msgId);
+    },
+    [selectionMode, toggleSelect]
+  );
 
   // Long press enters selection mode
-  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
-    if (!msgId) return;
-    if (selectionMode) return;
-    longPressTimerRef.current = setTimeout(() => {
-      toggleSelect(msgId);
-    }, 500);
-  }, [selectionMode, toggleSelect]);
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
+      if (!msgId) return;
+      if (selectionMode) return;
+      longPressTimerRef.current = setTimeout(() => {
+        toggleSelect(msgId);
+      }, 500);
+    },
+    [selectionMode, toggleSelect]
+  );
 
   const handleTouchEnd = useCallback(() => {
     if (longPressTimerRef.current) {
