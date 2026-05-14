@@ -40,7 +40,9 @@ const SidebarPanel = styled.div<{ $open: boolean; $width: number }>`
     z-index: 10;
     width: ${({ $open }) => ($open ? 'min(85vw, 320px)' : '0')} !important;
     box-shadow: ${({ $open }) => ($open ? '4px 0 20px rgba(0,0,0,0.22)' : 'none')};
-    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s ease;
+    transition:
+      width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.28s ease;
   }
 `;
 
