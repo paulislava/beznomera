@@ -122,8 +122,14 @@ export class ChatService {
 
   async getMyChats(userId: number): Promise<ChatInfo[]> {
     const chats = await this.chatRepository.find({
-      where: { reciever: { id: userId } },
-      relations: ['sender', 'anonymousSender', 'messages', 'messages.car'],
+      where: [{ reciever: { id: userId } }, { sender: { id: userId } }],
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
     });
 
     return chats
