@@ -108,6 +108,19 @@ export function useChat({ chatId, initialMessages = [], isOwner = false }: UseCh
     setMessages(prev => prev.filter(m => m.id !== messageId));
   }, []);
 
+  const deleteMessagesForAll = useCallback(
+    (messageIds: number[]) => {
+      messageIds.forEach(messageId => {
+        socketRef.current?.emit(CHAT_EVENTS.DELETE_MESSAGE, { messageId, chatId });
+      });
+    },
+    [chatId]
+  );
+
+  const deleteMessagesForMe = useCallback((messageIds: number[]) => {
+    setMessages(prev => prev.filter(m => !messageIds.includes(m.id)));
+  }, []);
+
   const deleteChat = useCallback(() => {
     if (!isOwner) return;
     socketRef.current?.emit(CHAT_EVENTS.DELETE_CHAT, { chatId });
@@ -121,6 +134,8 @@ export function useChat({ chatId, initialMessages = [], isOwner = false }: UseCh
     partnerTyping,
     deleteMessageForAll,
     deleteMessageForMe,
+    deleteMessagesForAll,
+    deleteMessagesForMe,
     deleteChat
   };
 }
