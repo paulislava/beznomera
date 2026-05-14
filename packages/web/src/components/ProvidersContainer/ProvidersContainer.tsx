@@ -12,7 +12,11 @@ const Container = styled(HeroUIProvider)`
   }
 
   & [data-placement='bottom-center'] {
-    bottom: 24px;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+
+    @media (min-width: 1024px) {
+      bottom: 24px;
+    }
   }
 `;
 
