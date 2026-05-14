@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chatscope/chat-ui-kit-react": "^2.0.3",
+    "@chatscope/chat-ui-kit-styles": "^1.4.0",
     "@heroui/react": "2.8.1",
     "@telegram-apps/sdk-react": "^3.3.6",
     "@types/jsonwebtoken": "9.0.10",
     "canvg": "4.0.3",
     "final-form": "^4.20.10",
     "framer-motion": "12.23.6",
+    "html5-qrcode": "2.3.8",
     "jsonwebtoken": "9.0.2",
     "next": "15.3.6",
     "react": "19.1.2",
@@ -23,11 +26,9 @@
     "react-imask": "^7.6.1",
     "react-qrcode-logo": "4.0.0",
     "react-textarea-autosize": "^8.5.9",
-    "styled-components": "^6.1.18",
-    "telegram-login-button": "^0.1.0",
     "socket.io-client": "^4.8.1",
-    "@chatscope/chat-ui-kit-react": "^2.0.3",
-    "@chatscope/chat-ui-kit-styles": "^1.4.0"
+    "styled-components": "^6.1.18",
+    "telegram-login-button": "^0.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

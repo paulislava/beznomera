@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import styled from 'styled-components';
@@ -8,6 +8,7 @@ import { forThemeValue } from '@/themes/utils';
 import { qrScanner } from '@telegram-apps/sdk-react';
 import { showErrorMessage } from '@/utils/messages';
 import { PRODUCTION_URL } from '@/constants/site';
+import { BrowserQrScanner } from '@/components/BrowserQrScanner/BrowserQrScanner';
 
 const Pill = styled.nav`
   position: fixed;
@@ -49,9 +50,7 @@ const ItemLink = styled(Link)<{ $active: boolean }>`
   svg {
     stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
     filter: ${({ $active }) => ($active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none')};
-    transition:
-      stroke 0.2s,
-      filter 0.2s;
+    transition: stroke 0.2s, filter 0.2s;
   }
 `;
 
@@ -60,9 +59,7 @@ const ItemButton = styled.button<{ $active: boolean }>`
   svg {
     stroke: ${({ $active, theme }) => ($active ? '#6C8EFF' : inactiveColor({ theme }))};
     filter: ${({ $active }) => ($active ? 'drop-shadow(0 0 8px rgba(108,142,255,0.8))' : 'none')};
-    transition:
-      stroke 0.2s,
-      filter 0.2s;
+    transition: stroke 0.2s, filter 0.2s;
   }
 `;
 
@@ -140,6 +137,19 @@ const HIDDEN_PREFIXES = ['/g/'];
 export const BottomNavBar: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const [showBrowserScanner, setShowBrowserScanner] = useState(false);
+
+  const handleQrResult = useCallback(
+    (text: string) => {
+      setShowBrowserScanner(false);
+      if (text.startsWith(PRODUCTION_URL)) {
+        router.push(text.slice(PRODUCTION_URL.length));
+      } else {
+        showErrorMessage('Некорректный QR-код', 'Этот QR-код не относится к сервису.');
+      }
+    },
+    [router]
+  );
 
   const handleQrScan = useCallback(async () => {
     if (qrScanner.open.isAvailable()) {
@@ -159,10 +169,7 @@ export const BottomNavBar: React.FC = () => {
         console.error('Error opening QR scanner:', error);
       }
     } else {
-      showErrorMessage(
-        'QR-сканнер недоступен',
-        'QR-сканнер доступен только в приложении Telegram.'
-      );
+      setShowBrowserScanner(true);
     }
   }, [router]);
 
@@ -174,26 +181,31 @@ export const BottomNavBar: React.FC = () => {
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
 
   return (
-    <Pill>
-      <ItemLink href='/messages' $active={active('/messages')}>
-        <ChatIcon />
-        <Label $active={active('/messages')}>Чаты</Label>
-      </ItemLink>
+    <>
+      {showBrowserScanner && (
+        <BrowserQrScanner onResult={handleQrResult} onClose={() => setShowBrowserScanner(false)} />
+      )}
+      <Pill>
+        <ItemLink href='/messages' $active={active('/messages')}>
+          <ChatIcon />
+          <Label $active={active('/messages')}>Чаты</Label>
+        </ItemLink>
 
-      <ItemLink href='/' $active={active('/', true)}>
-        <CarIcon />
-        <Label $active={active('/', true)}>Авто</Label>
-      </ItemLink>
+        <ItemLink href='/' $active={active('/', true)}>
+          <CarIcon />
+          <Label $active={active('/', true)}>Авто</Label>
+        </ItemLink>
 
-      <ItemLink href='/profile' $active={active('/profile')}>
-        <ProfileIcon />
-        <Label $active={active('/profile')}>Профиль</Label>
-      </ItemLink>
+        <ItemLink href='/profile' $active={active('/profile')}>
+          <ProfileIcon />
+          <Label $active={active('/profile')}>Профиль</Label>
+        </ItemLink>
 
-      <ItemButton $active={false} onClick={handleQrScan}>
-        <QrIcon />
-        <Label $active={false}>Скан</Label>
-      </ItemButton>
-    </Pill>
+        <ItemButton $active={false} onClick={handleQrScan}>
+          <QrIcon />
+          <Label $active={false}>Скан</Label>
+        </ItemButton>
+      </Pill>
+    </>
   );
 };
