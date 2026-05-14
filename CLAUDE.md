@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Изучение кода
+
+Всегда использовать Serena MCP (`find_symbol`, `get_symbols_overview`, `find_referencing_symbols` и др.) при изучении структуры кода, поиске символов и навигации по кодовой базе.
+
 ## Запуск и разработка
 
 Все сервисы запускаются через Docker Compose. Прямой запуск через npm не используется для разработки.

@@ -13,10 +13,14 @@ export interface ChatApi {
   chatByCarCode(code: string, ...args: any[]): Promise<ChatDetails>;
   sendOwnerMessage(body: ChatSendMessageBody, chatId: number, ...args: any[]): Promise<ChatMessageInfo>;
   updateContact(body: ChatContactBody, chatId: number, ...args: any[]): Promise<void>;
+  markAsRead(body: Record<string, never>, chatId: number, ...args: any[]): Promise<void>;
+  deleteChat(body: Record<string, never>, chatId: number, ...args: any[]): Promise<void>;
+  deleteMessage(body: Record<string, never>, chatId: number, messageId: number, ...args: any[]): Promise<void>;
 }
 
 export const CHAT_ID_PARAM = 'chatId';
 export const CHAT_CODE_PARAM = 'code';
+export const CHAT_MESSAGE_ID_PARAM = 'messageId';
 
 const CHAT_ROUTES: APIRoutes<ChatApi> = {
   myChats: 'my',
@@ -29,6 +33,19 @@ const CHAT_ROUTES: APIRoutes<ChatApi> = {
   updateContact: {
     path: (chatId) => `${chatId || `:${CHAT_ID_PARAM}`}/contact`,
     method: 'POST',
+  },
+  markAsRead: {
+    path: (chatId) => `${chatId || `:${CHAT_ID_PARAM}`}/read`,
+    method: 'POST',
+  },
+  deleteChat: {
+    path: (chatId) => `${chatId || `:${CHAT_ID_PARAM}`}`,
+    method: 'DELETE',
+  },
+  deleteMessage: {
+    path: (chatId, messageId) =>
+      `${chatId || `:${CHAT_ID_PARAM}`}/message/${messageId || `:${CHAT_MESSAGE_ID_PARAM}`}`,
+    method: 'DELETE',
   },
 };
 

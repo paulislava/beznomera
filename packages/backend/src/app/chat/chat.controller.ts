@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -13,10 +14,15 @@ import { Request, Response } from 'express';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 import { ChatService } from './chat.service';
+import { ChatGateway } from './chat.gateway';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import { RequestUser } from '@paulislava/shared/user/user.types';
-import CHAT_API, { CHAT_CODE_PARAM, CHAT_ID_PARAM } from '@paulislava/shared/chat/chat.api';
+import CHAT_API, {
+  CHAT_CODE_PARAM,
+  CHAT_ID_PARAM,
+  CHAT_MESSAGE_ID_PARAM,
+} from '@paulislava/shared/chat/chat.api';
 import {
   ChatContactBody,
   ChatDetails,
@@ -52,6 +58,7 @@ class UpdateContactDto implements ChatContactBody {
 export class ChatController {
   constructor(
     private readonly chatService: ChatService,
+    private readonly chatGateway: ChatGateway,
     private readonly configService: ConfigService,
   ) {}
 
@@ -84,7 +91,12 @@ export class ChatController {
     if (!anonymousId && !user) {
       const ip = req.ip ?? '';
       const ua = (req.headers['user-agent'] as string) ?? '';
-      anonymousId = await this.chatService.getOrCreateAnonymousId(undefined, undefined, ip, ua);
+      anonymousId = await this.chatService.getOrCreateAnonymousId(
+        undefined,
+        undefined,
+        ip,
+        ua,
+      );
       if (anonymousId) {
         const expires = new Date();
         expires.setDate(expires.getDate() + 10000);
@@ -103,12 +115,21 @@ export class ChatController {
 
   @Post(CHAT_API.backendRoutes.sendOwnerMessage)
   @UseGuards(JwtAuthGuard)
-  sendOwnerMessage(
+  async sendOwnerMessage(
     @Body() body: SendOwnerMessageDto,
     @Param(CHAT_ID_PARAM, ParseIntPipe) chatId: number,
     @CurrentUser() user: RequestUser,
   ): Promise<ChatMessageInfo> {
-    return this.chatService.sendOwnerMessage(chatId, body.text, body.attachmentUrl, user.userId);
+    const message = await this.chatService.sendOwnerMessage(
+      chatId,
+      body.text,
+      body.attachmentUrl,
+      user.userId,
+    );
+    this.chatGateway.emitNewMessage(chatId, message);
+    const chatInfo = await this.chatService.getChatInfo(chatId);
+    this.chatGateway.emitChatUpdate(user.userId, chatInfo);
+    return message;
   }
 
   @Post(CHAT_API.backendRoutes.updateContact)
@@ -119,7 +140,58 @@ export class ChatController {
     @Req() req: Request,
     @CurrentUser(true) user?: RequestUser,
   ): Promise<void> {
-    const anonymousId = req.cookies?.[this.configService.auth.anonymousIdCookie];
-    return this.chatService.updateContact(chatId, body, user?.userId, anonymousId);
+    const anonymousId =
+      req.cookies?.[this.configService.auth.anonymousIdCookie];
+    return this.chatService.updateContact(
+      chatId,
+      body,
+      user?.userId,
+      anonymousId,
+    );
+  }
+
+  @Post(CHAT_API.backendRoutes.markAsRead)
+  @UseGuards(JwtAuthGuard)
+  async markAsRead(
+    @Param(CHAT_ID_PARAM, ParseIntPipe) chatId: number,
+    @CurrentUser() user: RequestUser,
+  ): Promise<void> {
+    const chatInfo = await this.chatService.markAsRead(chatId, user.userId);
+    this.chatGateway.emitChatUpdate(user.userId, chatInfo);
+  }
+
+  @Delete(CHAT_API.backendRoutes.deleteMessage)
+  @UseGuards(OptionalJwtAuthGuard)
+  async deleteMessage(
+    @Param(CHAT_ID_PARAM, ParseIntPipe) chatId: number,
+    @Param(CHAT_MESSAGE_ID_PARAM, ParseIntPipe) messageId: number,
+    @Req() req: Request,
+    @CurrentUser(true) user?: RequestUser,
+  ): Promise<void> {
+    const anonymousId =
+      req.cookies?.[this.configService.auth.anonymousIdCookie];
+    const result = await this.chatService.deleteMessage(
+      messageId,
+      user?.userId,
+      anonymousId,
+    );
+    this.chatGateway['server']
+      .to(`chat:${chatId}`)
+      .emit('chat:message_deleted', result);
+  }
+
+  @Delete(CHAT_API.backendRoutes.deleteChat)
+  @UseGuards(JwtAuthGuard)
+  async deleteChat(
+    @Param(CHAT_ID_PARAM, ParseIntPipe) chatId: number,
+    @CurrentUser() user: RequestUser,
+  ): Promise<void> {
+    const ownerId = await this.chatService.deleteChat(chatId, user.userId);
+    this.chatGateway['server']
+      .to(`chat:${chatId}`)
+      .emit('chat:chat_deleted', { chatId });
+    this.chatGateway['server']
+      .to(`user:${ownerId}`)
+      .emit('chat:chat_deleted', { chatId });
   }
 }

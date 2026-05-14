@@ -3,7 +3,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -55,4 +54,10 @@ export class ChatMessage extends BaseEntity {
 
   @Column({ nullable: true })
   attachmentUrl: string | null;
+
+  @Column({ default: 'normal' })
+  type: string;
+
+  @Column({ default: false })
+  isDeleted: boolean;
 }

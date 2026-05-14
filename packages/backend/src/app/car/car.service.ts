@@ -45,6 +45,7 @@ import { Response, Request } from 'express';
 import { CarCreateDto } from './car.controller';
 import { SubmissionError, ValidationCode } from '@paulislava/shared/errors';
 import { ChatService } from '../chat/chat.service';
+import { ChatGateway } from '../chat/chat.gateway';
 import { BrandInfo, ModelInfo } from '@paulislava/shared/car/car.types';
 import { Brand } from '../entities/car/brand.entity';
 import { Model } from '../entities/car/model.entity';
@@ -79,6 +80,7 @@ export class CarService {
     private readonly telegramService: TelegramService,
     private readonly configService: ConfigService,
     private readonly chatService: ChatService,
+    private readonly chatGateway: ChatGateway,
     private readonly userService: UserService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
@@ -167,6 +169,8 @@ export class CarService {
     { coords }: CarCallBody,
     userAgent: Agent,
     ip: string,
+    userId?: number,
+    anonymousId?: string,
   ): Promise<void> {
     const car = await this.carRepository.findOne({
       where: { code },
@@ -195,6 +199,17 @@ export class CarService {
     }
 
     await this.callRepository.save({ car: { id }, ip });
+
+    const callResult = await this.chatService.createCallSystemMessage(
+      id,
+      userId,
+      anonymousId,
+    );
+    if (callResult) {
+      const { message: callMsg, ownerUserId, chatInfo } = callResult;
+      this.chatGateway.emitNewMessage(callMsg.chatId, callMsg);
+      this.chatGateway.emitChatUpdate(ownerUserId, chatInfo);
+    }
 
     this.eventEmitter.emit('car.call', {
       type: 'call',

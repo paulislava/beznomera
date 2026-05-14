@@ -7,6 +7,7 @@ import { ChatDetails, ChatInfo } from '@shared/chat/chat.types';
 import { themeable } from '@/themes/utils';
 import { chatService } from '@/services';
 import { ChatWindow } from './ChatWindow';
+import { useChatList } from '@/hooks/useChatList';
 
 const SIDEBAR_DEFAULT = 280;
 const SIDEBAR_MIN = 180;
@@ -39,9 +40,7 @@ const SidebarPanel = styled.div<{ $open: boolean; $width: number }>`
     z-index: 10;
     width: ${({ $open }) => ($open ? 'min(85vw, 320px)' : '0')} !important;
     box-shadow: ${({ $open }) => ($open ? '4px 0 20px rgba(0,0,0,0.22)' : 'none')};
-    transition:
-      width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.28s ease;
+    transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.28s ease;
   }
 `;
 
@@ -95,6 +94,8 @@ const ChatItem = styled.div<{ $active?: boolean }>`
   border-bottom: 1px solid ${themeable('mainBackgroundColor')};
   background: ${({ $active }) => ($active ? themeable('primaryColor') : 'transparent')};
   transition: background 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
 
   &:hover {
     background: ${({ $active }) =>
@@ -119,6 +120,25 @@ const ChatItemPreview = styled.div<{ $active?: boolean }>`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const ChatItemRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+`;
+
+const UnreadBadge = styled.span`
+  background: ${themeable('primaryColor')};
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
 `;
 
 const ResizeHandle = styled.div`
@@ -189,9 +209,48 @@ const EmptyState = styled.div`
   background: ${themeable('mainBackgroundColor')};
 `;
 
+const ContextMenu = styled.div`
+  position: fixed;
+  transform: translate(0, -100%);
+  background: ${themeable('secondaryBackground')};
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 160px;
+  white-space: nowrap;
+`;
+
+const ContextMenuItem = styled.button<{ $danger?: boolean }>`
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  color: ${({ $danger }) => ($danger ? '#e53e3e' : themeable('textColor'))};
+
+  &:hover {
+    background: ${themeable('mainBackgroundColor')};
+  }
+
+  & + & {
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+  }
+`;
+
 interface ChatListProps {
   initialChats: ChatInfo[];
   userId: number;
+}
+
+interface ChatMenuState {
+  id: number;
+  x: number;
+  y: number;
 }
 
 function formatContact(contactType?: string | null, contactValue?: string | null): string {
@@ -215,16 +274,19 @@ function chatTitle(chat: ChatInfo): string {
 }
 
 export function ChatList({ initialChats, userId }: ChatListProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(initialChats[0]?.id ?? null);
+  const { chats, markRead, deleteChatForMe, deleteChatForAll } = useChatList(initialChats);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detailsCache, setDetailsCache] = useState<Record<number, ChatDetails>>({});
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT);
   const [isMobile, setIsMobile] = useState(false);
+  const [chatMenu, setChatMenu] = useState<ChatMenuState | null>(null);
 
   const isResizingRef = useRef(false);
   const dragStartXRef = useRef(0);
   const dragStartWidthRef = useRef(0);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Detect mobile and set initial sidebar state
   useEffect(() => {
@@ -266,6 +328,21 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
     };
   }, []);
 
+  // Close chat context menu on outside click
+  useEffect(() => {
+    if (!chatMenu) return;
+    const close = () => setChatMenu(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [chatMenu]);
+
+  // Cleanup long press timer on unmount
+  useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    };
+  }, []);
+
   const loadChat = useCallback(
     async (chatId: number) => {
       if (detailsCache[chatId]) return;
@@ -287,12 +364,59 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
   const handleSelectChat = useCallback(
     (chatId: number) => {
       setSelectedId(chatId);
+      markRead(chatId);
       if (isMobile) setSidebarOpen(false);
     },
-    [isMobile]
+    [isMobile, markRead]
   );
 
-  const selectedChat = initialChats.find(c => c.id === selectedId);
+  const handleChatContextMenu = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, chatId: number) => {
+      e.preventDefault();
+      const x = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80);
+      setChatMenu({ id: chatId, x, y: e.clientY });
+    },
+    []
+  );
+
+  const handleChatTouchStart = useCallback(
+    (chatId: number) => (e: React.TouchEvent<HTMLDivElement>) => {
+      const t = e.touches[0];
+      const x = Math.min(Math.max(t.clientX, 80), window.innerWidth - 80);
+      const y = t.clientY;
+      longPressTimerRef.current = setTimeout(() => {
+        setChatMenu({ id: chatId, x, y });
+      }, 500);
+    },
+    []
+  );
+
+  const handleChatTouchEnd = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const handleDeleteForMe = useCallback(
+    (chatId: number) => {
+      deleteChatForMe(chatId);
+      if (selectedId === chatId) setSelectedId(null);
+      setChatMenu(null);
+    },
+    [deleteChatForMe, selectedId]
+  );
+
+  const handleDeleteForAll = useCallback(
+    (chatId: number) => {
+      deleteChatForAll(chatId);
+      if (selectedId === chatId) setSelectedId(null);
+      setChatMenu(null);
+    },
+    [deleteChatForAll, selectedId]
+  );
+
+  const selectedChat = chats.find(c => c.id === selectedId);
   const selectedDetails = selectedId != null ? detailsCache[selectedId] : undefined;
 
   return (
@@ -308,13 +432,25 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
             </IconBtn>
           </SidebarHeader>
           <SidebarScroll>
-            {initialChats.map(chat => {
+            {chats.map(chat => {
               const active = chat.id === selectedId;
+              const unread = (chat.unreadCount ?? 0) > 0 && !active;
               return (
-                <ChatItem key={chat.id} $active={active} onClick={() => handleSelectChat(chat.id)}>
-                  <ChatItemName $active={active}>
-                    {chat.senderName ?? `Чат #${chat.id}`}
-                  </ChatItemName>
+                <ChatItem
+                  key={chat.id}
+                  $active={active}
+                  onClick={() => handleSelectChat(chat.id)}
+                  onContextMenu={e => handleChatContextMenu(e, chat.id)}
+                  onTouchStart={handleChatTouchStart(chat.id)}
+                  onTouchEnd={handleChatTouchEnd}
+                  onTouchMove={handleChatTouchEnd}
+                >
+                  <ChatItemRow>
+                    <ChatItemName $active={active}>
+                      {chat.senderName ?? `Чат #${chat.id}`}
+                    </ChatItemName>
+                    {unread && <UnreadBadge>{chat.unreadCount}</UnreadBadge>}
+                  </ChatItemRow>
                   <ChatItemPreview $active={active}>{previewText(chat)}</ChatItemPreview>
                 </ChatItem>
               );
@@ -322,6 +458,20 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
           </SidebarScroll>
         </SidebarInner>
       </SidebarPanel>
+
+      {chatMenu && (
+        <ContextMenu
+          style={{ left: chatMenu.x, top: chatMenu.y }}
+          onClick={e => e.stopPropagation()}
+        >
+          <ContextMenuItem onClick={() => handleDeleteForMe(chatMenu.id)}>
+            Удалить у меня
+          </ContextMenuItem>
+          <ContextMenuItem $danger onClick={() => handleDeleteForAll(chatMenu.id)}>
+            Удалить у всех
+          </ContextMenuItem>
+        </ContextMenu>
+      )}
 
       {!isMobile && <ResizeHandle onMouseDown={startResize} />}
 

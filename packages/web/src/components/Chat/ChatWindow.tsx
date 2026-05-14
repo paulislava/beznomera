@@ -10,7 +10,8 @@ import {
   ChatContactBody,
   ChatDetails,
   ChatMessageInfo,
-  MessageSource
+  MessageSource,
+  MessageType
 } from '@shared/chat/chat.types';
 import { themeable } from '@/themes/utils';
 import { chatService, fileService } from '@/services';
@@ -54,11 +55,13 @@ const HeaderName = styled.div`
   white-space: nowrap;
 `;
 
-const HeaderStatus = styled.div<{ $online: boolean }>`
+const HeaderStatus = styled.div<{ $typing: boolean; $online: boolean }>`
   font-size: 12px;
-  color: ${({ $online }) => ($online ? '#4cd964' : themeable('textColor'))};
-  opacity: ${({ $online }) => ($online ? 1 : 0.45)};
+  color: ${({ $typing, $online }) =>
+    $typing ? themeable('primaryColor') : $online ? '#4cd964' : themeable('textColor')};
+  opacity: ${({ $typing, $online }) => ($typing || $online ? 1 : 0.45)};
   margin-top: 1px;
+  font-style: ${({ $typing }) => ($typing ? 'italic' : 'normal')};
 `;
 
 // ─── Message list ─────────────────────────────────────────────────────────────
@@ -70,30 +73,46 @@ const MsgList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3px;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
 `;
 
 const MsgRow = styled.div<{ $out: boolean }>`
   display: flex;
   justify-content: ${({ $out }) => ($out ? 'flex-end' : 'flex-start')};
+  align-items: flex-end;
+  gap: 2px;
+  position: relative;
 `;
 
-const Bubble = styled.div<{ $out: boolean }>`
+const Bubble = styled.div<{ $out: boolean; $deleted?: boolean }>`
   max-width: 75%;
   padding: 8px 12px 6px;
   border-radius: ${({ $out }) => ($out ? '18px 18px 4px 18px' : '18px 18px 18px 4px')};
   background: ${({ $out }) =>
     $out ? 'var(--cs-bubble-out, #2b82e5)' : themeable('secondaryBackground')};
-  color: ${({ $out }) => ($out ? '#fff' : themeable('textColor'))};
+  color: ${({ $out, $deleted }) =>
+    $deleted ? themeable('textColor') : $out ? '#fff' : themeable('textColor')};
   font-size: 14px;
   line-height: 1.45;
   word-break: break-word;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
   position: relative;
+  opacity: ${({ $deleted }) => ($deleted ? 0.5 : 1)};
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
 `;
 
 const BubbleText = styled.span`
   display: block;
   padding-right: 44px;
+`;
+
+const DeletedText = styled.span`
+  display: block;
+  padding-right: 44px;
+  font-style: italic;
 `;
 
 const BubbleTime = styled.span<{ $out: boolean }>`
@@ -103,6 +122,59 @@ const BubbleTime = styled.span<{ $out: boolean }>`
   bottom: 6px;
   right: 10px;
   color: ${({ $out }) => ($out ? 'rgba(255,255,255,0.85)' : themeable('textColor'))};
+`;
+
+// ─── Context menu ─────────────────────────────────────────────────────────────
+
+const ContextMenu = styled.div`
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 8px));
+  background: ${themeable('secondaryBackground')};
+  border: 1px solid rgba(128, 128, 128, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  z-index: 1000;
+  min-width: 148px;
+  white-space: nowrap;
+`;
+
+const ContextMenuItem = styled.button<{ $danger?: boolean }>`
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  color: ${({ $danger }) => ($danger ? '#e53e3e' : themeable('textColor'))};
+
+  &:hover {
+    background: ${themeable('mainBackgroundColor')};
+  }
+
+  & + & {
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+  }
+`;
+
+// ─── System message ───────────────────────────────────────────────────────────
+
+const SystemMsgRow = styled.div`
+  display: flex;
+  justify-content: center;
+  margin: 6px 0;
+`;
+
+const SystemMsgBubble = styled.div`
+  background: ${themeable('secondaryBackground')};
+  color: ${themeable('textColor')};
+  font-size: 12px;
+  opacity: 0.7;
+  padding: 4px 14px;
+  border-radius: 12px;
+  text-align: center;
 `;
 
 const AttachImg = styled.img`
@@ -197,7 +269,10 @@ const SendBtn = styled(RoundBtn)<{ $active: boolean }>`
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
-  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+  return `${d.getHours().toString().padStart(2, '0')}:${d
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}`;
 }
 
 const CONTACT_OPTIONS = [
@@ -216,6 +291,12 @@ interface ChatWindowProps {
   initialContact?: Pick<ChatDetails, 'contactType' | 'contactValue'>;
 }
 
+interface MenuState {
+  id: number;
+  x: number;
+  y: number;
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function ChatWindow({
@@ -225,20 +306,94 @@ export function ChatWindow({
   title,
   initialContact
 }: ChatWindowProps) {
-  const { messages, connected, sendMessage } = useChat({ chatId, initialMessages });
+  const {
+    messages,
+    connected,
+    sendMessage,
+    sendTyping,
+    partnerTyping,
+    deleteMessageForAll,
+    deleteMessageForMe
+  } = useChat({ chatId, initialMessages, isOwner });
   const listRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
+  const isAtBottomRef = useRef(true);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
   const [contactType, setContactType] = useState(initialContact?.contactType ?? 'none');
   const [contactValue, setContactValue] = useState(initialContact?.contactValue ?? '');
+  const [menuState, setMenuState] = useState<MenuState | null>(null);
 
-  // Auto-scroll to bottom on new messages
+  const closeMenu = useCallback(() => setMenuState(null), []);
+
+  // Track whether user is at the bottom of the scroll
+  const handleScroll = useCallback(() => {
+    const el = listRef.current;
+    if (!el) return;
+    isAtBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  }, []);
+
+  // Auto-scroll only when user is at the bottom
   useEffect(() => {
     const el = listRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    if (el && isAtBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages]);
+
+  // Always scroll to bottom on chat switch
+  useEffect(() => {
+    const el = listRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+      isAtBottomRef.current = true;
+    }
+  }, [chatId]);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    if (!menuState) return;
+    const close = () => setMenuState(null);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, [menuState]);
+
+  // Cleanup long press timer on unmount
+  useEffect(() => {
+    return () => {
+      if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    };
+  }, []);
+
+  // Right-click opens menu
+  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
+    if (!msgId) return;
+    const x = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80);
+    setMenuState({ id: msgId, x, y: e.clientY });
+  }, []);
+
+  // Long press opens menu on touch
+  const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const msgId = parseInt(e.currentTarget.dataset.msgid ?? '');
+    if (!msgId) return;
+    const t = e.touches[0];
+    const x = Math.min(Math.max(t.clientX, 80), window.innerWidth - 80);
+    const y = t.clientY;
+    longPressTimerRef.current = setTimeout(() => {
+      setMenuState({ id: msgId, x, y });
+    }, 500);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
 
   const handleContactChange = useCallback(
     async (type: string, value: string) => {
@@ -254,11 +409,15 @@ export function ChatWindow({
     const t = text.trim();
     if (!t || !connected) return;
     sendMessage(t);
+    sendTyping(false);
     setText('');
-    if (textRef.current) {
-      textRef.current.style.height = 'auto';
-    }
-  }, [text, connected, sendMessage]);
+    if (textRef.current) textRef.current.style.height = 'auto';
+    isAtBottomRef.current = true;
+    setTimeout(() => {
+      const el = listRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
+  }, [text, connected, sendMessage, sendTyping]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -270,11 +429,15 @@ export function ChatWindow({
     [handleSend]
   );
 
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-    e.target.style.height = 'auto';
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
-  }, []);
+  const handleTextChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setText(e.target.value);
+      e.target.style.height = 'auto';
+      e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+      sendTyping(e.target.value.length > 0);
+    },
+    [sendTyping]
+  );
 
   const handleAttach = useCallback(async () => {
     const file = fileInputRef.current?.files?.[0];
@@ -293,6 +456,7 @@ export function ChatWindow({
     }
   }, [sendMessage]);
 
+  const menuMsg = menuState ? messages.find(m => m.id === menuState.id) : null;
   const needsValue = contactType === 'tel' || contactType === 'email';
 
   return (
@@ -301,8 +465,8 @@ export function ChatWindow({
         <Header>
           <HeaderTitle>
             <HeaderName>{title}</HeaderName>
-            <HeaderStatus $online={connected}>
-              {connected ? 'в сети' : 'соединение...'}
+            <HeaderStatus $typing={partnerTyping} $online={connected}>
+              {partnerTyping ? 'печатает...' : connected ? 'в сети' : 'соединение...'}
             </HeaderStatus>
           </HeaderTitle>
         </Header>
@@ -342,20 +506,70 @@ export function ChatWindow({
         </ContactPanel>
       )}
 
-      <MsgList ref={listRef}>
+      <MsgList ref={listRef} onScroll={handleScroll}>
         {messages.map(msg => {
+          if (msg.type === MessageType.Call || msg.type === MessageType.System) {
+            return (
+              <SystemMsgRow key={msg.id}>
+                <SystemMsgBubble>{msg.text}</SystemMsgBubble>
+              </SystemMsgRow>
+            );
+          }
+
           const out = (msg.source === MessageSource.Sender) !== isOwner;
+
           return (
             <MsgRow key={msg.id} $out={out}>
-              <Bubble $out={out}>
-                {msg.attachmentUrl && <AttachImg src={msg.attachmentUrl} alt='attachment' />}
-                {msg.text && <BubbleText>{msg.text}</BubbleText>}
+              <Bubble
+                $out={out}
+                $deleted={msg.isDeleted}
+                data-msgid={msg.id}
+                onContextMenu={handleContextMenu}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onTouchMove={handleTouchEnd}
+              >
+                {msg.attachmentUrl && !msg.isDeleted && (
+                  <AttachImg src={msg.attachmentUrl} alt='attachment' />
+                )}
+                {msg.isDeleted ? (
+                  <DeletedText>Сообщение удалено</DeletedText>
+                ) : (
+                  msg.text && <BubbleText>{msg.text}</BubbleText>
+                )}
                 <BubbleTime $out={out}>{formatTime(msg.createdAt)}</BubbleTime>
               </Bubble>
             </MsgRow>
           );
         })}
       </MsgList>
+
+      {menuState && (
+        <ContextMenu
+          style={{ left: menuState.x, top: menuState.y }}
+          onClick={e => e.stopPropagation()}
+        >
+          <ContextMenuItem
+            onClick={() => {
+              deleteMessageForMe(menuState.id);
+              closeMenu();
+            }}
+          >
+            Удалить у меня
+          </ContextMenuItem>
+          {menuMsg && !menuMsg.isDeleted && (
+            <ContextMenuItem
+              $danger
+              onClick={() => {
+                deleteMessageForAll(menuState.id);
+                closeMenu();
+              }}
+            >
+              Удалить у всех
+            </ContextMenuItem>
+          )}
+        </ContextMenu>
+      )}
 
       <InputArea>
         <RoundBtn

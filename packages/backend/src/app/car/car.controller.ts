@@ -62,6 +62,7 @@ import { RequestUser } from '@paulislava/shared/user/user.types';
 import { ApiClientAuthGuard } from '../auth/api-auth.guard';
 import { FileDto } from '../file/file.dto';
 import { FileInfo } from '@paulislava/shared/file/file.types';
+import { ConfigService } from '../config/config.service';
 
 class LocationDto implements LocationInfo {
   @IsNumber()
@@ -222,7 +223,10 @@ export class AddDriverByUsernameDto implements AddDriverByUsernameBody {
 
 @Controller(CAR_API.path)
 export class CarController implements CarApi {
-  constructor(private readonly carService: CarService) {}
+  constructor(
+    private readonly carService: CarService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get(CAR_API.backendRoutes.info)
   info(@Param(CODE_PARAM) code: string): Promise<PublicCarInfo> {
@@ -230,15 +234,26 @@ export class CarController implements CarApi {
   }
 
   @Post(CAR_API.backendRoutes.call)
+  @UseGuards(OptionalJwtAuthGuard)
   async call(
     @Body() body: CarCallDto,
     @Param(CODE_PARAM) code: string,
     @Req() req: Request,
     @Ip() ip: string,
+    @CurrentUser(true) user?: RequestUser,
   ): Promise<void> {
     const agent = userAgentParser.parse(req.headers['user-agent']);
+    const anonymousId =
+      req.cookies?.[this.configService.auth.anonymousIdCookie] ?? undefined;
 
-    return this.carService.call(code, body, agent, ip);
+    return this.carService.call(
+      code,
+      body,
+      agent,
+      ip,
+      user?.userId,
+      anonymousId,
+    );
   }
 
   @Get(CAR_API.backendRoutes.my)
