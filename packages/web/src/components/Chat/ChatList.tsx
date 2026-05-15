@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
+import { useRouter } from 'next/navigation';
 
 import { ChatDetails, ChatInfo } from '@shared/chat/chat.types';
 import { themeable } from '@/themes/utils';
@@ -9,10 +10,12 @@ import { chatService } from '@/services';
 import { ChatWindow } from './ChatWindow';
 import { useChatList } from '@/hooks/useChatList';
 
-const SIDEBAR_DEFAULT = 280;
-const SIDEBAR_MIN = 180;
+const SIDEBAR_DEFAULT = 300;
+const SIDEBAR_MIN = 220;
 const SIDEBAR_MAX = 520;
 const MOBILE_BP = 640;
+
+// ─── Layout ──────────────────────────────────────────────────────────────────
 
 const Layout = styled.div`
   flex: 1;
@@ -28,21 +31,15 @@ const SidebarPanel = styled.div<{ $open: boolean; $width: number }>`
   display: flex;
   flex-direction: column;
   background: ${themeable('secondaryBackground')};
-  border-right: 1px solid ${themeable('mainBackgroundColor')};
+  border-right: 1px solid rgba(128, 128, 128, 0.1);
   overflow: hidden;
   transition: width 0.25s ease;
 
   @media (max-width: ${MOBILE_BP - 1}px) {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 10;
-    width: ${({ $open }) => ($open ? 'min(85vw, 320px)' : '0')} !important;
-    box-shadow: ${({ $open }) => ($open ? '4px 0 20px rgba(0,0,0,0.22)' : 'none')};
-    transition:
-      width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.28s ease;
+    width: 100% !important;
+    flex-shrink: 1;
+    display: ${({ $open }) => ($open ? 'flex' : 'none')};
+    transition: none;
   }
 `;
 
@@ -53,36 +50,20 @@ const SidebarInner = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  @media (max-width: ${MOBILE_BP - 1}px) {
+    min-width: unset;
+  }
 `;
 
 const SidebarHeader = styled.div`
   padding: 14px 16px;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: ${themeable('textColor')};
-  border-bottom: 1px solid ${themeable('mainBackgroundColor')};
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-`;
-
-const IconBtn = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${themeable('textColor')};
-  padding: 4px 6px;
-  border-radius: 6px;
-  font-size: 18px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  opacity: 0.65;
-  &:hover {
-    background: ${themeable('mainBackgroundColor')};
-    opacity: 1;
-  }
 `;
 
 const SidebarScroll = styled.div`
@@ -90,45 +71,88 @@ const SidebarScroll = styled.div`
   flex: 1;
 `;
 
+// ─── Chat item (Telegram style) ───────────────────────────────────────────────
+
 const ChatItem = styled.div<{ $active?: boolean }>`
-  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
   cursor: pointer;
-  border-bottom: 1px solid ${themeable('mainBackgroundColor')};
-  background: ${({ $active }) => ($active ? themeable('primaryColor') : 'transparent')};
-  transition: background 0.15s;
+  background: ${({ $active }) => ($active ? 'rgba(43, 130, 229, 0.1)' : 'transparent')};
+  transition: background 0.1s;
   user-select: none;
   -webkit-user-select: none;
 
   &:hover {
     background: ${({ $active }) =>
-      $active ? themeable('primaryColor') : themeable('mainBackgroundColor')};
+      $active ? 'rgba(43, 130, 229, 0.13)' : themeable('mainBackgroundColor')};
   }
 `;
 
-const ChatItemName = styled.div<{ $active?: boolean }>`
-  font-size: 14px;
+const ChatAvatar = styled.div<{ $color: string }>`
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+  color: #fff;
+  font-size: 19px;
   font-weight: 600;
-  color: ${({ $active }) => ($active ? '#fff' : themeable('textColor'))};
-  margin-bottom: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 `;
 
-const ChatItemPreview = styled.div<{ $active?: boolean }>`
+const ChatMeta = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+`;
+
+const ChatTopRow = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+`;
+
+const ChatName = styled.span`
+  font-size: 15px;
+  font-weight: 600;
+  color: ${themeable('textColor')};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+`;
+
+const ChatTime = styled.span<{ $unread?: boolean }>`
   font-size: 12px;
-  color: ${({ $active }) => ($active ? 'rgba(255,255,255,0.75)' : themeable('textColor'))};
-  opacity: ${({ $active }) => ($active ? 1 : 0.55)};
+  color: ${({ $unread }) => ($unread ? themeable('primaryColor') : themeable('textColor'))};
+  opacity: ${({ $unread }) => ($unread ? 1 : 0.45)};
+  flex-shrink: 0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 `;
 
-const ChatItemRow = styled.div`
+const ChatBottomRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+`;
+
+const ChatPreview = styled.span`
+  font-size: 13px;
+  color: ${themeable('textColor')};
+  opacity: 0.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 `;
 
 const UnreadBadge = styled.span`
@@ -137,11 +161,13 @@ const UnreadBadge = styled.span`
   font-size: 11px;
   font-weight: 700;
   border-radius: 10px;
-  padding: 1px 6px;
-  min-width: 18px;
+  padding: 2px 7px;
+  min-width: 20px;
   text-align: center;
   flex-shrink: 0;
 `;
+
+// ─── Resize / layout ─────────────────────────────────────────────────────────
 
 const ResizeHandle = styled.div`
   width: 5px;
@@ -149,24 +175,15 @@ const ResizeHandle = styled.div`
   flex-shrink: 0;
   background: transparent;
   transition: background 0.15s;
+
   &:hover,
   &:active {
     background: ${themeable('primaryColor')};
-    opacity: 0.45;
+    opacity: 0.35;
   }
+
   @media (max-width: ${MOBILE_BP - 1}px) {
     display: none;
-  }
-`;
-
-const MobileOverlay = styled.div`
-  display: none;
-  @media (max-width: ${MOBILE_BP - 1}px) {
-    display: block;
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.38);
-    z-index: 9;
   }
 `;
 
@@ -175,29 +192,10 @@ const MainArea = styled.div`
   min-width: 0;
   display: flex;
   flex-direction: column;
-`;
 
-const MobileBar = styled.div`
-  display: none;
   @media (max-width: ${MOBILE_BP - 1}px) {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: ${themeable('secondaryBackground')};
-    border-bottom: 1px solid ${themeable('mainBackgroundColor')};
-    flex-shrink: 0;
+    display: none;
   }
-`;
-
-const MobileBarTitle = styled.span`
-  font-size: 15px;
-  font-weight: 600;
-  color: ${themeable('textColor')};
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
 `;
 
 const EmptyState = styled.div`
@@ -244,9 +242,62 @@ const ContextMenuItem = styled.button<{ $danger?: boolean }>`
   }
 `;
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const AVATAR_COLORS = ['#2b82e5', '#5856d6', '#ff2d55', '#ff9500', '#34c759', '#00c7be', '#af52de'];
+
+function nameToColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
+function nameInitials(name: string): string {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map(w => w[0] ?? '')
+    .join('')
+    .toUpperCase();
+}
+
+function formatMsgTime(dateStr?: string): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  if (isToday) {
+    return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+  }
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (d.toDateString() === yesterday.toDateString()) return 'вчера';
+  const diffMs = now.getTime() - d.getTime();
+  if (diffMs < 7 * 24 * 60 * 60 * 1000) {
+    return ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'][d.getDay()];
+  }
+  return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+}
+
+function previewText(chat: ChatInfo): string {
+  const msg = chat.lastMessage;
+  if (!msg) return '';
+  if (msg.isDeleted) return 'Сообщение удалено';
+  if (msg.attachmentUrl && !msg.text) return '📎 Изображение';
+  return msg.text ?? '';
+}
+
+function chatTitle(chat: ChatInfo): string {
+  return chat.senderName ?? `Чат #${chat.id}`;
+}
+
+// ─── Props ────────────────────────────────────────────────────────────────────
+
 interface ChatListProps {
   initialChats: ChatInfo[];
   userId: number;
+  selectedChatId?: number;
+  initialChatDetails?: Record<number, ChatDetails>;
 }
 
 interface ChatMenuState {
@@ -255,32 +306,19 @@ interface ChatMenuState {
   y: number;
 }
 
-function formatContact(contactType?: string | null, contactValue?: string | null): string {
-  if (contactType === 'tel' && contactValue) return `Тел: ${contactValue}`;
-  if (contactType === 'email' && contactValue) return `E-mail: ${contactValue}`;
-  if (contactType === 'bot') return 'Через бот';
-  return '';
-}
+// ─── Component ────────────────────────────────────────────────────────────────
 
-function previewText(chat: ChatInfo): string {
-  const msg = chat.lastMessage;
-  if (!msg) return formatContact(chat.contactType, chat.contactValue);
-  if (msg.attachmentUrl && !msg.text) return '📎 Изображение';
-  return msg.text ?? '';
-}
-
-function chatTitle(chat: ChatInfo): string {
-  const name = chat.senderName ?? `Чат #${chat.id}`;
-  const contact = formatContact(chat.contactType, chat.contactValue);
-  return `${name} · ${contact}`;
-}
-
-export function ChatList({ initialChats, userId }: ChatListProps) {
+export function ChatList({
+  initialChats,
+  userId,
+  selectedChatId,
+  initialChatDetails = {}
+}: ChatListProps) {
+  const router = useRouter();
   const { chats, markRead, deleteChatForMe, deleteChatForAll } = useChatList(initialChats);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [detailsCache, setDetailsCache] = useState<Record<number, ChatDetails>>({});
+  const [selectedId, setSelectedId] = useState<number | null>(selectedChatId ?? null);
+  const [detailsCache, setDetailsCache] = useState<Record<number, ChatDetails>>(initialChatDetails);
   const [loading, setLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT);
   const [isMobile, setIsMobile] = useState(false);
   const [chatMenu, setChatMenu] = useState<ChatMenuState | null>(null);
@@ -290,17 +328,24 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
   const dragStartWidthRef = useRef(0);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Detect mobile and set initial sidebar state
   useEffect(() => {
-    const check = () => {
-      const mobile = window.innerWidth < MOBILE_BP;
-      setIsMobile(mobile);
-      setSidebarOpen(!mobile);
-    };
+    const check = () => setIsMobile(window.innerWidth < MOBILE_BP);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // Sync selectedId when selectedChatId prop changes (navigation)
+  useEffect(() => {
+    if (selectedChatId != null) setSelectedId(selectedChatId);
+  }, [selectedChatId]);
+
+  // Merge server-preloaded details into cache
+  useEffect(() => {
+    if (Object.keys(initialChatDetails).length > 0) {
+      setDetailsCache(prev => ({ ...prev, ...initialChatDetails }));
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Desktop resize drag
   const startResize = useCallback(
@@ -330,7 +375,6 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
     };
   }, []);
 
-  // Close chat context menu on outside click
   useEffect(() => {
     if (!chatMenu) return;
     const close = () => setChatMenu(null);
@@ -338,12 +382,12 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
     return () => document.removeEventListener('click', close);
   }, [chatMenu]);
 
-  // Cleanup long press timer on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
-    };
-  }, []);
+    },
+    []
+  );
 
   const loadChat = useCallback(
     async (chatId: number) => {
@@ -365,12 +409,20 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
 
   const handleSelectChat = useCallback(
     (chatId: number) => {
-      setSelectedId(chatId);
       markRead(chatId);
-      if (isMobile) setSidebarOpen(false);
+      if (isMobile) {
+        router.push(`/messages/${chatId}`);
+      } else {
+        setSelectedId(chatId);
+        window.history.pushState(null, '', `/messages/${chatId}`);
+      }
     },
-    [isMobile, markRead]
+    [isMobile, markRead, router]
   );
+
+  const handleBack = useCallback(() => {
+    router.push('/messages');
+  }, [router]);
 
   const handleChatContextMenu = useCallback(
     (e: React.MouseEvent<HTMLDivElement>, chatId: number) => {
@@ -403,40 +455,64 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
   const handleDeleteForMe = useCallback(
     (chatId: number) => {
       deleteChatForMe(chatId);
-      if (selectedId === chatId) setSelectedId(null);
+      if (selectedId === chatId) {
+        setSelectedId(null);
+        if (isMobile) router.push('/messages');
+        else window.history.pushState(null, '', '/messages');
+      }
       setChatMenu(null);
     },
-    [deleteChatForMe, selectedId]
+    [deleteChatForMe, selectedId, isMobile, router]
   );
 
   const handleDeleteForAll = useCallback(
     (chatId: number) => {
       deleteChatForAll(chatId);
-      if (selectedId === chatId) setSelectedId(null);
+      if (selectedId === chatId) {
+        setSelectedId(null);
+        if (isMobile) router.push('/messages');
+        else window.history.pushState(null, '', '/messages');
+      }
       setChatMenu(null);
     },
-    [deleteChatForAll, selectedId]
+    [deleteChatForAll, selectedId, isMobile, router]
   );
 
   const selectedChat = chats.find(c => c.id === selectedId);
   const selectedDetails = selectedId != null ? detailsCache[selectedId] : undefined;
 
+  // Mobile: when a chat is selected, show only the ChatWindow (full screen)
+  if (isMobile && selectedId != null) {
+    if (selectedDetails) {
+      return (
+        <ChatWindow
+          key={selectedId}
+          chatId={selectedId}
+          initialMessages={selectedDetails.messages}
+          currentUserId={userId}
+          isOwner
+          title={selectedChat ? chatTitle(selectedChat) : undefined}
+          onBack={handleBack}
+        />
+      );
+    }
+    if (loading) {
+      return <EmptyState style={{ flex: 1, display: 'flex' }}>Загрузка...</EmptyState>;
+    }
+  }
+
+  // Desktop: split-pane layout / Mobile: just the list
   return (
     <Layout>
-      {isMobile && sidebarOpen && <MobileOverlay onClick={() => setSidebarOpen(false)} />}
-
-      <SidebarPanel $open={sidebarOpen} $width={sidebarWidth}>
+      <SidebarPanel $open $width={sidebarWidth}>
         <SidebarInner>
-          <SidebarHeader>
-            Сообщения
-            <IconBtn onClick={() => setSidebarOpen(false)} title='Закрыть'>
-              ✕
-            </IconBtn>
-          </SidebarHeader>
+          <SidebarHeader>Сообщения</SidebarHeader>
           <SidebarScroll>
             {chats.map(chat => {
               const active = chat.id === selectedId;
               const unread = (chat.unreadCount ?? 0) > 0 && !active;
+              const name = chatTitle(chat);
+              const timeStr = formatMsgTime(chat.lastMessageAt ?? chat.createdAt);
               return (
                 <ChatItem
                   key={chat.id}
@@ -447,13 +523,17 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
                   onTouchEnd={handleChatTouchEnd}
                   onTouchMove={handleChatTouchEnd}
                 >
-                  <ChatItemRow>
-                    <ChatItemName $active={active}>
-                      {chat.senderName ?? `Чат #${chat.id}`}
-                    </ChatItemName>
-                    {unread && <UnreadBadge>{chat.unreadCount}</UnreadBadge>}
-                  </ChatItemRow>
-                  <ChatItemPreview $active={active}>{previewText(chat)}</ChatItemPreview>
+                  <ChatAvatar $color={nameToColor(name)}>{nameInitials(name)}</ChatAvatar>
+                  <ChatMeta>
+                    <ChatTopRow>
+                      <ChatName>{name}</ChatName>
+                      <ChatTime $unread={unread}>{timeStr}</ChatTime>
+                    </ChatTopRow>
+                    <ChatBottomRow>
+                      <ChatPreview>{previewText(chat)}</ChatPreview>
+                      {unread && <UnreadBadge>{chat.unreadCount}</UnreadBadge>}
+                    </ChatBottomRow>
+                  </ChatMeta>
                 </ChatItem>
               );
             })}
@@ -475,16 +555,9 @@ export function ChatList({ initialChats, userId }: ChatListProps) {
         </ContextMenu>
       )}
 
-      {!isMobile && <ResizeHandle onMouseDown={startResize} />}
+      <ResizeHandle onMouseDown={startResize} />
 
       <MainArea>
-        <MobileBar>
-          <IconBtn onClick={() => setSidebarOpen(v => !v)} title='Список чатов'>
-            ☰
-          </IconBtn>
-          <MobileBarTitle>{selectedChat ? chatTitle(selectedChat) : 'Сообщения'}</MobileBarTitle>
-        </MobileBar>
-
         {selectedChat && selectedDetails ? (
           <ChatWindow
             key={selectedId}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Select as HeroSelect, SelectItem } from '@heroui/react';
 import { Input as HeroInput } from '@heroui/input';
 
@@ -33,12 +33,32 @@ const Wrapper = styled.div`
 const Header = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 16px;
+  gap: 8px;
+  padding: 0 12px 0 8px;
   min-height: 52px;
   flex-shrink: 0;
   background: ${themeable('secondaryBackground')};
   border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+`;
+
+const BackBtn = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  color: ${themeable('primaryColor')};
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+
+  &:hover {
+    background: ${themeable('mainBackgroundColor')};
+  }
 `;
 
 const HeaderTitle = styled.div`
@@ -64,33 +84,120 @@ const HeaderStatus = styled.div<{ $typing: boolean; $online: boolean }>`
   font-style: ${({ $typing }) => ($typing ? 'italic' : 'normal')};
 `;
 
+// ─── Selection bar (top, replaces header in selection mode) ──────────────────
+
+const SelectionBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  min-height: 52px;
+  background: ${themeable('secondaryBackground')};
+  border-bottom: 1px solid rgba(128, 128, 128, 0.15);
+  flex-shrink: 0;
+`;
+
+const SelectionCancelBtn = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  color: ${themeable('textColor')};
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+  flex-shrink: 0;
+
+  &:hover {
+    opacity: 1;
+    background: ${themeable('mainBackgroundColor')};
+  }
+`;
+
+const SelectionCount = styled.span`
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: ${themeable('textColor')};
+`;
+
+const SelectionActionBtn = styled.button<{ $danger?: boolean }>`
+  background: none;
+  border: 1px solid ${({ $danger }) => ($danger ? '#e53e3e' : themeable('primaryColor'))};
+  border-radius: 16px;
+  padding: 5px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: ${({ $danger }) => ($danger ? '#e53e3e' : themeable('primaryColor'))};
+  transition: background 0.15s;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${({ $danger }) => ($danger ? 'rgba(229,62,62,0.08)' : 'rgba(43,130,229,0.08)')};
+  }
+`;
+
 // ─── Message list ─────────────────────────────────────────────────────────────
 
 const MsgList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 12px 16px 8px;
+  padding: 12px 12px 8px;
   display: flex;
   flex-direction: column;
   gap: 3px;
   overscroll-behavior: contain;
-  scroll-behavior: smooth;
 `;
 
-const MsgRow = styled.div<{ $out: boolean; $selected?: boolean }>`
+const MsgRow = styled.div<{ $out: boolean; $selectionMode?: boolean }>`
   display: flex;
   justify-content: ${({ $out }) => ($out ? 'flex-end' : 'flex-start')};
   align-items: flex-end;
   gap: 2px;
   position: relative;
-  border-radius: 6px;
-  margin: 0 -8px;
-  padding: 1px 8px;
-  background: ${({ $selected }) => ($selected ? 'rgba(43, 130, 229, 0.13)' : 'transparent')};
-  transition: background 0.1s;
+  padding: 1px ${({ $selectionMode }) => ($selectionMode ? '4px' : '0')};
+  padding-left: ${({ $selectionMode }) => ($selectionMode ? '36px' : '0')};
+  transition: padding-left 0.18s;
 `;
 
-const Bubble = styled.div<{ $out: boolean; $deleted?: boolean; $selectionMode?: boolean }>`
+// ─── Telegram-style selection checkmark ──────────────────────────────────────
+
+const SelectionCheckmark = styled.div<{ $selected: boolean }>`
+  position: absolute;
+  left: 4px;
+  bottom: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid
+    ${({ $selected }) => ($selected ? themeable('primaryColor') : 'rgba(128,128,128,0.38)')};
+  background: ${({ $selected }) => ($selected ? themeable('primaryColor') : 'transparent')};
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+  cursor: pointer;
+`;
+
+const Bubble = styled.div<{
+  $out: boolean;
+  $deleted?: boolean;
+  $selectionMode?: boolean;
+  $selected?: boolean;
+}>`
   max-width: 75%;
   padding: 8px 12px 6px;
   border-radius: ${({ $out }) => ($out ? '18px 18px 4px 18px' : '18px 18px 18px 4px')};
@@ -101,12 +208,16 @@ const Bubble = styled.div<{ $out: boolean; $deleted?: boolean; $selectionMode?: 
   font-size: 14px;
   line-height: 1.45;
   word-break: break-word;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  box-shadow: ${({ $selected }) =>
+    $selected
+      ? '0 0 0 2px var(--cs-primary, #2b82e5), 0 1px 3px rgba(0,0,0,0.14)'
+      : '0 1px 3px rgba(0,0,0,0.14)'};
   position: relative;
   opacity: ${({ $deleted }) => ($deleted ? 0.5 : 1)};
   cursor: ${({ $selectionMode }) => ($selectionMode ? 'pointer' : 'default')};
   user-select: none;
   -webkit-user-select: none;
+  transition: box-shadow 0.15s;
 `;
 
 const BubbleText = styled.span`
@@ -127,6 +238,36 @@ const BubbleTime = styled.span<{ $out: boolean }>`
   bottom: 6px;
   right: 10px;
   color: ${({ $out }) => ($out ? 'rgba(255,255,255,0.85)' : themeable('textColor'))};
+`;
+
+// ─── Image skeleton ───────────────────────────────────────────────────────────
+
+const shimmer = keyframes`
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+`;
+
+const ImgSkeleton = styled.div`
+  width: 220px;
+  height: 160px;
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(128, 128, 128, 0.15) 25%,
+    rgba(128, 128, 128, 0.28) 50%,
+    rgba(128, 128, 128, 0.15) 75%
+  );
+  background-size: 200% 100%;
+  animation: ${shimmer} 1.5s infinite;
+  margin-bottom: 2px;
+`;
+
+const AttachImg = styled.img`
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 12px;
+  display: block;
+  margin-bottom: 2px;
 `;
 
 // ─── Context menu ─────────────────────────────────────────────────────────────
@@ -164,65 +305,6 @@ const ContextMenuItem = styled.button<{ $danger?: boolean }>`
   }
 `;
 
-// ─── Selection bar ────────────────────────────────────────────────────────────
-
-const SelectionBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: ${themeable('secondaryBackground')};
-  border-top: 1px solid rgba(128, 128, 128, 0.12);
-  flex-shrink: 0;
-`;
-
-const SelectionCount = styled.span`
-  flex: 1;
-  font-size: 14px;
-  font-weight: 500;
-  color: ${themeable('textColor')};
-`;
-
-const SelectionActionBtn = styled.button<{ $danger?: boolean }>`
-  background: none;
-  border: 1px solid ${({ $danger }) => ($danger ? '#e53e3e' : themeable('primaryColor'))};
-  border-radius: 16px;
-  padding: 5px 12px;
-  font-size: 13px;
-  cursor: pointer;
-  color: ${({ $danger }) => ($danger ? '#e53e3e' : themeable('primaryColor'))};
-  transition: background 0.15s;
-  white-space: nowrap;
-
-  &:hover {
-    background: ${({ $danger }) => ($danger ? 'rgba(229,62,62,0.08)' : 'rgba(43,130,229,0.08)')};
-  }
-`;
-
-const SelectionCancelBtn = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  color: ${themeable('textColor')};
-  font-size: 18px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.6;
-  transition:
-    opacity 0.15s,
-    background 0.15s;
-  flex-shrink: 0;
-
-  &:hover {
-    opacity: 1;
-    background: ${themeable('mainBackgroundColor')};
-  }
-`;
-
 // ─── System message ───────────────────────────────────────────────────────────
 
 const SystemMsgRow = styled.div`
@@ -239,14 +321,6 @@ const SystemMsgBubble = styled.div`
   padding: 4px 14px;
   border-radius: 12px;
   text-align: center;
-`;
-
-const AttachImg = styled.img`
-  max-width: 220px;
-  max-height: 220px;
-  border-radius: 12px;
-  display: block;
-  margin-bottom: 2px;
 `;
 
 // ─── Contact panel ────────────────────────────────────────────────────────────
@@ -333,10 +407,7 @@ const SendBtn = styled(RoundBtn)<{ $active: boolean }>`
 
 function formatTime(iso: string): string {
   const d = new Date(iso);
-  return `${d.getHours().toString().padStart(2, '0')}:${d
-    .getMinutes()
-    .toString()
-    .padStart(2, '0')}`;
+  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
 const CONTACT_OPTIONS = [
@@ -353,6 +424,7 @@ interface ChatWindowProps {
   isOwner?: boolean;
   title?: string;
   initialContact?: Pick<ChatDetails, 'contactType' | 'contactValue'>;
+  onBack?: () => void;
 }
 
 interface MenuState {
@@ -368,7 +440,8 @@ export function ChatWindow({
   initialMessages,
   isOwner = false,
   title,
-  initialContact
+  initialContact,
+  onBack
 }: ChatWindowProps) {
   const {
     messages,
@@ -381,22 +454,25 @@ export function ChatWindow({
     deleteMessagesForAll,
     deleteMessagesForMe
   } = useChat({ chatId, initialMessages, isOwner });
+
   const listRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const isAtBottomRef = useRef(true);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [text, setText] = useState('');
   const [uploading, setUploading] = useState(false);
   const [contactType, setContactType] = useState(initialContact?.contactType ?? 'none');
   const [contactValue, setContactValue] = useState(initialContact?.contactValue ?? '');
   const [menuState, setMenuState] = useState<MenuState | null>(null);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set<number>());
+  const [imgLoaded, setImgLoaded] = useState<Record<number, boolean>>({});
+
   const selectionMode = selectedIds.size > 0;
 
   const closeMenu = useCallback(() => setMenuState(null), []);
-
-  const exitSelection = useCallback(() => setSelectedIds(new Set()), []);
+  const exitSelection = useCallback(() => setSelectedIds(new Set<number>()), []);
 
   const toggleSelect = useCallback((msgId: number) => {
     setSelectedIds(prev => {
@@ -407,22 +483,20 @@ export function ChatWindow({
     });
   }, []);
 
-  // Track whether user is at the bottom of the scroll
+  // Track scroll position
   const handleScroll = useCallback(() => {
     const el = listRef.current;
     if (!el) return;
     isAtBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
   }, []);
 
-  // Auto-scroll only when user is at the bottom
+  // Auto-scroll when at bottom
   useEffect(() => {
     const el = listRef.current;
-    if (el && isAtBottomRef.current) {
-      el.scrollTop = el.scrollHeight;
-    }
+    if (el && isAtBottomRef.current) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
-  // Always scroll to bottom on chat switch
+  // Scroll to bottom on chat switch
   useEffect(() => {
     const el = listRef.current;
     if (el) {
@@ -439,12 +513,12 @@ export function ChatWindow({
     return () => document.removeEventListener('click', close);
   }, [menuState]);
 
-  // Cleanup long press timer on unmount
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
-    };
-  }, []);
+    },
+    []
+  );
 
   // Right-click: in selection mode toggles selection, otherwise opens context menu
   const handleContextMenu = useCallback(
@@ -462,7 +536,7 @@ export function ChatWindow({
     [selectionMode, toggleSelect]
   );
 
-  // Click in selection mode toggles selection
+  // Click on bubble in selection mode toggles selection
   const handleBubbleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (!selectionMode) return;
@@ -569,15 +643,36 @@ export function ChatWindow({
 
   return (
     <Wrapper>
-      {title && (
-        <Header>
-          <HeaderTitle>
-            <HeaderName>{title}</HeaderName>
-            <HeaderStatus $typing={partnerTyping} $online={connected}>
-              {partnerTyping ? 'печатает...' : connected ? 'в сети' : 'соединение...'}
-            </HeaderStatus>
-          </HeaderTitle>
-        </Header>
+      {/* Top bar: selection bar or header */}
+      {selectionMode ? (
+        <SelectionBar>
+          <SelectionCancelBtn onClick={exitSelection} title='Отменить выделение'>
+            ✕
+          </SelectionCancelBtn>
+          <SelectionCount>{selectedIds.size} выбрано</SelectionCount>
+          <SelectionActionBtn onClick={handleDeleteSelectedForMe}>
+            Удалить у меня
+          </SelectionActionBtn>
+          <SelectionActionBtn $danger onClick={handleDeleteSelectedForAll}>
+            Удалить у всех
+          </SelectionActionBtn>
+        </SelectionBar>
+      ) : (
+        title && (
+          <Header>
+            {onBack && (
+              <BackBtn onClick={onBack} title='Назад'>
+                ‹
+              </BackBtn>
+            )}
+            <HeaderTitle>
+              <HeaderName>{title}</HeaderName>
+              <HeaderStatus $typing={partnerTyping} $online={connected}>
+                {partnerTyping ? 'печатает...' : connected ? 'в сети' : 'соединение...'}
+              </HeaderStatus>
+            </HeaderTitle>
+          </Header>
+        )
       )}
 
       {!isOwner && messages.length === 0 && (
@@ -625,13 +720,20 @@ export function ChatWindow({
           }
 
           const out = (msg.source === MessageSource.Sender) !== isOwner;
+          const selected = selectedIds.has(msg.id);
 
           return (
-            <MsgRow key={msg.id} $out={out} $selected={selectedIds.has(msg.id)}>
+            <MsgRow key={msg.id} $out={out} $selectionMode={selectionMode}>
+              {selectionMode && (
+                <SelectionCheckmark $selected={selected} onClick={() => toggleSelect(msg.id)}>
+                  {selected && '✓'}
+                </SelectionCheckmark>
+              )}
               <Bubble
                 $out={out}
                 $deleted={msg.isDeleted}
                 $selectionMode={selectionMode}
+                $selected={selected}
                 data-msgid={msg.id}
                 onClick={handleBubbleClick}
                 onContextMenu={handleContextMenu}
@@ -640,7 +742,15 @@ export function ChatWindow({
                 onTouchMove={handleTouchEnd}
               >
                 {msg.attachmentUrl && !msg.isDeleted && (
-                  <AttachImg src={msg.attachmentUrl} alt='attachment' />
+                  <>
+                    {!imgLoaded[msg.id] && <ImgSkeleton />}
+                    <AttachImg
+                      src={msg.attachmentUrl}
+                      alt='attachment'
+                      style={{ display: imgLoaded[msg.id] ? 'block' : 'none' }}
+                      onLoad={() => setImgLoaded(prev => ({ ...prev, [msg.id]: true }))}
+                    />
+                  </>
                 )}
                 {msg.isDeleted ? (
                   <DeletedText>Сообщение удалено</DeletedText>
@@ -681,54 +791,39 @@ export function ChatWindow({
         </ContextMenu>
       )}
 
-      {selectionMode ? (
-        <SelectionBar>
-          <SelectionCancelBtn onClick={exitSelection} title='Отменить выделение'>
-            ✕
-          </SelectionCancelBtn>
-          <SelectionCount>{selectedIds.size} выбрано</SelectionCount>
-          <SelectionActionBtn onClick={handleDeleteSelectedForMe}>
-            Удалить у меня
-          </SelectionActionBtn>
-          <SelectionActionBtn $danger onClick={handleDeleteSelectedForAll}>
-            Удалить у всех
-          </SelectionActionBtn>
-        </SelectionBar>
-      ) : (
-        <InputArea>
-          <RoundBtn
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            title='Прикрепить изображение'
-          >
-            📎
-          </RoundBtn>
-          <input
-            ref={fileInputRef}
-            type='file'
-            accept='image/*'
-            style={{ display: 'none' }}
-            onChange={handleAttach}
-          />
-          <TextInput
-            ref={textRef}
-            rows={1}
-            placeholder={connected ? 'Сообщение...' : 'Соединение...'}
-            value={text}
-            onChange={handleTextChange}
-            onKeyDown={handleKeyDown}
-            disabled={!connected}
-          />
-          <SendBtn
-            $active={!!text.trim() && connected}
-            onClick={handleSend}
-            disabled={!text.trim() || !connected}
-            title='Отправить'
-          >
-            ➤
-          </SendBtn>
-        </InputArea>
-      )}
+      <InputArea>
+        <RoundBtn
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          title='Прикрепить изображение'
+        >
+          📎
+        </RoundBtn>
+        <input
+          ref={fileInputRef}
+          type='file'
+          accept='image/*'
+          style={{ display: 'none' }}
+          onChange={handleAttach}
+        />
+        <TextInput
+          ref={textRef}
+          rows={1}
+          placeholder={connected ? 'Сообщение...' : 'Соединение...'}
+          value={text}
+          onChange={handleTextChange}
+          onKeyDown={handleKeyDown}
+          disabled={!connected}
+        />
+        <SendBtn
+          $active={!!text.trim() && connected}
+          onClick={handleSend}
+          disabled={!text.trim() || !connected}
+          title='Отправить'
+        >
+          ➤
+        </SendBtn>
+      </InputArea>
     </Wrapper>
   );
 }
