@@ -62,6 +62,12 @@ jobs:
           cache-from: type=gha,scope=web-pr-${{ github.event.number }}
           cache-to: type=gha,mode=max,scope=web-pr-${{ github.event.number }}
 
+      - name: Encode backend config
+        id: config
+        env:
+          BACKEND_CONFIG: ${{ vars.BACKEND_CONFIG }}
+        run: echo "b64=$(printf '%s' "$BACKEND_CONFIG" | base64 -w 0)" >> $GITHUB_OUTPUT
+
       - name: Deploy preview to server
         uses: appleboy/ssh-action@v1.2.0
         env:
@@ -71,12 +77,12 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           BACKEND_PORT: ${{ steps.ports.outputs.backend_port }}
           WEB_PORT: ${{ steps.ports.outputs.web_port }}
-          BACKEND_CONFIG: ${{ vars.BACKEND_CONFIG }}
+          CONFIG_B64: ${{ steps.config.outputs.b64 }}
         with:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: GHCR_TOKEN,GHCR_ACTOR,PR_NUMBER,IMAGE_TAG,BACKEND_PORT,WEB_PORT,BACKEND_CONFIG
+          envs: GHCR_TOKEN,GHCR_ACTOR,PR_NUMBER,IMAGE_TAG,BACKEND_PORT,WEB_PORT,CONFIG_B64
           script: |
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
             docker pull ghcr.io/paulislava/beznomera:backend-pr-${PR_NUMBER}-${IMAGE_TAG}
@@ -88,7 +94,7 @@ jobs:
             docker stop $BACKEND_NAME $WEB_NAME 2>/dev/null || true
             docker rm -f $BACKEND_NAME $WEB_NAME 2>/dev/null || true
 
-            printf '%s' "$BACKEND_CONFIG" | base64 -d > /tmp/config-backend-pr-${PR_NUMBER}.yaml
+            printf '%s' "$CONFIG_B64" | base64 -d > /tmp/config-backend-pr-${PR_NUMBER}.yaml
 
             # Backend on host network with a dedicated port
             docker run --name $BACKEND_NAME -d \
