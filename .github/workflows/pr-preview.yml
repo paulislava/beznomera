@@ -68,7 +68,7 @@ jobs:
             docker rm -f $WEB_NAME 2>/dev/null || true
 
             docker run --name $WEB_NAME -d \
-              -p 127.0.0.1:${WEB_PORT}:3000 \
+              -p ${WEB_PORT}:3000 \
               --env-file /home/user/web/beznomera.net/web.env \
               --restart unless-stopped \
               ghcr.io/paulislava/beznomera:web-pr-${PR_NUMBER}-${IMAGE_TAG}
@@ -138,7 +138,8 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request.number;
-            const url = `http://pr-${pr}.beznomera.net`;
+            const subdomainUrl = `http://pr-${pr}.beznomera.net`;
+            const portUrl = `http://beznomera.net:${40000 + pr}`;
             const sha = context.payload.pull_request.head.sha.substring(0, 7);
 
             const { data: comments } = await github.rest.issues.listComments({
@@ -149,7 +150,7 @@ jobs:
 
             const marker = '<!-- pr-preview -->';
             const existing = comments.find(c => c.body.includes(marker));
-            const body = `${marker}\n🚀 **Preview deployed**: ${url}\n\nCommit: \`${sha}\``;
+            const body = `${marker}\n🚀 **Preview deployed**\n\n| | URL |\n|---|---|\n| Subdomain (нужен wildcard DNS) | ${subdomainUrl} |\n| Прямой порт | ${portUrl} |\n\nCommit: \`${sha}\``;
 
             if (existing) {
               await github.rest.issues.updateComment({
