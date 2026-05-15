@@ -5,6 +5,7 @@ on:
     branches:
       - master
   pull_request:
+    types: [opened, synchronize, reopened, closed]
   workflow_dispatch:
     inputs:
       deploy:
@@ -24,6 +25,7 @@ jobs:
   build-backend:
     runs-on: ubuntu-latest
     environment: dev
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
     permissions:
       contents: read
       packages: write
@@ -54,6 +56,7 @@ jobs:
   build-web:
     runs-on: ubuntu-latest
     environment: dev
+    if: github.event_name != 'pull_request' || github.event.action != 'closed'
     permissions:
       contents: read
       packages: write
@@ -201,8 +204,6 @@ jobs:
             docker logs beznomera_web --tail=100 2>&1 || true
             exit 1
 
-
-            
   deploy-nginx:
     runs-on: ubuntu-latest
     environment: dev
@@ -320,3 +321,250 @@ jobs:
           script: |
             docker image prune -f
             docker container prune -f
+
+  deploy-preview:
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [build-web, build-backend]
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Encode backend config
+        id: config
+        env:
+          BACKEND_CONFIG: ${{ vars.BACKEND_CONFIG }}
+        run: echo "b64=$(printf '%s' "$BACKEND_CONFIG" | base64 -w 0)" >> $GITHUB_OUTPUT
+
+      - name: Deploy preview
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHCR_ACTOR: ${{ github.actor }}
+          PR_NUMBER: ${{ github.event.number }}
+          IMAGE_TAG: ${{ github.sha }}
+          CONFIG_B64: ${{ steps.config.outputs.b64 }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: GHCR_TOKEN,GHCR_ACTOR,PR_NUMBER,IMAGE_TAG,CONFIG_B64
+          script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+            docker pull ghcr.io/paulislava/beznomera:backend-${IMAGE_TAG}
+            docker pull ghcr.io/paulislava/beznomera:web-${IMAGE_TAG}
+
+            BACKEND_PORT=$((30000 + PR_NUMBER))
+            WEB_PORT=$((40000 + PR_NUMBER))
+            BACKEND_NAME="beznomera_backend_pr_${PR_NUMBER}"
+            WEB_NAME="beznomera_web_pr_${PR_NUMBER}"
+
+            docker stop $BACKEND_NAME $WEB_NAME 2>/dev/null || true
+            docker rm -f $BACKEND_NAME $WEB_NAME 2>/dev/null || true
+
+            printf '%s' "$CONFIG_B64" | base64 -d > /tmp/config-backend-pr-${PR_NUMBER}.yaml
+
+            docker run --name $BACKEND_NAME -d \
+              --network host \
+              -e APP_PORT=${BACKEND_PORT} \
+              --env-file /home/user/web/beznomera.net/web.env \
+              -v /tmp/config-backend-pr-${PR_NUMBER}.yaml:/config.yaml \
+              -v /home/user/web/beznomera.net/ip-location-data:/app/node_modules/ip-location-api/data \
+              ghcr.io/paulislava/beznomera:backend-${IMAGE_TAG}
+
+            docker run --name $WEB_NAME -d \
+              -p ${WEB_PORT}:3000 \
+              --env-file /home/user/web/beznomera.net/web.env \
+              --restart unless-stopped \
+              ghcr.io/paulislava/beznomera:web-${IMAGE_TAG}
+
+            cat > /etc/nginx/conf.d/pr-${PR_NUMBER}.beznomera.net.conf << NGINXEOF
+            server {
+                listen 80;
+                server_name pr-${PR_NUMBER}.beznomera.net;
+
+                location /socket.io {
+                    proxy_pass http://0.0.0.0:${BACKEND_PORT}/socket.io;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection "upgrade";
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                    proxy_buffering off;
+                }
+
+                location /api {
+                    proxy_pass http://0.0.0.0:${BACKEND_PORT};
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                }
+
+                location / {
+                    proxy_pass http://127.0.0.1:${WEB_PORT};
+                    proxy_set_header Host \$host;
+                    proxy_set_header X-Real-IP \$remote_addr;
+                    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                    proxy_set_header X-Forwarded-Proto \$scheme;
+                }
+            }
+            NGINXEOF
+
+            nginx -t && systemctl reload nginx
+
+      - name: Health check backend
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: PR_NUMBER
+          script: |
+            BACKEND_PORT=$((30000 + PR_NUMBER))
+            BACKEND_NAME="beznomera_backend_pr_${PR_NUMBER}"
+            for i in $(seq 1 10); do
+              if ! docker inspect --format='{{.State.Running}}' $BACKEND_NAME 2>/dev/null | grep -q 'true'; then
+                echo "Backend stopped on attempt $i"
+                docker logs $BACKEND_NAME --tail=50 2>&1 || true
+                exit 1
+              fi
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://localhost:${BACKEND_PORT}/api/health 2>/dev/null || echo "000")
+              if [ "$STATUS" = "200" ]; then
+                echo "Backend healthy on attempt $i"
+                exit 0
+              fi
+              echo "Attempt $i/10: backend not ready (HTTP $STATUS), waiting 10s..."
+              sleep 10
+            done
+            echo "Backend failed health check"
+            docker logs $BACKEND_NAME --tail=50 2>&1 || true
+            exit 1
+
+      - name: Health check web
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: PR_NUMBER
+          script: |
+            WEB_PORT=$((40000 + PR_NUMBER))
+            WEB_NAME="beznomera_web_pr_${PR_NUMBER}"
+            for i in $(seq 1 10); do
+              if ! docker inspect --format='{{.State.Running}}' $WEB_NAME 2>/dev/null | grep -q 'true'; then
+                echo "Web stopped on attempt $i"
+                docker logs $WEB_NAME --tail=50 2>&1 || true
+                exit 1
+              fi
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 http://127.0.0.1:${WEB_PORT}/health 2>/dev/null || echo "000")
+              if [ "$STATUS" = "200" ]; then
+                echo "Web healthy on attempt $i"
+                exit 0
+              fi
+              echo "Attempt $i/10: web not ready (HTTP $STATUS), waiting 10s..."
+              sleep 10
+            done
+            echo "Web failed health check"
+            docker logs $WEB_NAME --tail=50 2>&1 || true
+            exit 1
+
+      - name: Update PR description with preview URLs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request.number;
+            const backendPort = 30000 + pr;
+            const webPort = 40000 + pr;
+            const sha = context.payload.pull_request.head.sha.substring(0, 7);
+
+            const marker_start = '<!-- pr-preview-start -->';
+            const marker_end = '<!-- pr-preview-end -->';
+
+            const section = [
+              marker_start,
+              `---`,
+              `🚀 **Preview** — commit \`${sha}\``,
+              `| Сервис | URL |`,
+              `|---|---|`,
+              `| 🌐 Web (subdomain, нужен wildcard DNS \`*.beznomera.net\`) | http://pr-${pr}.beznomera.net |`,
+              `| 🌐 Web (прямой порт) | http://beznomera.net:${webPort} |`,
+              `| 🔌 Backend | http://beznomera.net:${backendPort}/api/health |`,
+              marker_end
+            ].join('\n');
+
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr
+            });
+
+            const body = pullRequest.body || '';
+            const hasSection = body.includes(marker_start);
+            const newBody = hasSection
+              ? body.replace(new RegExp(`${marker_start}[\\s\\S]*?${marker_end}`), section)
+              : body + (body.endsWith('\n') ? '' : '\n') + '\n' + section;
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr,
+              body: newBody
+            });
+
+  cleanup-preview:
+    runs-on: ubuntu-latest
+    environment: dev
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Remove preview from server
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        with:
+          host: beznomera.net
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: PR_NUMBER
+          script: |
+            docker stop beznomera_backend_pr_${PR_NUMBER} beznomera_web_pr_${PR_NUMBER} 2>/dev/null || true
+            docker rm -f beznomera_backend_pr_${PR_NUMBER} beznomera_web_pr_${PR_NUMBER} 2>/dev/null || true
+            rm -f /tmp/config-backend-pr-${PR_NUMBER}.yaml
+            rm -f /etc/nginx/conf.d/pr-${PR_NUMBER}.beznomera.net.conf
+            nginx -t && systemctl reload nginx || true
+
+      - name: Remove preview section from PR description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request.number;
+            const marker_start = '<!-- pr-preview-start -->';
+            const marker_end = '<!-- pr-preview-end -->';
+
+            const { data: pullRequest } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr
+            });
+
+            const body = pullRequest.body || '';
+            if (!body.includes(marker_start)) return;
+
+            const newBody = body
+              .replace(new RegExp(`\n*${marker_start}[\\s\\S]*?${marker_end}`), '')
+              .trimEnd();
+
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr,
+              body: newBody
+            });
