@@ -21,8 +21,9 @@ COPY packages/web /app/packages/web
 ARG BACKEND_API_TOKEN
 ENV BACKEND_API_TOKEN=$BACKEND_API_TOKEN
 
+ARG BACKEND_URL=https://beznomera.net/api
 ENV NEXT_TELEMETRY_DISABLED=1 \
-    BACKEND_URL=https://beznomera.net/api
+    BACKEND_URL=$BACKEND_URL
 RUN npm run build:web
 
 FROM node:20.18-slim AS web
@@ -40,10 +41,11 @@ COPY --from=build-web ${HOME}/packages/web/.next/standalone ./
 
 RUN chgrp -R 0 /app/.next && chmod -R g=u /app/.next
 
+ARG BACKEND_URL=https://beznomera.net/api
 ENV NODE_ENV=production \
     PORT=3000 \
     NEXT_TELEMETRY_DISABLED=1 \
-    BACKEND_URL=https://beznomera.net/api
+    BACKEND_URL=$BACKEND_URL
 
 EXPOSE 3000
 CMD [ "node", "server.js" ]

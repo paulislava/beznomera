@@ -201,8 +201,6 @@ jobs:
             docker logs beznomera_web --tail=100 2>&1 || true
             exit 1
 
-
-            
   deploy-nginx:
     runs-on: ubuntu-latest
     environment: dev
@@ -233,7 +231,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
@@ -248,7 +245,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             cp /tmp/beznomera-nginx/production.conf "${NGINX_CONF}.new"
@@ -261,7 +257,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
@@ -284,7 +279,6 @@ jobs:
           host: beznomera.net
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-
           script: |
             NGINX_CONF="/home/user/conf/web/beznomera.net/nginx.ssl.conf_app"
             BACKUP_CONF="/tmp/beznomera-nginx-current.bak"
