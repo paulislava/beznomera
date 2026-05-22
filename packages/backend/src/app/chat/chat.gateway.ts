@@ -32,9 +32,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   async handleConnection(client: Socket) {
+    const rawCookie = client.handshake.headers?.cookie ?? '';
+    const parsed = rawCookie ? parseCookies(rawCookie) : {};
+
     const token =
       client.handshake.auth?.token ||
-      client.handshake.headers?.['x-user-token'];
+      client.handshake.headers?.['x-user-token'] ||
+      parsed[this.configService.auth.jwtCookie];
 
     if (token) {
       try {
@@ -48,12 +52,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
 
-    const rawCookie = client.handshake.headers?.cookie ?? '';
-    if (rawCookie) {
-      const parsed = parseCookies(rawCookie);
-      const cookieName = this.configService.auth.anonymousIdCookie;
-      client.data.anonymousId = parsed[cookieName];
-    }
+    client.data.anonymousId = parsed[this.configService.auth.anonymousIdCookie];
   }
 
   handleDisconnect(_client: Socket) {}
