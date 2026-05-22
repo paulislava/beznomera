@@ -10,6 +10,7 @@ import { Form } from '@/ui/FormContainer/FormContainer';
 import FormField from '@/ui/FormField/FormField';
 import { Button, Avatar, Chip } from '@heroui/react';
 import { showErrorMessage } from '@/utils/messages';
+import { clearStoredAuthToken } from '@/utils/auth-storage';
 
 const PROVIDER_LABELS: Record<OAuthProvider, string> = {
   [OAuthProvider.GOOGLE]: 'Google',
@@ -322,6 +323,20 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
         <h2 className='text-lg font-semibold'>Привязанные аккаунты</h2>
         <LinkedAccountsSection accounts={profile.linkedAccounts ?? []} onUnlink={handleUnlink} />
       </section>
+
+      <div className='pt-2 border-t border-default-200'>
+        <Button
+          color='danger'
+          variant='flat'
+          className='w-full'
+          onPress={() => {
+            clearStoredAuthToken();
+            window.location.href = '/api/logout';
+          }}
+        >
+          Выйти
+        </Button>
+      </div>
     </div>
   );
 }
