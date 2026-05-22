@@ -77,6 +77,16 @@ export class AuthController implements AuthApi {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   async checkAuthorized(): Promise<void> {}
 
+  @Post(AUTH_API.backendRoutes.logout)
+  async logout(@Res({ passthrough: true }) res: Response): Promise<void> {
+    res.clearCookie(this.configService.auth.jwtCookie, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+  }
+
   @Post(AUTH_API.backendRoutes.authTelegramWebApp)
   async authTelegramWebApp(
     @Body() { data }: AuthTelegramWebAppData,
