@@ -11,7 +11,6 @@ import FormField from '@/ui/FormField/FormField';
 import { Button, Avatar, Chip } from '@heroui/react';
 import { showErrorMessage } from '@/utils/messages';
 import { clearStoredAuthToken } from '@/utils/auth-storage';
-import { logout } from './actions';
 
 const PROVIDER_LABELS: Record<OAuthProvider, string> = {
   [OAuthProvider.GOOGLE]: 'Google',
@@ -332,7 +331,7 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
           className='w-full'
           onPress={() => {
             clearStoredAuthToken();
-            logout();
+            window.location.href = '/api/logout';
           }}
         >
           Выйти
