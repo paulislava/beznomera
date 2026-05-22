@@ -329,9 +329,13 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
           color='danger'
           variant='flat'
           className='w-full'
-          onPress={() => {
-            clearStoredAuthToken();
-            window.location.href = '/api/logout';
+          onPress={async () => {
+            try {
+              await authService.logout();
+            } finally {
+              clearStoredAuthToken();
+              window.location.href = '/auth';
+            }
           }}
         >
           Выйти

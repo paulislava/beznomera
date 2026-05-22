@@ -15,6 +15,7 @@ export interface AuthApi {
   authTelegram(data: AuthTelegramData, ...args: any): Promise<string>;
   authTelegramWebApp(data: AuthTelegramWebAppData, ...args: any): Promise<string>;
   checkAuthorized(...args: any): Promise<void>;
+  logout(...args: any): Promise<void>;
   getLinkedAccounts(...args: any): Promise<LinkedAccount[]>;
   unlinkProvider(provider: OAuthProvider, ...args: any): Promise<void>;
 }
@@ -25,6 +26,7 @@ const AUTH_ROUTES: APIRoutes<AuthApi> = {
   authTelegram: { method: 'POST', path: 'telegram' },
   authTelegramWebApp: { method: 'POST', path: 'telegram-web-app' },
   checkAuthorized: 'check',
+  logout: { method: 'POST', path: 'logout' },
   getLinkedAccounts: { method: 'GET', path: 'linked' },
   unlinkProvider: {
     method: 'DELETE',
