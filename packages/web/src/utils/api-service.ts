@@ -62,9 +62,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
       }`,
       {
         credentials: 'include',
-        next: {
-          revalidate: 60 * 60
-        },
+        cache: 'no-store',
         ...options,
         headers: headers as HeadersInit
       }
