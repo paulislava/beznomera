@@ -25,13 +25,11 @@ export function useChatList(initialChats: ChatInfo[]) {
 
   useEffect(() => {
     const token = getStoredAuthToken();
-    if (!token) return;
-
     const socketUrl = socketPath?.startsWith('/') ? '' : socketPath;
 
     const socket = io(`${socketUrl ?? ''}/chat`, {
       path: '/socket.io',
-      auth: { token },
+      auth: token ? { token } : undefined,
       withCredentials: true
     });
 
