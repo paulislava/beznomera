@@ -51,6 +51,7 @@ export class NotificationService {
 
   @OnEvent('car.message')
   async onCarMessage(event: CarNotificationEvent): Promise<void> {
+    this.logger.debug(`car.message event received for carId=${event.carId}`);
     await this.sendToCarOwners(event.carId, {
       type: event.type,
       carCode: event.carCode,
@@ -83,12 +84,14 @@ export class NotificationService {
     const car = await this.carRepository.findOne({ where: { id: carId } });
     if (!car) return;
 
-    const carDrivers = await this.carDriverRepository.find({ where: { car: { id: carId } } });
+    const carDrivers = await this.carDriverRepository.find({ where: { carId } });
     const userIds = [car.ownerId, ...carDrivers.map((cd) => cd.driverId)];
 
     const subscriptions = await this.pushSubscriptionRepository.find({
       where: { userId: In(userIds) },
     });
+
+    this.logger.debug(`Sending push to ${subscriptions.length} subscription(s) for carId=${carId}`);
 
     const payloadStr = JSON.stringify(payload);
 

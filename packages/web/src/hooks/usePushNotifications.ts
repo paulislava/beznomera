@@ -7,8 +7,10 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = atob(base64);
-  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+  return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
 }
+
+const SESSION_KEY = 'push-permission-asked';
 
 export function usePushNotifications() {
   useEffect(() => {
@@ -16,7 +18,14 @@ export function usePushNotifications() {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
 
     async function init() {
-      const permission = await Notification.requestPermission();
+      let permission = Notification.permission;
+
+      if (permission === 'default') {
+        if (sessionStorage.getItem(SESSION_KEY)) return;
+        sessionStorage.setItem(SESSION_KEY, '1');
+        permission = await Notification.requestPermission();
+      }
+
       if (permission !== 'granted') return;
 
       const registration = await navigator.serviceWorker.register('/service-worker.js');
@@ -30,7 +39,7 @@ export function usePushNotifications() {
         existing ??
         (await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey
+          applicationServerKey,
         }));
 
       const { endpoint, keys } = subscription.toJSON() as {
