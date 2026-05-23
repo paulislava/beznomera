@@ -8,7 +8,7 @@ import { PushSubscription } from '../entities/push-subscription.entity';
 import { CarDriver } from '../entities/car/car-driver.entity';
 import { Car } from '../entities/car/car.entity';
 import { ConfigService } from '../config/config.service';
-import { CarNotificationEvent, PushPayload } from '@paulislava/shared/notification/notification.types';
+import { CarNotificationEvent, ChatNotificationEvent, PushPayload } from '@paulislava/shared/notification/notification.types';
 
 @Injectable()
 export class NotificationService {
@@ -82,6 +82,23 @@ export class NotificationService {
     });
   }
 
+  @OnEvent('chat.message')
+  async onChatMessage(event: ChatNotificationEvent): Promise<void> {
+    await this.sendToUser(event.ownerUserId, {
+      type: 'chat',
+      chatId: event.chatId,
+      title: event.senderName,
+      body: event.body,
+    });
+  }
+
+  private async sendToUser(userId: number, payload: PushPayload): Promise<void> {
+    const subscriptions = await this.pushSubscriptionRepository.find({
+      where: { userId },
+    });
+    await this.sendPush(subscriptions, payload);
+  }
+
   private async sendToCarOwners(carId: number, payload: PushPayload): Promise<void> {
     const car = await this.carRepository.findOne({ where: { id: carId } });
     if (!car) return;
@@ -93,6 +110,10 @@ export class NotificationService {
       where: { userId: In(userIds) },
     });
 
+    await this.sendPush(subscriptions, payload);
+  }
+
+  private async sendPush(subscriptions: PushSubscription[], payload: PushPayload): Promise<void> {
     const payloadStr = JSON.stringify(payload);
 
     await Promise.allSettled(

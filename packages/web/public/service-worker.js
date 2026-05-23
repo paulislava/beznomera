@@ -2,10 +2,10 @@ self.addEventListener('push', function (event) {
   if (!event.data) return;
 
   const payload = event.data.json();
-  const { type, carId, carCode, title, body } = payload;
+  const { type, carId, carCode, chatId, title, body } = payload;
 
   const actions =
-    type === 'message'
+    type === 'message' || type === 'chat'
       ? [{ action: 'reply', title: 'Ответить' }]
       : [{ action: 'open', title: 'Открыть' }];
 
@@ -14,7 +14,7 @@ self.addEventListener('push', function (event) {
       body,
       icon: '/logo-for-qr-light.png',
       badge: '/logo-for-qr-light.png',
-      data: { type, carId, carCode },
+      data: { type, carId, carCode, chatId },
       actions,
     })
   );
@@ -23,13 +23,15 @@ self.addEventListener('push', function (event) {
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
 
-  const { type, carId, carCode } = event.notification.data || {};
+  const { type, carId, carCode, chatId } = event.notification.data || {};
   const url =
-    type === 'message' && carCode
-      ? `/g/${carCode}/chat`
-      : type === 'call' && carId
-        ? `/car/${carId}`
-        : '/';
+    type === 'chat' && chatId
+      ? `/messages/${chatId}`
+      : type === 'message' && carCode
+        ? `/g/${carCode}/chat`
+        : type === 'call' && carId
+          ? `/car/${carId}`
+          : '/';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {

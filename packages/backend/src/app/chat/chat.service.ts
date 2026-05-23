@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Chat } from '../entities/chat/chat.entity';
 import { ChatMessage } from '../entities/chat/message.entity';
 import { AnonymousUser } from '../entities/user/anonymous-user.entity';
@@ -34,6 +35,7 @@ export class ChatService {
     private readonly anonymousUserRepository: Repository<AnonymousUser>,
     private readonly telegramService: TelegramService,
     private readonly configService: ConfigService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   mapMessageToInfo(msg: ChatMessage, chat: Chat): ChatMessageInfo {
@@ -310,6 +312,16 @@ export class ChatService {
       (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
     const chatInfo = this.mapChatToInfo(updatedChat!, sorted);
+
+    if (isSender && chat.reciever?.id) {
+      const senderName = chatInfo.senderName ?? 'Новое сообщение';
+      this.eventEmitter.emit('chat.message', {
+        chatId,
+        ownerUserId: chat.reciever.id,
+        senderName,
+        body: text || '📎 Изображение',
+      });
+    }
 
     return { message, ownerUserId: chat.reciever?.id, chatInfo };
   }
