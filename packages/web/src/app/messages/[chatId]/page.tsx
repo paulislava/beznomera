@@ -5,6 +5,8 @@ import { cookies } from 'next/headers';
 import { ChatList } from '@/components/Chat/ChatList';
 import { ChatDetails } from '@shared/chat/chat.types';
 
+export const dynamic = 'force-dynamic';
+
 interface ChatPageProps {
   params: Promise<{ chatId: string }>;
 }
