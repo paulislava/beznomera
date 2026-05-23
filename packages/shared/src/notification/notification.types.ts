@@ -11,6 +11,7 @@ export interface PushUnsubscribeBody {
 }
 
 export type CarNotificationType = 'message' | 'rating' | 'call';
+export type NotificationType = CarNotificationType | 'chat';
 
 export interface CarNotificationEvent {
   type: CarNotificationType;
@@ -21,10 +22,18 @@ export interface CarNotificationEvent {
   body: string;
 }
 
+export interface ChatNotificationEvent {
+  chatId: number;
+  ownerUserId: number;
+  senderName: string;
+  body: string;
+}
+
 export interface PushPayload {
-  type: CarNotificationType;
-  carId: number;
-  carCode: string;
+  type: NotificationType;
+  carId?: number;
+  carCode?: string;
+  chatId?: number;
   title: string;
   body: string;
 }
