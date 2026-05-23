@@ -20,8 +20,9 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
   private readonly api: APIInfo<T>;
   private readonly apiToken: string;
   private readonly userToken: string;
+  private readonly revalidate: number | false;
 
-  constructor(api: APIInfo<T>, userToken?: string) {
+  constructor(api: APIInfo<T>, userToken?: string, revalidate: number | false = false) {
     if (!api) {
       throw new Error(`api is not defined`);
     }
@@ -30,6 +31,7 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
     this.basePath = api.path.startsWith('/') ? api.path : `/${api.path}`;
     this.apiToken = process.env.BACKEND_API_TOKEN ?? '';
     this.userToken = userToken ?? '';
+    this.revalidate = revalidate;
   }
 
   async fetch<Path extends keyof T>({
@@ -62,7 +64,9 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
       }`,
       {
         credentials: 'include',
-        cache: 'no-store',
+        ...(this.revalidate === false
+          ? { cache: 'no-store' }
+          : { next: { revalidate: this.revalidate } }),
         ...options,
         headers: headers as HeadersInit
       }
@@ -144,9 +148,10 @@ class ApiService<T extends { [K in keyof T]: (...args: any[]) => any }> {
 export function createApiService<T extends { [K in keyof T]: (...args: any[]) => any }>(
   api: APIInfo<T>,
   userToken?: string,
-  methods?: (service: ApiService<T>) => Partial<T>
+  methods?: (service: ApiService<T>) => Partial<T>,
+  revalidate: number | false = false
 ): T {
-  const service = new ApiService<T>(api, userToken);
+  const service = new ApiService<T>(api, userToken, revalidate);
 
   const rawMethods = methods?.(service);
 
