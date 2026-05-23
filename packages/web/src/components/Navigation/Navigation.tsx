@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Navbar,
   NavbarContent,
@@ -14,12 +14,8 @@ import {
 import styled, { css } from 'styled-components';
 import { PageContainer, pagePaddingTop, Spacer } from '@/ui/Styled';
 import { isTelegramWebApp, transferLinkToTelegram } from '@/utils/telegram';
-import { qrScanner } from '@telegram-apps/sdk-react';
-import qrCodeSvg from '@/assets/images/qrcode.svg';
-import { showErrorMessage } from '@/utils/messages';
-import { PRODUCTION_URL } from '@/constants/site';
-import { themeable } from '@/themes/utils';
 import { Button } from '@/ui/Button';
+import { BottomNavBar } from '@/components/BottomNavBar/bottom-nav-bar';
 
 interface NavigationProps {
   children?: React.ReactNode;
@@ -33,16 +29,6 @@ const StyledNavbar = styled(Navbar)`
 
 const TgSpace = styled.div`
   padding-top: ${pagePaddingTop};
-`;
-
-const QRCode = styled(qrCodeSvg)`
-  cursor: pointer;
-  fill: ${themeable('qrCodeFill')};
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 32px;
-  height: 32px;
 `;
 
 const StyledMenu = styled(NavbarMenu)`
@@ -65,10 +51,8 @@ const StyledItem = styled(NavbarMenuItem)<{ $active?: boolean }>`
 
 export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const pathname = usePathname();
-  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Закрываем меню при изменении пути
   useEffect(() => {
     setIsMenuOpen(false);
   }, [pathname]);
@@ -81,33 +65,11 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
 
   const filteredMenuItems = menuItems;
 
-  const handleQrCodeScan = useCallback(async () => {
-    if (qrScanner.open.isAvailable()) {
-      try {
-        const promise = qrScanner.open({
-          text: 'QR-код автомобиля или водителя',
-          onCaptured: (qrContent: string) => {
-            if (qrContent?.startsWith(PRODUCTION_URL)) {
-              qrScanner.close();
-              router.push(qrContent.slice(PRODUCTION_URL.length));
-            } else {
-              alert('Некорректный QR-код');
-            }
-          }
-        });
-
-        // This promise resolves when the scanner is closed
-        await promise;
-        console.log('QR Scanner closed');
-      } catch (error) {
-        console.error('Error opening QR scanner:', error);
-      }
-    } else {
-      showErrorMessage('Недоступен QR-сканнер', 'QR-сканнер недоступен в этой версии Telegram.');
-    }
-  }, [router]);
-
   const telegramAppLink = useMemo(() => transferLinkToTelegram(pathname), [pathname]);
+
+  if (pathname.startsWith('/auth')) {
+    return <>{children}</>;
+  }
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -116,52 +78,55 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
           <TgSpace />
         </>
       ) : (
-        <StyledNavbar
-          isBordered
-          maxWidth='xl'
-          position='sticky'
-          onMenuOpenChange={setIsMenuOpen}
-          isMenuOpen={isMenuOpen}
-        >
-          <NavbarContent>
-            <NavbarMenuToggle aria-label='Открыть меню' className='sm:hidden' />
-            <Spacer />
-            <Button size='sm' targetBlank href={telegramAppLink}>
-              Продолжить в Telegram
-            </Button>
-          </NavbarContent>
+        <div className='hidden lg:block'>
+          <StyledNavbar
+            isBordered
+            maxWidth='xl'
+            position='sticky'
+            onMenuOpenChange={setIsMenuOpen}
+            isMenuOpen={isMenuOpen}
+          >
+            <NavbarContent>
+              <NavbarMenuToggle aria-label='Открыть меню' className='sm:hidden' />
+              <Spacer />
+              <Button size='sm' targetBlank href={telegramAppLink}>
+                Продолжить в Telegram
+              </Button>
+            </NavbarContent>
 
-          <NavbarContent className='hidden sm:flex gap-4' justify='center'>
-            {filteredMenuItems.map(item => (
-              <NavbarItem key={item.href} isActive={pathname === item.href}>
-                <Link
-                  href={item.href}
-                  className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
-                >
-                  {item.name}
-                </Link>
-              </NavbarItem>
-            ))}
-          </NavbarContent>
+            <NavbarContent className='hidden sm:flex gap-4' justify='center'>
+              {filteredMenuItems.map(item => (
+                <NavbarItem key={item.href} isActive={pathname === item.href}>
+                  <Link
+                    href={item.href}
+                    className={`w-full ${pathname === item.href ? 'font-bold' : 'text-foreground'}`}
+                  >
+                    {item.name}
+                  </Link>
+                </NavbarItem>
+              ))}
+            </NavbarContent>
 
-          <StyledMenu>
-            {filteredMenuItems.map(item => (
-              <StyledItem $active={pathname === item.href} key={item.href}>
-                <Link href={item.href}>{item.name}</Link>
-              </StyledItem>
-            ))}
-          </StyledMenu>
-        </StyledNavbar>
+            <StyledMenu>
+              {filteredMenuItems.map(item => (
+                <StyledItem $active={pathname === item.href} key={item.href}>
+                  <Link href={item.href}>{item.name}</Link>
+                </StyledItem>
+              ))}
+            </StyledMenu>
+          </StyledNavbar>
+        </div>
       )}
 
-      {pathname.startsWith('/messages') ? (
+      {pathname.startsWith('/messages') || /^\/g\/[^/]+\/chat/.test(pathname) ? (
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
       ) : (
         <PageContainer>{children}</PageContainer>
       )}
-      {isTelegramWebApp && <QRCode onClick={handleQrCodeScan} />}
+
+      <BottomNavBar />
     </div>
   );
 };

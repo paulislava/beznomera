@@ -2,7 +2,7 @@ self.addEventListener('push', function (event) {
   if (!event.data) return;
 
   const payload = event.data.json();
-  const { type, carCode, title, body } = payload;
+  const { type, carId, carCode, title, body } = payload;
 
   const actions =
     type === 'message'
@@ -14,7 +14,7 @@ self.addEventListener('push', function (event) {
       body,
       icon: '/logo-for-qr-light.png',
       badge: '/logo-for-qr-light.png',
-      data: { type, carCode },
+      data: { type, carId, carCode },
       actions,
     })
   );
@@ -23,8 +23,13 @@ self.addEventListener('push', function (event) {
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
 
-  const { type, carCode } = event.notification.data || {};
-  const url = type === 'message' && carCode ? `/g/${carCode}/chat` : '/panel';
+  const { type, carId, carCode } = event.notification.data || {};
+  const url =
+    type === 'message' && carCode
+      ? `/g/${carCode}/chat`
+      : type === 'call' && carId
+        ? `/car/${carId}`
+        : '/';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {

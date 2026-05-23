@@ -27,6 +27,9 @@ export abstract class UserCore extends BaseEntity {
   @Column({ nullable: true, unique: true })
   nickname: string | null;
 
+  @Column({ nullable: true, name: 'avatar_url' })
+  avatarUrl: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   readonly createdAt: Date;
 }

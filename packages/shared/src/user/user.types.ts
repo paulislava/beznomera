@@ -1,3 +1,5 @@
+import { LinkedAccount } from '../auth/auth.types';
+
 export interface UserBalance {
   pure: number;
   bonus: number;
@@ -13,12 +15,20 @@ export interface UserTransaction {
 }
 
 export interface UserProfile {
+  id: number;
   firstName?: string;
   lastName?: string;
   avatarUrl?: string;
   nickname?: string;
   tel?: string;
-  id: number;
+  email?: string;
+  linkedAccounts?: LinkedAccount[];
+}
+
+export interface UserProfileUpdate {
+  firstName?: string;
+  lastName?: string;
+  nickname?: string;
 }
 
 export interface RequestUser {

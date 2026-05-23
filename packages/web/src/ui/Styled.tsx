@@ -27,6 +27,10 @@ export const PageContainer = styled(CenterContainer).attrs({
   margin: auto;
   padding: 20px;
   width: 100%;
+
+  @media (max-width: 1023px) {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
 `;
 
 export const ImageContainer = styled.div`

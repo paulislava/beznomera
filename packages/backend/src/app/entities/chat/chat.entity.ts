@@ -34,6 +34,12 @@ export class Chat extends BaseEntity {
   @Column({ nullable: true })
   contactValue: string | null;
 
+  @Column({ nullable: true, type: 'timestamp' })
+  recieverReadAt: Date | null;
+
+  @Column({ nullable: true, type: 'int' })
+  anonymousNumber: number | null;
+
   @CreateDateColumn()
   createdAt: Date;
 }

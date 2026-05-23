@@ -15,6 +15,13 @@ export class TelegramService implements OnModuleInit {
   constructor(@InjectBot() private readonly bot: Telegraf) {}
 
   async onModuleInit() {
+    if (process.env.DISABLE_TELEGRAM === '1') {
+      this.logger.log(
+        'DISABLE_TELEGRAM=1 — Telegram bot disabled, skipping launch',
+      );
+      return;
+    }
+
     // Telegraf's startPolling вызывает loop() без await — Promise теряется,
     // и 409/401 становятся unhandled rejection, роняя процесс.
     // Патчим startPolling на экземпляре, добавляя .catch() к loop().

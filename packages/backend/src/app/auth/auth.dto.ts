@@ -1,4 +1,11 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import {
   AuthCheckData,
   AuthStartData,
@@ -14,6 +21,10 @@ export class AuthStartDto implements AuthStartData {
 
   @IsEnum(AuthMode)
   authMode: AuthMode;
+
+  @IsOptional()
+  @IsBoolean()
+  allowRegistration?: boolean;
 }
 
 export class AuthCheckDto extends AuthStartDto implements AuthCheckData {

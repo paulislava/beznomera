@@ -1,4 +1,8 @@
-import { Injectable, Logger, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
 import { Chat } from '../entities/chat/chat.entity';
@@ -17,12 +21,11 @@ import {
   ChatInfo,
   ChatMessageInfo,
   MessageSource,
+  MessageType,
 } from '@paulislava/shared/chat/chat.types';
 
 @Injectable()
 export class ChatService {
-  private readonly logger = new Logger(ChatService.name);
-
   constructor(
     @InjectRepository(Chat) private readonly chatRepository: Repository<Chat>,
     @InjectRepository(ChatMessage)
@@ -47,26 +50,47 @@ export class ChatService {
       createdAt: msg.createdAt.toISOString(),
       source,
       attachmentUrl: msg.attachmentUrl ?? null,
+      type: (msg.type as MessageType) ?? MessageType.Normal,
+      isDeleted: msg.isDeleted ?? false,
     };
   }
 
-  private mapChatToInfo(chat: Chat, messages: ChatMessage[]): ChatInfo {
-    const senderName =
-      chat.sender?.firstName ??
-      chat.anonymousSender?.id?.slice(0, 8) ??
-      'Анонимный';
+  private mapChatToInfo(
+    chat: Chat,
+    messages: ChatMessage[],
+    viewerUserId?: number,
+  ): ChatInfo {
+    const isSender = viewerUserId != null && chat.sender?.id === viewerUserId;
 
-    const lastMessage = messages[0]
-      ? this.mapMessageToInfo(messages[0], chat)
+    const senderName = isSender
+      ? chat.reciever?.firstName ?? chat.reciever?.nickname ?? 'Получатель'
+      : chat.sender?.firstName ??
+        (chat.anonymousNumber != null
+          ? `Аноним #${chat.anonymousNumber}`
+          : chat.anonymousSender?.id?.slice(0, 8) ?? 'Анонимный');
+
+    const lastMsg = messages[0];
+    const lastMessage = lastMsg
+      ? this.mapMessageToInfo(lastMsg, chat)
       : undefined;
+    const lastMessageAt =
+      lastMsg?.createdAt.toISOString() ?? chat.createdAt.toISOString();
+
+    const unreadCount = messages.filter(
+      (m) =>
+        (m.userId == null || m.userId !== chat.reciever?.id) &&
+        (!chat.recieverReadAt || m.createdAt > chat.recieverReadAt),
+    ).length;
 
     return {
       id: chat.id,
       createdAt: chat.createdAt.toISOString(),
       lastMessage,
+      lastMessageAt,
       senderName,
       contactType: chat.contactType,
       contactValue: chat.contactValue,
+      unreadCount,
       car: chat.messages?.[0]?.car
         ? {
             id: chat.messages[0].car.id,
@@ -80,10 +104,13 @@ export class ChatService {
   private mapChatToDetails(chat: Chat): ChatDetails {
     const senderName =
       chat.sender?.firstName ??
-      chat.anonymousSender?.id?.slice(0, 8) ??
-      'Анонимный';
+      (chat.anonymousNumber != null
+        ? `Аноним #${chat.anonymousNumber}`
+        : chat.anonymousSender?.id?.slice(0, 8) ?? 'Анонимный');
 
-    const messages = (chat.messages ?? []).map((m) => this.mapMessageToInfo(m, chat));
+    const messages = (chat.messages ?? []).map((m) =>
+      this.mapMessageToInfo(m, chat),
+    );
 
     const firstMsgCar = chat.messages?.find((m) => m.car)?.car;
 
@@ -102,23 +129,58 @@ export class ChatService {
 
   async getMyChats(userId: number): Promise<ChatInfo[]> {
     const chats = await this.chatRepository.find({
-      where: { reciever: { id: userId } },
-      relations: ['sender', 'anonymousSender', 'messages', 'messages.car'],
-      order: { createdAt: 'DESC' },
+      where: [{ reciever: { id: userId } }, { sender: { id: userId } }],
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
     });
 
-    return chats.map((chat) => {
-      const sorted = (chat.messages ?? []).sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-      );
-      return this.mapChatToInfo(chat, sorted);
+    return chats
+      .map((chat) => {
+        const sorted = (chat.messages ?? []).sort(
+          (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+        );
+        return this.mapChatToInfo(chat, sorted, userId);
+      })
+      .sort((a, b) => {
+        const aTime = new Date(a.lastMessageAt ?? a.createdAt).getTime();
+        const bTime = new Date(b.lastMessageAt ?? b.createdAt).getTime();
+        return bTime - aTime;
+      });
+  }
+
+  async getChatInfo(chatId: number): Promise<ChatInfo> {
+    const chat = await this.chatRepository.findOne({
+      where: { id: chatId },
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
     });
+    if (!chat) throw new NotFoundException('Chat not found');
+    const sorted = (chat.messages ?? []).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+    return this.mapChatToInfo(chat, sorted);
   }
 
   async getChatDetails(chatId: number, userId: number): Promise<ChatDetails> {
     const chat = await this.chatRepository.findOne({
       where: { id: chatId },
-      relations: ['reciever', 'sender', 'anonymousSender', 'messages', 'messages.car'],
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
       order: { messages: { createdAt: 'ASC' } },
     });
 
@@ -147,7 +209,13 @@ export class ChatService {
 
     const fullChat = await this.chatRepository.findOne({
       where: { id: chat.id },
-      relations: ['reciever', 'sender', 'anonymousSender', 'messages', 'messages.car'],
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
       order: { messages: { createdAt: 'ASC' } },
     });
 
@@ -175,6 +243,8 @@ export class ChatService {
       attachmentUrl: attachmentUrl ?? null,
       telegramId: null,
       sourceTelegramId: null,
+      type: MessageType.Normal,
+      isDeleted: false,
     });
 
     return this.mapMessageToInfo(saved, chat);
@@ -186,10 +256,20 @@ export class ChatService {
     attachmentUrl: string | undefined,
     userId?: number,
     anonymousId?: string,
-  ): Promise<ChatMessageInfo> {
+  ): Promise<{
+    message: ChatMessageInfo;
+    ownerUserId: number;
+    chatInfo: ChatInfo;
+  }> {
     const chat = await this.chatRepository.findOne({
       where: { id: chatId },
-      relations: ['reciever', 'sender', 'anonymousSender'],
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
     });
 
     if (!chat) throw new NotFoundException('Chat not found');
@@ -209,9 +289,155 @@ export class ChatService {
       attachmentUrl: attachmentUrl ?? null,
       telegramId: null,
       sourceTelegramId: null,
+      type: MessageType.Normal,
+      isDeleted: false,
     });
 
-    return this.mapMessageToInfo(saved, chat);
+    const message = this.mapMessageToInfo(saved, chat);
+
+    // refresh messages for chatInfo
+    const updatedChat = await this.chatRepository.findOne({
+      where: { id: chatId },
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
+    });
+    const sorted = (updatedChat!.messages ?? []).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+    const chatInfo = this.mapChatToInfo(updatedChat!, sorted);
+
+    return { message, ownerUserId: chat.reciever?.id, chatInfo };
+  }
+
+  async markAsRead(chatId: number, userId: number): Promise<ChatInfo> {
+    const chat = await this.chatRepository.findOne({
+      where: { id: chatId, reciever: { id: userId } },
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
+    });
+
+    if (!chat) throw new ForbiddenException('Access denied');
+
+    await this.chatRepository.update(chatId, { recieverReadAt: new Date() });
+
+    chat.recieverReadAt = new Date();
+    const sorted = (chat.messages ?? []).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+    return this.mapChatToInfo(chat, sorted);
+  }
+
+  async deleteMessage(
+    messageId: number,
+    userId?: number,
+    anonymousId?: string,
+  ): Promise<{ messageId: number; chatId: number }> {
+    const msg = await this.messagesRepository.findOne({
+      where: { id: messageId },
+      relations: [
+        'chat',
+        'chat.reciever',
+        'chat.sender',
+        'chat.anonymousSender',
+      ],
+    });
+
+    if (!msg) throw new NotFoundException('Message not found');
+
+    const chat = msg.chat;
+    const isOwner = userId != null && chat.reciever?.id === userId;
+    const isSender =
+      (userId != null && chat.sender?.id === userId) ||
+      (anonymousId != null && chat.anonymousSender?.id === anonymousId);
+
+    if (!isOwner && !isSender) throw new ForbiddenException('Access denied');
+
+    await this.messagesRepository.update(messageId, { isDeleted: true });
+
+    return { messageId, chatId: msg.chatId };
+  }
+
+  async deleteChat(chatId: number, userId: number): Promise<number> {
+    const chat = await this.chatRepository.findOne({
+      where: { id: chatId, reciever: { id: userId } },
+      relations: ['reciever'],
+    });
+
+    if (!chat) throw new ForbiddenException('Access denied');
+
+    const ownerId = chat.reciever.id;
+    await this.chatRepository.delete(chatId);
+    return ownerId;
+  }
+
+  async createCallSystemMessage(
+    carId: number,
+    userId?: number,
+    anonymousId?: string,
+  ): Promise<{
+    message: ChatMessageInfo;
+    ownerUserId: number;
+    chatInfo: ChatInfo;
+  } | null> {
+    if (!userId && !anonymousId) return null;
+
+    const senderInfo: FindOptionsWhere<Chat> = userId
+      ? { sender: { id: userId } }
+      : { anonymousSender: { id: anonymousId } };
+
+    const chat = await this.chatRepository.findOne({
+      where: { messages: { car: { id: carId } }, ...senderInfo },
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
+    });
+
+    if (!chat) return null;
+
+    const saved = await this.messagesRepository.save({
+      chat,
+      chatId: chat.id,
+      text: '🔔 Водителя вызвали к автомобилю',
+      userId: null,
+      attachmentUrl: null,
+      telegramId: null,
+      sourceTelegramId: null,
+      type: MessageType.Call,
+      isDeleted: false,
+    });
+
+    const message = this.mapMessageToInfo(saved, chat);
+
+    const updatedChat = await this.chatRepository.findOne({
+      where: { id: chat.id },
+      relations: [
+        'reciever',
+        'sender',
+        'anonymousSender',
+        'messages',
+        'messages.car',
+      ],
+    });
+    const sorted = (updatedChat!.messages ?? []).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
+    const chatInfo = this.mapChatToInfo(updatedChat!, sorted);
+
+    return { message, ownerUserId: chat.reciever?.id, chatInfo };
   }
 
   async updateContact(
@@ -231,7 +457,8 @@ export class ChatService {
       (userId != null && chat.sender?.id === userId) ||
       (anonymousId != null && chat.anonymousSender?.id === anonymousId);
 
-    if (!isSender) throw new ForbiddenException('Only sender can update contact');
+    if (!isSender)
+      throw new ForbiddenException('Only sender can update contact');
 
     await this.chatRepository.update(chatId, {
       contactType: body.contactType,
@@ -257,7 +484,7 @@ export class ChatService {
     return newAnonymousUser.id;
   }
 
-  private async getOrCreateChat(
+  async getOrCreateChat(
     car: Car,
     userId: number | undefined,
     anonymousId: string | undefined,
@@ -282,8 +509,19 @@ export class ChatService {
       return existingChat;
     }
 
+    const isAnonymous = !userId && !!anonymousId;
+    let anonymousNumber: number | null = null;
+
+    if (isAnonymous) {
+      const maxNum = await this.chatRepository.maximum('anonymousNumber', {
+        reciever: { id: car.owner.id },
+      });
+      anonymousNumber = (maxNum ?? 0) + 1;
+    }
+
     return this.chatRepository.save({
       reciever: car.owner,
+      anonymousNumber,
       ...senderInfo,
     });
   }
@@ -295,7 +533,9 @@ export class ChatService {
     userAgentString?: string,
     coords?: { latitude: number; longitude: number },
   ) {
-    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''}\nОтветьте на это сообщение, чтобы отправить ответ отправителю.\n\n#чат${chatId}`;
+    const tgText = `${car.no}: новое сообщение:\n${text}\n\n${
+      userAgentString ? `Отправлено из: ${userAgentString}.\n` : ''
+    }\nОтветьте на это сообщение, чтобы отправить ответ отправителю.\n\n#чат${chatId}`;
 
     const tgMessage = await this.telegramService.sendMessage(tgText, car.owner);
 
@@ -338,6 +578,8 @@ export class ChatService {
       userId,
       telegramId: tgMessage?.message_id.toString() ?? null,
       attachmentUrl: null,
+      type: MessageType.Normal,
+      isDeleted: false,
     });
   }
 
@@ -387,6 +629,8 @@ export class ChatService {
       userId,
       telegramId: tgMessage?.message_id.toString() ?? null,
       attachmentUrl: null,
+      type: MessageType.Normal,
+      isDeleted: false,
     });
 
     if (newAnonymousId) {

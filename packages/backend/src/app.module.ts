@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { AppController } from './app.controller';
+import { HealthController } from './health.controller';
 import { ConfigModule } from './app/config/config.module';
 import { DatabaseModule } from './app/database/database.module';
 import { AppService } from './app.service';
@@ -34,7 +35,7 @@ import { NotificationModule } from './app/notification/notification.module';
     AdminModule,
     NotificationModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
 })
 export class AppModule {}

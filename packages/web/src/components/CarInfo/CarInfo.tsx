@@ -1,9 +1,9 @@
 'use client';
 
 import Button from '@/ui/Button/Button';
-import { carService, chatService } from '@/services';
+import { carService } from '@/services';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { handleEvent } from '@/utils/log';
 import { TELEGRAM_BOT_NAME } from '@/utils/env';
@@ -19,7 +19,6 @@ import {
 } from '@/components/CarDetails';
 import { ButtonsColumn } from '@/ui/Styled';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { isTelegramWebApp } from '@/utils/telegram';
 import { CarInfoProps } from './CarInfo.types';
 import { CarRating } from '../CarRating';
@@ -27,18 +26,6 @@ import { CarRating } from '../CarRating';
 export const CarInfoPage = ({ info, code }: CarInfoProps) => {
   const [called, setCalled] = useState(false);
   const eventData = useMemo(() => ({ carId: info?.id, code }), [info, code]);
-  const router = useRouter();
-
-  useEffect(() => {
-    chatService
-      .chatByCarCode(code)
-      .then(chat => {
-        if (chat.messages.length > 0) {
-          router.replace(`/g/${code}/chat`);
-        }
-      })
-      .catch(() => {});
-  }, [code, router]);
 
   const callHandler = useCallback(
     () =>

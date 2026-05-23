@@ -8,12 +8,12 @@ import CHAT_API from '@shared/chat/chat.api';
 
 export const createApi = (userToken?: string) => {
   return {
-    auth: createApiService(AUTH_API, userToken),
-    car: createApiService(CAR_API, userToken),
-    file: createApiService(FILE_API, userToken),
-    user: createApiService(USER_API, userToken),
-    notification: createApiService(NOTIFICATION_API, userToken),
-    chat: createApiService(CHAT_API, userToken)
+    auth: createApiService(AUTH_API, userToken, undefined, false),
+    car: createApiService(CAR_API, userToken, undefined, 60 * 60),
+    file: createApiService(FILE_API, userToken, undefined, false),
+    user: createApiService(USER_API, userToken, undefined, false),
+    notification: createApiService(NOTIFICATION_API, userToken, undefined, false),
+    chat: createApiService(CHAT_API, userToken, undefined, false)
   };
 };
 

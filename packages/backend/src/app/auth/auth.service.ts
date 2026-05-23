@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transactional } from 'typeorm-transactional';
 import { Response } from 'express';
@@ -13,6 +13,7 @@ import { AuthCode } from '../entities/auth-code.entity';
 import { User } from '../entities/user/user.entity';
 import { UserDraft } from '../entities/user/user-draft.entity';
 import { UserCore } from '../entities/user/user-core.entity';
+import { UserOAuth } from '../entities/user/user-oauth.entity';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 
 import { AuthMode } from './auth.types';
@@ -24,7 +25,11 @@ import {
 
 import { SmsHttpClientService } from '~/common/http-clients/sms-http-client/sms-http-client.service';
 import { randomDigitsString } from '~/common/utils/randomDigitsString';
-import { AuthTelegramData } from '@paulislava/shared/auth/auth.types';
+import {
+  AuthTelegramData,
+  LinkedAccount,
+  OAuthProvider,
+} from '@paulislava/shared/auth/auth.types';
 import { createHash, createHmac } from 'crypto';
 import querystring from 'querystring';
 import {
@@ -32,6 +37,7 @@ import {
   WebAppUser,
   TOKEN_VERSION,
 } from '@paulislava/shared/auth/auth.api';
+import { OAuthProfileData } from './strategies/oauth-profile.types';
 
 @Injectable()
 export class AuthService {
@@ -46,6 +52,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserDraft)
     private readonly userDraftRepository: Repository<UserDraft>,
+    @InjectRepository(UserOAuth)
+    private readonly userOAuthRepository: Repository<UserOAuth>,
   ) {}
 
   @Transactional()
@@ -62,7 +70,11 @@ export class AuthService {
   }
 
   @Transactional()
-  async authStart(authMode: AuthMode, identifier: string): Promise<void> {
+  async authStart(
+    authMode: AuthMode,
+    identifier: string,
+    allowRegistration = false,
+  ): Promise<void> {
     const userParams = this.getUserParams(authMode, identifier);
 
     const user = await this.userRepository.findOne({ where: userParams });
@@ -73,7 +85,16 @@ export class AuthService {
       userDraft = await this.userDraftRepository.findOne({ where: userParams });
 
       if (!userDraft) {
-        throw new UserNotFound(authMode, identifier);
+        if (!allowRegistration) {
+          throw new UserNotFound(authMode, identifier);
+        }
+        const draftData: DeepPartial<UserDraft> =
+          authMode === AuthMode.EMAIL
+            ? { email: identifier }
+            : { tel: identifier };
+        userDraft = await this.userDraftRepository.save(
+          this.userDraftRepository.create(draftData),
+        );
       }
     }
 
@@ -112,13 +133,11 @@ export class AuthService {
 
     if (findUser) {
       return this.saveAuthCookie(findUser, res);
-      return;
     }
 
     const user = await this.userRepository.save(
       this.userRepository.create({
         firstName: data.first_name,
-        // @ts-ignore last_name doesn't exists in type. Why?
         lastName: data.last_name,
         nickname: data.username,
         telegramID: data.id.toString(),
@@ -157,6 +176,102 @@ export class AuthService {
     return this.saveAuthCookie(user, res);
   }
 
+  @Transactional()
+  async authOAuth(
+    oauthData: OAuthProfileData,
+    currentUserId: number | null,
+    res: Response,
+  ): Promise<string> {
+    const { provider, providerUserId, email, displayName, avatarUrl } =
+      oauthData;
+
+    // Linking mode: user is already logged in
+    if (currentUserId !== null) {
+      const existing = await this.userOAuthRepository.findOne({
+        where: { provider, providerUserId },
+      });
+      if (existing && existing.userId !== currentUserId) {
+        throw new BadRequestException(
+          'Этот аккаунт уже привязан к другому пользователю',
+        );
+      }
+      if (!existing) {
+        await this.userOAuthRepository.save(
+          this.userOAuthRepository.create({
+            userId: currentUserId,
+            provider,
+            providerUserId,
+            email,
+            displayName,
+          }),
+        );
+      }
+      const user = await this.userRepository.findOneOrFail({
+        where: { id: currentUserId },
+      });
+      return this.saveAuthCookie(user, res);
+    }
+
+    // Auth mode: find existing OAuth link
+    const existingOAuth = await this.userOAuthRepository.findOne({
+      where: { provider, providerUserId },
+      relations: ['user'],
+    });
+
+    if (existingOAuth) {
+      return this.saveAuthCookie(existingOAuth.user, res);
+    }
+
+    // Try to find user by email
+    let user: User | null = null;
+    if (email) {
+      user = await this.userRepository.findOne({ where: { email } });
+    }
+
+    // Create new user if not found
+    if (!user) {
+      user = await this.userRepository.save(
+        this.userRepository.create({
+          firstName: displayName?.split(' ')[0] ?? null,
+          lastName: displayName?.split(' ').slice(1).join(' ') || null,
+          email,
+          avatarUrl,
+        }),
+      );
+    }
+
+    await this.userOAuthRepository.save(
+      this.userOAuthRepository.create({
+        userId: user.id,
+        provider,
+        providerUserId,
+        email,
+        displayName,
+      }),
+    );
+
+    return this.saveAuthCookie(user, res);
+  }
+
+  async unlinkOAuth(userId: number, provider: OAuthProvider): Promise<void> {
+    const record = await this.userOAuthRepository.findOne({
+      where: { userId, provider },
+    });
+    if (!record) {
+      throw new BadRequestException('Аккаунт не привязан');
+    }
+    await this.userOAuthRepository.remove(record);
+  }
+
+  async getLinkedAccounts(userId: number): Promise<LinkedAccount[]> {
+    const records = await this.userOAuthRepository.find({ where: { userId } });
+    return records.map((r) => ({
+      provider: r.provider,
+      email: r.email,
+      displayName: r.displayName,
+    }));
+  }
+
   private async getOrCreateUserByAuthCode(authCode: AuthCode): Promise<User> {
     if (authCode.user) {
       return authCode.user;
@@ -186,7 +301,7 @@ export class AuthService {
     return user;
   }
 
-  private saveAuthCookie(user: User, res: Response) {
+  saveAuthCookie(user: User, res: Response): string {
     const expires = new Date(Date.now() + AUTH_TOKEN_EXPIRATION_TIME);
 
     const requestUser: RequestUser = {
@@ -229,18 +344,15 @@ export class AuthService {
       .update(this.configService.telegram.token)
       .digest();
 
-    // this is the data to be authenticated i.e. telegram user id, first_name, last_name etc.
     const dataCheckString = Object.keys(data)
       .sort()
       .map((key) => `${key}=${data[key]}`)
       .join('\n');
 
-    // run a cryptographic hash function over the data to be authenticated and the secret
     const hmac = createHmac('sha256', secretKey as any)
       .update(dataCheckString)
       .digest('hex');
 
-    // compare the hash that you calculate on your side (hmac) with what Telegram sends you (hash) and return the result
     if (hmac !== hash) {
       throw new AuthServiceException('Telegram authentication failed');
     }
@@ -249,24 +361,19 @@ export class AuthService {
   private checkTelegramWebAppData(data: string): WebAppUser {
     const parsedData = querystring.parse(data);
 
-    // Извлекаем хэш из данных
     const hash = parsedData.hash;
     if (!hash) {
       throw new Error('Hash not found in initData');
     }
 
-    // Удаляем хэш из объекта, чтобы он не участвовал в вычислении хэша
     delete parsedData.hash;
 
-    // Сортируем ключи в алфавитном порядке
     const sortedKeys = Object.keys(parsedData).sort();
 
-    // Создаем строку для хэширования
     const dataCheckString = sortedKeys
       .map((key) => `${key}=${parsedData[key]}`)
       .join('\n');
 
-    // Вычисляем хэш с использованием HMAC-SHA-256
     const secretKey = createHmac('sha256', 'WebAppData')
       .update(this.configService.telegram.token)
       .digest();
@@ -275,9 +382,8 @@ export class AuthService {
       .update(dataCheckString)
       .digest('hex');
 
-    // Сравниваем вычисленный хэш с предоставленным хэшем
     if (computedHash === hash) {
-      return JSON.parse(parsedData.user as string); // Данные валидны
+      return JSON.parse(parsedData.user as string);
     } else {
       throw new AuthServiceException('Invalid initData hash');
     }

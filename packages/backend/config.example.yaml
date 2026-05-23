@@ -41,6 +41,28 @@ s3:
   bucket: your_bucket_name
   region: your_region
 
+# OAuth — все поля опциональны; провайдер активируется только если заполнен
+# oauth:
+#   frontendUrl: https://beznomera.net   # куда редиректить после OAuth callback
+#   backendUrl: https://beznomera.net    # публичный URL бэкенда (для callbackURL)
+#   google:
+#     clientId: YOUR_GOOGLE_CLIENT_ID
+#     clientSecret: YOUR_GOOGLE_CLIENT_SECRET
+#   yandex:
+#     clientId: YOUR_YANDEX_CLIENT_ID
+#     clientSecret: YOUR_YANDEX_CLIENT_SECRET
+#   vk:
+#     clientId: YOUR_VK_CLIENT_ID
+#     clientSecret: YOUR_VK_CLIENT_SECRET
+#   apple:
+#     clientId: com.example.app          # Service ID (не Bundle ID)
+#     teamId: TEAM_ID
+#     keyId: KEY_ID
+#     privateKey: |                       # содержимое .p8 файла
+#       -----BEGIN PRIVATE KEY-----
+#       ...
+#       -----END PRIVATE KEY-----
+
 # Generate with: npx web-push generate-vapid-keys
 vapid:
   subject: mailto:admin@example.com

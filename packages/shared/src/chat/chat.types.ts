@@ -3,6 +3,12 @@ export enum MessageSource {
   Reciever = 'reciever'
 }
 
+export enum MessageType {
+  Normal = 'normal',
+  Call = 'call',
+  System = 'system',
+}
+
 export interface ChatMessageInfo {
   id: number;
   chatId: number;
@@ -11,15 +17,19 @@ export interface ChatMessageInfo {
   createdAt: string;
   source: MessageSource;
   attachmentUrl?: string | null;
+  type?: MessageType;
+  isDeleted?: boolean;
 }
 
 export interface ChatInfo {
   id: number;
   createdAt: string;
   lastMessage?: ChatMessageInfo;
+  lastMessageAt?: string;
   senderName?: string;
   contactType?: string | null;
   contactValue?: string | null;
+  unreadCount?: number;
   car?: {
     id: number;
     no: string;
@@ -58,4 +68,11 @@ export const CHAT_EVENTS = {
   SEND_MESSAGE: 'chat:send_message',
   NEW_MESSAGE: 'chat:new_message',
   ERROR: 'chat:error',
+  TYPING: 'chat:typing',
+  MARK_READ: 'chat:mark_read',
+  CHAT_UPDATE: 'chat:chat_update',
+  MESSAGE_DELETED: 'chat:message_deleted',
+  CHAT_DELETED: 'chat:chat_deleted',
+  DELETE_MESSAGE: 'chat:delete_message',
+  DELETE_CHAT: 'chat:delete_chat',
 } as const;
