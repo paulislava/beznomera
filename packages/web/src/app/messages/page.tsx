@@ -4,6 +4,8 @@ import { AUTH_COOKIE_NAME } from '@/helpers/constants';
 import { cookies } from 'next/headers';
 import { ChatList } from '@/components/Chat/ChatList';
 
+export const dynamic = 'force-dynamic';
+
 const MessagesPage: AuthComponent = async ({ user }) => {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
