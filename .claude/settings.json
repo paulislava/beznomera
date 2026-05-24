@@ -11,21 +11,6 @@
       }
     ]
   },
-  "mcpServers": {
-    "serena": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/oraios/serena",
-        "serena-mcp-server",
-        "--context",
-        "ide-assistant",
-        "--project-root",
-        "$CLAUDE_PROJECT_DIR"
-      ]
-    }
-  },
   "enabledPlugins": {
     "superpowers@superpowers-marketplace": true
   }
