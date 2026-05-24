@@ -560,7 +560,9 @@ export function ChatWindow({
   // Close lightbox on Escape
   useEffect(() => {
     if (!lightboxUrl) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightboxUrl(null); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxUrl(null);
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [lightboxUrl]);
@@ -801,7 +803,10 @@ export function ChatWindow({
                       alt='attachment'
                       style={{ display: imgLoaded[msg.id] ? 'block' : 'none' }}
                       onLoad={() => setImgLoaded(prev => ({ ...prev, [msg.id]: true }))}
-                      onClick={e => { e.stopPropagation(); setLightboxUrl(msg.attachmentUrl!); }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setLightboxUrl(msg.attachmentUrl!);
+                      }}
                     />
                   </>
                 )}
