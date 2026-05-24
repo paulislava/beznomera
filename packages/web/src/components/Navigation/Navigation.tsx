@@ -66,14 +66,15 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const filteredMenuItems = menuItems;
 
   const telegramAppLink = useMemo(() => transferLinkToTelegram(pathname), [pathname]);
-  const isChatPage = pathname.startsWith('/messages') || /^\/g\/[^/]+\/chat/.test(pathname);
+  const isFullscreenChat = /^\/messages\/\d+/.test(pathname) || /^\/g\/[^/]+\/chat/.test(pathname);
+  const isChatLayout = pathname.startsWith('/messages') || /^\/g\/[^/]+\/chat/.test(pathname);
 
   if (pathname.startsWith('/auth')) {
     return <>{children}</>;
   }
 
   return (
-    <div className={`${isChatPage ? 'h-dvh' : 'min-h-screen'} flex flex-col overflow-hidden`}>
+    <div className={`${isChatLayout ? 'h-dvh' : 'min-h-screen'} flex flex-col overflow-hidden`}>
       {isTelegramWebApp ? (
         <>
           <TgSpace />
@@ -119,7 +120,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         </div>
       )}
 
-      {isChatPage ? (
+      {isChatLayout ? (
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           {children}
         </div>
@@ -127,7 +128,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
         <PageContainer>{children}</PageContainer>
       )}
 
-      {!isChatPage && <BottomNavBar />}
+      {!isFullscreenChat && <BottomNavBar />}
     </div>
   );
 };
