@@ -25,5 +25,8 @@
         "$CLAUDE_PROJECT_DIR"
       ]
     }
+  },
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true
   }
 }
