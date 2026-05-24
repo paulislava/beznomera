@@ -9,6 +9,13 @@ echo '{"async": true, "asyncTimeout": 300000}'
 
 cd "$CLAUDE_PROJECT_DIR"
 
+echo "[session-start] Installing plugins..."
+claude plugin marketplace add obra/superpowers-marketplace 2>&1 || true
+claude plugin install superpowers@superpowers-marketplace --scope project 2>&1 || true
+
+echo "[session-start] Installing Serena MCP..."
+claude mcp add serena --scope user -- uvx --from git+https://github.com/oraios/serena serena-mcp-server --context ide-assistant --project-root "$CLAUDE_PROJECT_DIR" 2>&1 || true
+
 echo "[session-start] Installing root dependencies..."
 npm install --legacy-peer-deps --prefer-offline 2>&1
 
