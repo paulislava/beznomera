@@ -268,6 +268,49 @@ const AttachImg = styled.img`
   border-radius: 12px;
   display: block;
   margin-bottom: 2px;
+  cursor: zoom-in;
+`;
+
+const Lightbox = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+`;
+
+const LightboxImg = styled.img`
+  max-width: 95vw;
+  max-height: 95vh;
+  border-radius: 8px;
+  object-fit: contain;
+  cursor: default;
+  user-select: none;
+`;
+
+const LightboxClose = styled.button`
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
 `;
 
 // ─── Context menu ─────────────────────────────────────────────────────────────
@@ -468,6 +511,7 @@ export function ChatWindow({
   const [menuState, setMenuState] = useState<MenuState | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set<number>());
   const [imgLoaded, setImgLoaded] = useState<Record<number, boolean>>({});
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const selectionMode = selectedIds.size > 0;
 
@@ -512,6 +556,16 @@ export function ChatWindow({
     document.addEventListener('click', close);
     return () => document.removeEventListener('click', close);
   }, [menuState]);
+
+  // Close lightbox on Escape
+  useEffect(() => {
+    if (!lightboxUrl) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxUrl(null);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [lightboxUrl]);
 
   useEffect(
     () => () => {
@@ -749,6 +803,10 @@ export function ChatWindow({
                       alt='attachment'
                       style={{ display: imgLoaded[msg.id] ? 'block' : 'none' }}
                       onLoad={() => setImgLoaded(prev => ({ ...prev, [msg.id]: true }))}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setLightboxUrl(msg.attachmentUrl!);
+                      }}
                     />
                   </>
                 )}
@@ -763,6 +821,13 @@ export function ChatWindow({
           );
         })}
       </MsgList>
+
+      {lightboxUrl && (
+        <Lightbox onClick={() => setLightboxUrl(null)}>
+          <LightboxClose onClick={() => setLightboxUrl(null)}>✕</LightboxClose>
+          <LightboxImg src={lightboxUrl} alt='preview' onClick={e => e.stopPropagation()} />
+        </Lightbox>
+      )}
 
       {menuState && (
         <ContextMenu
