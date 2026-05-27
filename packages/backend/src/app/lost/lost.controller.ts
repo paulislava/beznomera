@@ -84,7 +84,7 @@ export class LostController implements LostApi {
 
   @Get('shortcut/:token/file')
   @Header('Content-Type', 'application/octet-stream')
-  @Header('Content-Disposition', 'attachment; filename="i-forgot.shortcut"')
+  @Header('Content-Disposition', 'attachment; filename="iloss.shortcut"')
   async downloadShortcutFile(
     @Param('token') token: string,
     @Req() req: Request,

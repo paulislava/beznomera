@@ -73,10 +73,11 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
             if (!values.itemId || shortcutLoading) return;
             setShortcutLoading(true);
             try {
-              const { token } = await lostService.getOrCreateShortcut({
+              const { token, itemName } = await lostService.getOrCreateShortcut({
                 itemId: Number(values.itemId)
               });
-              window.location.href = `/api/lost/shortcut/${token}/file`;
+              const fileUrl = `${window.location.origin}/api/lost/shortcut/${token}/file`;
+              window.location.href = `shortcuts://import-shortcut?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent('Я потеряла ' + itemName)}`;
             } catch {
             } finally {
               setShortcutLoading(false);
