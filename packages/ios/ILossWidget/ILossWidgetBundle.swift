@@ -2,8 +2,8 @@ import WidgetKit
 import SwiftUI
 
 @main
-struct ILossWidgetBundle: WidgetBundle {
+struct ILostWidgetBundle: WidgetBundle {
     var body: some Widget {
-        ILossWidget()
+        ILostWidget()
     }
 }

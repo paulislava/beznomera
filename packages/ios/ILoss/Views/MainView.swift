@@ -102,7 +102,7 @@ struct MainView: View {
                 }
                 .padding(.vertical, 32)
             }
-            .navigationTitle("ILoss")
+            .navigationTitle("ILost")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Выйти") {

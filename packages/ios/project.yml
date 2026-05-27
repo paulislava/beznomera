@@ -1,4 +1,4 @@
-name: ILoss
+name: ILost
 options:
   bundleIdPrefix: net.beznomera
   deploymentTarget:
@@ -16,7 +16,7 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
 
 targets:
-  ILoss:
+  ILost:
     type: application
     platform: iOS
     sources:
@@ -24,22 +24,22 @@ targets:
       - path: ILoss
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.iloss
+        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ilost
         INFOPLIST_FILE: ILoss/Info.plist
     entitlements:
       path: ILoss/ILoss.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.net.beznomera.iloss
+          - group.net.beznomera.ilost
     dependencies:
-      - target: ILossWidget
+      - target: ILostWidget
         embed: true
         codeSign: true
-      - target: ILossWatchApp
+      - target: ILostWatchApp
         embed: true
         codeSign: true
 
-  ILossWidget:
+  ILostWidget:
     type: app-extension
     platform: iOS
     sources:
@@ -47,15 +47,15 @@ targets:
       - path: ILossWidget
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.iloss.widget
+        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ilost.widget
         INFOPLIST_FILE: ILossWidget/Info.plist
     entitlements:
       path: ILossWidget/ILossWidget.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.net.beznomera.iloss
+          - group.net.beznomera.ilost
 
-  ILossWatchApp:
+  ILostWatchApp:
     type: watchos.application
     platform: watchOS
     sources:
@@ -65,11 +65,11 @@ targets:
       - path: ILossWatchApp
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.iloss.watchapp
+        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ilost.watchapp
         INFOPLIST_FILE: ILossWatchApp/Info.plist
         TARGETED_DEVICE_FAMILY: "4"
     entitlements:
       path: ILossWatchApp/ILossWatchApp.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.net.beznomera.iloss
+          - group.net.beznomera.ilost

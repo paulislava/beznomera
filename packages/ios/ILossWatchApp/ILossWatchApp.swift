@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ILossWatchApp: App {
+struct ILostWatchApp: App {
     var body: some Scene {
         WindowGroup {
             WatchContentView()
