@@ -103,11 +103,11 @@ export class LostController implements LostApi {
     const host =
       (req.headers['x-forwarded-host'] as string) || req.headers.host || '';
     const baseUrl = `${proto}://${host}`;
-    const plist = this.lostService.generateShortcutFile(
+    const buf = this.lostService.generateShortcutFile(
       token,
       shortcutInfo.itemName,
       baseUrl,
     );
-    return new StreamableFile(Buffer.from(plist, 'utf8'));
+    return new StreamableFile(buf);
   }
 }

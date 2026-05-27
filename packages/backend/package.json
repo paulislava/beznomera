@@ -40,6 +40,7 @@
     "@types/web-push": "3.6.4",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "bplist-creator": "0.1.1",
     "cjstoesm": "^2.1.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
