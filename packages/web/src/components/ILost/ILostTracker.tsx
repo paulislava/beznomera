@@ -83,7 +83,13 @@ export function ILostTracker({ initialStats, initialItems, initialItemStats }: P
               });
               const blob = generateShortcutBlob(token, itemName, window.location.origin);
               const url = URL.createObjectURL(blob);
-              window.location.href = url;
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'iloss.shortcut';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
             } catch {
             } finally {
               setShortcutLoading(false);
