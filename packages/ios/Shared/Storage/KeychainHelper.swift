@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 enum KeychainHelper {
-    private static let service = "net.beznomera.iloss"
+    private static let service = "net.beznomera.ilost"
     private static let account = "jwt_token"
 
     static var token: String? {

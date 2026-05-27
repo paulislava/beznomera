@@ -1,6 +1,6 @@
 import Foundation
 
-private let suiteName = "group.net.beznomera.iloss"
+private let suiteName = "group.net.beznomera.ilost"
 private let tokenKey = "jwt_token"
 private let lastItemIdKey = "last_item_id"
 private let itemStatsKey = "item_stats_json"

@@ -1,22 +1,22 @@
 import WidgetKit
 import SwiftUI
 
-struct ILossWidget: Widget {
-    let kind = "ILossWidget"
+struct ILostWidget: Widget {
+    let kind = "ILostWidget"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: ILossProvider()) { entry in
-            ILossWidgetView(entry: entry)
+        StaticConfiguration(kind: kind, provider: ILostProvider()) { entry in
+            ILostWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("ILoss")
+        .configurationDisplayName("ILost")
         .description("Статистика потерь")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 
-struct ILossWidgetView: View {
-    let entry: ILossEntry
+struct ILostWidgetView: View {
+    let entry: ILostEntry
     @Environment(\.widgetFamily) var family
 
     var body: some View {
@@ -64,7 +64,7 @@ private struct MediumWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Label("ILoss", systemImage: "questionmark.circle.fill")
+            Label("ILost", systemImage: "questionmark.circle.fill")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
             ForEach(stats) { stat in

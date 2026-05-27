@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ILossApp: App {
+struct ILostApp: App {
     @State private var isLoggedIn = AuthService.isLoggedIn
 
     var body: some Scene {

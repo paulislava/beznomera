@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>ILossWidget</string>
+	<string>ILostWidget</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.beznomera.iloss.widget</string>
+	<string>net.beznomera.ilost.widget</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>CFBundleShortVersionString</key>

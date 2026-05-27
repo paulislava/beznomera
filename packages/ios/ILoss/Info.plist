@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>ILoss</string>
+	<string>ILost</string>
 	<key>CFBundleDisplayName</key>
-	<string>ILoss</string>
+	<string>ILost</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.beznomera.iloss</string>
+	<string>net.beznomera.ilost</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>CFBundleShortVersionString</key>
