@@ -81,7 +81,7 @@ export function ILostTracker({ initialStats, initialItems, initialItemStats }: P
                 itemId: Number(values.itemId)
               });
               const fileUrl = `${window.location.origin}/api/lost/shortcut/${token}/file`;
-              window.location.href = `shortcuts://import-shortcut?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent('Я потеряла ' + itemName)}`;
+              window.location.href = `shortcuts://import-shortcut?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent('iloss ' + itemName)}`;
             } catch {
             } finally {
               setShortcutLoading(false);
