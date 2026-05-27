@@ -12,6 +12,7 @@ import {
   LostItemStats,
 } from '@paulislava/shared/lost/lost.types';
 import { MoreThan, Repository } from 'typeorm';
+import bplistCreator = require('bplist-creator');
 import { LostItem } from '../entities/lost/lost-item.entity';
 import { LossEvent } from '../entities/lost/loss-event.entity';
 import { LostShortcutToken } from '../entities/lost/lost-shortcut-token.entity';
@@ -151,43 +152,31 @@ export class LostService {
     return { token: shortcut.token, itemName: shortcut.item.name };
   }
 
-  generateShortcutFile(
-    token: string,
-    itemName: string,
-    baseUrl: string,
-  ): string {
+  generateShortcutFile(token: string, itemName: string, baseUrl: string): Buffer {
     const triggerUrl = `${baseUrl}/api/lost/shortcut/${token}`;
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>WFWorkflowClientRelease</key><string>2.0</string>
-  <key>WFWorkflowClientVersion</key><string>2190</string>
-  <key>WFWorkflowMinimumClientVersion</key><integer>900</integer>
-  <key>WFWorkflowName</key><string>Я забыла ${itemName}</string>
-  <key>WFWorkflowIcon</key>
-  <dict>
-    <key>WFWorkflowIconGlyphNumber</key><integer>59499</integer>
-    <key>WFWorkflowIconStartColor</key><integer>4274264319</integer>
-  </dict>
-  <key>WFWorkflowImportQuestions</key><array/>
-  <key>WFWorkflowInputContentItemClasses</key><array/>
-  <key>WFWorkflowTypes</key>
-  <array><string>WatchKit</string></array>
-  <key>WFWorkflowActions</key>
-  <array>
-    <dict>
-      <key>WFWorkflowActionIdentifier</key>
-      <string>is.workflow.actions.downloadurl</string>
-      <key>WFWorkflowActionParameters</key>
-      <dict>
-        <key>WFHTTPMethod</key><string>GET</string>
-        <key>WFURL</key><string>${triggerUrl}</string>
-      </dict>
-    </dict>
-  </array>
-</dict>
-</plist>`;
+    const data = {
+      WFWorkflowClientRelease: '2.0',
+      WFWorkflowClientVersion: 2190,
+      WFWorkflowMinimumClientVersion: 900,
+      WFWorkflowName: `Я потеряла ${itemName}`,
+      WFWorkflowIcon: {
+        WFWorkflowIconGlyphNumber: 59499,
+        WFWorkflowIconStartColor: 4274264319,
+      },
+      WFWorkflowImportQuestions: [],
+      WFWorkflowInputContentItemClasses: [],
+      WFWorkflowTypes: ['WatchKit'],
+      WFWorkflowHasShortcutInputVariables: false,
+      WFWorkflowActions: [
+        {
+          WFWorkflowActionIdentifier: 'is.workflow.actions.downloadurl',
+          WFWorkflowActionParameters: {
+            WFHTTPMethod: 'GET',
+            WFURL: triggerUrl,
+          },
+        },
+      ],
+    };
+    return bplistCreator(data);
   }
 }
