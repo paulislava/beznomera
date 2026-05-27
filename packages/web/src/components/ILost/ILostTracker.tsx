@@ -184,6 +184,7 @@ const StatLabel = styled.div`
 const LossButton = styled.button`
   width: 200px;
   height: 200px;
+  justify-self: center;
   border-radius: 50%;
   border: none;
   background: linear-gradient(135deg, #a855f7, #7c3aed);
