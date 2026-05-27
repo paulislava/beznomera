@@ -2,12 +2,8 @@ import {
   Body,
   Controller,
   Get,
-  Header,
-  NotFoundException,
   Param,
   Post,
-  Req,
-  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import { LostApi, LOST_API } from '@paulislava/shared/lost/lost.api';
@@ -19,7 +15,6 @@ import {
   LostItemStats,
 } from '@paulislava/shared/lost/lost.types';
 import { RequestUser } from '@paulislava/shared/user/user.types';
-import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import {
@@ -87,27 +82,5 @@ export class LostController implements LostApi {
   @Get('shortcut/:token')
   async triggerShortcut(@Param('token') token: string): Promise<void> {
     await this.lostService.triggerShortcut(token);
-  }
-
-  @Get('shortcut/:token/file')
-  @Header('Content-Type', 'application/octet-stream')
-  @Header('Content-Disposition', 'attachment; filename="iloss.shortcut"')
-  async downloadShortcutFile(
-    @Param('token') token: string,
-    @Req() req: Request,
-  ): Promise<StreamableFile> {
-    const shortcutInfo =
-      await this.lostService.getOrCreateShortcutByToken(token);
-    const proto =
-      (req.headers['x-forwarded-proto'] as string) || req.protocol || 'https';
-    const host =
-      (req.headers['x-forwarded-host'] as string) || req.headers.host || '';
-    const baseUrl = `${proto}://${host}`;
-    const buf = this.lostService.generateShortcutFile(
-      token,
-      shortcutInfo.itemName,
-      baseUrl,
-    );
-    return new StreamableFile(buf);
   }
 }
