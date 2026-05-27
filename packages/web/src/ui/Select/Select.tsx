@@ -15,7 +15,8 @@ export function Select<
   value,
   onChange,
   onInputChange,
-  allowsCustomValue
+  allowsCustomValue,
+  onEnterKey
 }: SelectProps<OptionData>) {
   const errorsContent = useErrorsContent(errors);
 
@@ -30,6 +31,11 @@ export function Select<
       isRequired={required}
       onInputChange={onInputChange}
       allowsCustomValue={allowsCustomValue}
+      inputProps={{
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter') onEnterKey?.();
+        }
+      }}
     >
       {options.map(option => (
         <AutocompleteItem key={option[optionKey] as string}>{option[optionValue]}</AutocompleteItem>

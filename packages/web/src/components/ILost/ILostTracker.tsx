@@ -5,10 +5,9 @@ import styled from 'styled-components';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import { SelectField } from '@/ui/Select/SelectField';
 import { useLostSync } from '@/hooks/useLostSync';
-import { LostItemInfo, LossStats } from '@shared/lost/lost.types';
+import { LostItemInfo, LossStats, LostItemStats } from '@shared/lost/lost.types';
 import { lostService } from '@/services';
 
-// SelectField stores selected keys as strings
 interface FormData {
   itemId: string | null;
 }
@@ -16,10 +15,15 @@ interface FormData {
 type Props = {
   initialStats: LossStats;
   initialItems: LostItemInfo[];
+  initialItemStats: LostItemStats[];
 };
 
-export function ILostTracker({ initialStats, initialItems }: Props) {
-  const { stats, items, recordLoss, addItem, isOnline } = useLostSync(initialStats, initialItems);
+export function ILostTracker({ initialStats, initialItems, initialItemStats }: Props) {
+  const { itemStats, items, recordLoss, addItem, isOnline, lastItemId } = useLostSync(
+    initialStats,
+    initialItems,
+    initialItemStats
+  );
   const [inputValue, setInputValue] = useState('');
   const [shortcutLoading, setShortcutLoading] = useState(false);
   const [lossLoading, setLossLoading] = useState(false);
@@ -29,22 +33,22 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
     <Wrapper>
       {!isOnline && <OfflineBadge>Офлайн — данные синхронизируются при подключении</OfflineBadge>}
 
-      <StatsRow>
-        <StatCard>
-          <StatValue>{stats.today}</StatValue>
-          <StatLabel>за сутки</StatLabel>
-        </StatCard>
-        <StatCard $accent>
-          <StatValue $large>{stats.total}</StatValue>
-          <StatLabel>всего</StatLabel>
-        </StatCard>
-        <StatCard>
-          <StatValue>{stats.week}</StatValue>
-          <StatLabel>за неделю</StatLabel>
-        </StatCard>
-      </StatsRow>
+      {itemStats.length > 0 && (
+        <StatsList>
+          {itemStats.map(s => (
+            <StatsItem key={s.itemId}>
+              <StatsItemName>{s.name}</StatsItemName>
+              <StatsPills>
+                <StatsPill>{s.today} сег</StatsPill>
+                <StatsPill>{s.week} нед</StatsPill>
+                <StatsPill>{s.total} всего</StatsPill>
+              </StatsPills>
+            </StatsItem>
+          ))}
+        </StatsList>
+      )}
 
-      <Form<FormData> initialValues={{ itemId: null }} onSubmit={() => {}}>
+      <Form<FormData> initialValues={{ itemId: lastItemId }} onSubmit={() => {}}>
         {({ values, form }) => {
           const selectedItem = items.find(i => String(i.id) === values.itemId);
           const typedNew = !values.itemId && inputValue.trim().length > 0;
@@ -73,10 +77,11 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
             if (!values.itemId || shortcutLoading) return;
             setShortcutLoading(true);
             try {
-              const { token } = await lostService.getOrCreateShortcut({
+              const { token, itemName } = await lostService.getOrCreateShortcut({
                 itemId: Number(values.itemId)
               });
-              window.location.href = `/api/lost/shortcut/${token}/file`;
+              const fileUrl = `${window.location.origin}/api/lost/shortcut/${token}/file`;
+              window.location.href = `shortcuts://import-shortcut?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent('Я потеряла ' + itemName)}`;
             } catch {
             } finally {
               setShortcutLoading(false);
@@ -94,6 +99,7 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
                 optionValue='name'
                 onInputChange={setInputValue}
                 allowsCustomValue
+                onEnterKey={handleLoss}
               />
 
               <LossButton type='button' onClick={handleLoss} disabled={lossLoading || !canLose}>
@@ -137,36 +143,47 @@ const OfflineBadge = styled.div`
   width: 100%;
 `;
 
-const StatsRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
+const StatsList = styled.div`
   width: 100%;
-`;
-
-const StatCard = styled.div<{ $accent?: boolean }>`
-  background: var(--heroui-content1);
-  border: 1px solid
-    ${({ $accent }) => ($accent ? 'var(--heroui-primary)' : 'var(--heroui-divider)')};
-  border-radius: 16px;
-  padding: 16px 8px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+`;
+
+const StatsItem = styled.div`
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  background: var(--heroui-content1);
+  border: 1px solid var(--heroui-divider);
+  border-radius: 12px;
+  padding: 10px 14px;
+  gap: 8px;
+`;
+
+const StatsItemName = styled.span`
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const StatsPills = styled.div`
+  display: flex;
   gap: 6px;
+  flex-shrink: 0;
 `;
 
-const StatValue = styled.div<{ $large?: boolean }>`
-  font-size: ${({ $large }) => ($large ? '2.4rem' : '2rem')};
-  font-weight: 800;
-  line-height: 1;
-  color: ${({ $large }) => ($large ? 'inherit' : 'var(--heroui-primary)')};
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.7rem;
-  opacity: 0.6;
-  text-align: center;
+const StatsPill = styled.span`
+  font-size: 0.72rem;
+  opacity: 0.65;
+  background: var(--heroui-default-100);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
 `;
 
 const LossButton = styled.button`

@@ -9,6 +9,7 @@ import {
   LossEventInfo,
   LossStats,
   LostShortcutInfo,
+  LostItemStats,
 } from '@paulislava/shared/lost/lost.types';
 import { MoreThan, Repository } from 'typeorm';
 import { LostItem } from '../entities/lost/lost-item.entity';
@@ -61,6 +62,30 @@ export class LostService {
     ]);
 
     return { total, today, week };
+  }
+
+  async getItemStats(userId: number): Promise<LostItemStats[]> {
+    const events = await this.eventRepo.find({
+      where: { userId },
+      relations: ['item'],
+    });
+    const now = Date.now();
+    const map = new Map<number, LostItemStats>();
+    for (const e of events) {
+      const s = map.get(e.itemId) ?? {
+        itemId: e.itemId,
+        name: e.item.name,
+        total: 0,
+        today: 0,
+        week: 0,
+      };
+      const age = now - e.createdAt.getTime();
+      s.total++;
+      if (age < 86_400_000) s.today++;
+      if (age < 604_800_000) s.week++;
+      map.set(e.itemId, s);
+    }
+    return [...map.values()].sort((a, b) => b.total - a.total);
   }
 
   async getRecentEvents(userId: number): Promise<LossEventInfo[]> {

@@ -16,6 +16,7 @@ import {
   LossEventInfo,
   LossStats,
   LostShortcutInfo,
+  LostItemStats,
 } from '@paulislava/shared/lost/lost.types';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 import { Request } from 'express';
@@ -53,6 +54,12 @@ export class LostController implements LostApi {
     return this.lostService.getStats(user.userId);
   }
 
+  @Get(LOST_API.backendRoutes.getItemStats)
+  @UseGuards(JwtAuthGuard)
+  getItemStats(@CurrentUser() user: RequestUser): Promise<LostItemStats[]> {
+    return this.lostService.getItemStats(user.userId);
+  }
+
   @Get(LOST_API.backendRoutes.getRecentEvents)
   @UseGuards(JwtAuthGuard)
   getRecentEvents(@CurrentUser() user: RequestUser): Promise<LossEventInfo[]> {
@@ -84,7 +91,7 @@ export class LostController implements LostApi {
 
   @Get('shortcut/:token/file')
   @Header('Content-Type', 'application/octet-stream')
-  @Header('Content-Disposition', 'attachment; filename="i-forgot.shortcut"')
+  @Header('Content-Disposition', 'attachment; filename="iloss.shortcut"')
   async downloadShortcutFile(
     @Param('token') token: string,
     @Req() req: Request,
