@@ -13,7 +13,8 @@ export function Select<
   required,
   errors,
   value,
-  onChange
+  onChange,
+  onInputChange,
 }: SelectProps<OptionData>) {
   const errorsContent = useErrorsContent(errors);
 
@@ -26,6 +27,7 @@ export function Select<
       onSelectionChange={onChange}
       selectedKey={value}
       isRequired={required}
+      onInputChange={onInputChange}
     >
       {options.map(option => (
         <AutocompleteItem key={option[optionKey] as string}>{option[optionValue]}</AutocompleteItem>

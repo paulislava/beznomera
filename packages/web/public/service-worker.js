@@ -1,3 +1,25 @@
+const LOST_CACHE = 'lost-api-v1';
+
+self.addEventListener('fetch', function (event) {
+  const url = new URL(event.request.url);
+  if (event.request.method !== 'GET') return;
+  if (!url.pathname.startsWith('/api/lost/')) return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then(function (response) {
+        const clone = response.clone();
+        caches.open(LOST_CACHE).then(function (cache) {
+          cache.put(event.request, clone);
+        });
+        return response;
+      })
+      .catch(function () {
+        return caches.match(event.request);
+      }),
+  );
+});
+
 self.addEventListener('push', function (event) {
   if (!event.data) return;
 
