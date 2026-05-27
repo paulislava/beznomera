@@ -16,3 +16,8 @@ export interface LossStats {
   today: number;
   week: number;
 }
+
+export interface LostShortcutInfo {
+  token: string;
+  itemName: string;
+}
