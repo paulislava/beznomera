@@ -1,12 +1,11 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import { SelectField } from '@/ui/Select/SelectField';
 import { useLostSync } from '@/hooks/useLostSync';
 import { LostItemInfo, LossStats } from '@shared/lost/lost.types';
-import { processFormSubmit } from '@/utils/forms';
 import { lostService } from '@/services';
 
 // SelectField stores selected keys as strings
@@ -23,18 +22,8 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
   const { stats, items, recordLoss, addItem, isOnline } = useLostSync(initialStats, initialItems);
   const [inputValue, setInputValue] = useState('');
   const [shortcutLoading, setShortcutLoading] = useState(false);
+  const [lossLoading, setLossLoading] = useState(false);
   const [selectKey, setSelectKey] = useState(0);
-
-  const matchesExisting = items.some(i => i.name.toLowerCase() === inputValue.toLowerCase().trim());
-  const showAddButton = inputValue.trim().length > 0 && !matchesExisting;
-
-  const onSubmit = useCallback(
-    async (data: FormData) => {
-      if (!data.itemId) return;
-      await processFormSubmit(recordLoss(Number(data.itemId)), undefined, 'Ошибка при записи');
-    },
-    [recordLoss]
-  );
 
   return (
     <Wrapper>
@@ -55,17 +44,29 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
         </StatCard>
       </StatsRow>
 
-      <Form<FormData> initialValues={{ itemId: null }} onSubmit={onSubmit}>
-        {({ handleSubmit, submitting, values, form }) => {
+      <Form<FormData> initialValues={{ itemId: null }} onSubmit={() => {}}>
+        {({ values, form }) => {
           const selectedItem = items.find(i => String(i.id) === values.itemId);
+          const typedNew = !values.itemId && inputValue.trim().length > 0;
+          const canLose = !!(values.itemId || typedNew);
+          const displayName = selectedItem?.name ?? (typedNew ? inputValue.trim() : '');
 
-          const handleAddItem = async () => {
+          const handleLoss = async () => {
+            if (lossLoading || !canLose) return;
+            setLossLoading(true);
             try {
-              const newItem = await addItem(inputValue.trim());
-              form.change('itemId', String(newItem.id));
-              setInputValue('');
-              setSelectKey(k => k + 1);
-            } catch {}
+              if (values.itemId) {
+                await recordLoss(Number(values.itemId));
+              } else if (inputValue.trim()) {
+                const newItem = await addItem(inputValue.trim());
+                await recordLoss(newItem.id);
+                form.change('itemId', String(newItem.id));
+                setSelectKey(k => k + 1);
+              }
+            } catch {
+            } finally {
+              setLossLoading(false);
+            }
           };
 
           const handleDownloadShortcut = async () => {
@@ -91,26 +92,12 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
                 options={items as any[]}
                 optionKey='id'
                 optionValue='name'
-                required
                 onInputChange={setInputValue}
               />
 
-              {showAddButton && (
-                <AddItemButton type='button' onClick={handleAddItem}>
-                  + Добавить «{inputValue.trim()}» в базу
-                </AddItemButton>
-              )}
-
-              <LossButton
-                type='button'
-                onClick={handleSubmit}
-                disabled={submitting || !values.itemId}
-              >
+              <LossButton type='button' onClick={handleLoss} disabled={lossLoading || !canLose}>
                 <span>😔</span>
-                <span>
-                  Я потеряла
-                  {selectedItem ? ` ${selectedItem.name}` : ''}
-                </span>
+                <span>Я потеряла{displayName ? ` ${displayName}` : ''}</span>
               </LossButton>
 
               <ShortcutButton
@@ -218,22 +205,6 @@ const LossButton = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-`;
-
-const AddItemButton = styled.button`
-  width: 100%;
-  background: none;
-  border: 1px dashed var(--heroui-primary);
-  border-radius: 10px;
-  color: var(--heroui-primary);
-  font-size: 0.85rem;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background 0.15s;
-
-  &:hover {
-    background: rgba(124, 58, 237, 0.06);
   }
 `;
 
