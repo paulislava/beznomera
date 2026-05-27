@@ -23,6 +23,7 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
   const { stats, items, recordLoss, addItem, isOnline } = useLostSync(initialStats, initialItems);
   const [inputValue, setInputValue] = useState('');
   const [shortcutLoading, setShortcutLoading] = useState(false);
+  const [selectKey, setSelectKey] = useState(0);
 
   const matchesExisting = items.some(i => i.name.toLowerCase() === inputValue.toLowerCase().trim());
   const showAddButton = inputValue.trim().length > 0 && !matchesExisting;
@@ -55,13 +56,15 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
       </StatsRow>
 
       <Form<FormData> initialValues={{ itemId: null }} onSubmit={onSubmit}>
-        {({ handleSubmit, submitting, values }) => {
+        {({ handleSubmit, submitting, values, form }) => {
           const selectedItem = items.find(i => String(i.id) === values.itemId);
 
           const handleAddItem = async () => {
             try {
-              await addItem(inputValue.trim());
+              const newItem = await addItem(inputValue.trim());
+              form.change('itemId', String(newItem.id));
               setInputValue('');
+              setSelectKey(k => k + 1);
             } catch {}
           };
 
@@ -82,6 +85,7 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
           return (
             <>
               <SelectField<FormData>
+                key={selectKey}
                 name='itemId'
                 label='Что потерял(а)'
                 options={items as any[]}
@@ -239,15 +243,15 @@ const ShortcutButton = styled.button`
   gap: 12px;
   margin: 0 auto;
   padding: 14px 28px;
-  min-width: 220px;
-  background: linear-gradient(160deg, #7b6fe8 0%, #5e5ce6 45%, #3a38b0 100%);
+  width: fit-content;
+  background: #1c2145;
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 6px 24px rgba(94, 92, 230, 0.45);
+  box-shadow: 0 6px 24px rgba(28, 33, 69, 0.55);
   transition:
     transform 0.12s,
     box-shadow 0.12s;
@@ -262,23 +266,41 @@ const ShortcutButton = styled.button`
 
   &:active:not(:disabled) {
     transform: scale(0.95);
-    box-shadow: 0 3px 12px rgba(94, 92, 230, 0.35);
+    box-shadow: 0 3px 12px rgba(28, 33, 69, 0.4);
   }
 `;
 
 function ShortcutIcon() {
   return (
-    <svg width='34' height='34' viewBox='0 0 34 34' fill='none' xmlns='http://www.w3.org/2000/svg'>
-      <rect x='1' y='9' width='19' height='19' rx='5' fill='white' transform='rotate(-18 10 18)' />
+    <svg width='40' height='46' viewBox='0 0 40 46' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <defs>
+        <linearGradient id='sc_pink' gradientUnits='userSpaceOnUse' x1='38' y1='0' x2='2' y2='32'>
+          <stop offset='0%' stopColor='#F5859C' />
+          <stop offset='100%' stopColor='#D04468' />
+        </linearGradient>
+        <linearGradient id='sc_teal' gradientUnits='userSpaceOnUse' x1='2' y1='14' x2='38' y2='46'>
+          <stop offset='0%' stopColor='#4ECDB8' />
+          <stop offset='100%' stopColor='#3580F0' />
+        </linearGradient>
+      </defs>
       <rect
-        x='14'
-        y='6'
-        width='19'
-        height='19'
-        rx='5'
-        fill='white'
-        opacity='0.55'
-        transform='rotate(18 23 15)'
+        x='-13'
+        y='-13'
+        width='26'
+        height='26'
+        rx='6'
+        fill='url(#sc_pink)'
+        transform='translate(20, 16) rotate(45)'
+      />
+      <rect
+        x='-13'
+        y='-13'
+        width='26'
+        height='26'
+        rx='6'
+        fill='url(#sc_teal)'
+        opacity='0.92'
+        transform='translate(20, 30) rotate(45)'
       />
     </svg>
   );
