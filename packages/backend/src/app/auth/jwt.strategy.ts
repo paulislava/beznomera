@@ -17,6 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest(req: Request): string {
+        const authHeader = req.headers.authorization as string | undefined;
+        if (authHeader?.startsWith('Bearer ')) {
+          return authHeader.slice(7);
+        }
+
         if (req.headers[AUTH_USER_TOKEN_HEADER]) {
           return req.headers[AUTH_USER_TOKEN_HEADER] as string;
         }
