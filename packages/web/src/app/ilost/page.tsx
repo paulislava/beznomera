@@ -7,16 +7,20 @@ import { ILostTracker } from '@/components/ILost/ILostTracker';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'I Forgot'
+  title: 'iloss'
 };
 
 const ILostPage: AuthComponent = async () => {
   const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
   const api = createApi(token);
 
-  const [stats, items] = await Promise.all([api.lost.getStats(), api.lost.getItems()]);
+  const [stats, items, itemStats] = await Promise.all([
+    api.lost.getStats(),
+    api.lost.getItems(),
+    api.lost.getItemStats()
+  ]);
 
-  return <ILostTracker initialStats={stats} initialItems={items} />;
+  return <ILostTracker initialStats={stats} initialItems={items} initialItemStats={itemStats} />;
 };
 
 export default withUser(ILostPage);

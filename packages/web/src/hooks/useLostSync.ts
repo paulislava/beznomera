@@ -1,11 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { LostItemInfo, LossStats } from '@shared/lost/lost.types';
+import { LostItemInfo, LossStats, LostItemStats } from '@shared/lost/lost.types';
 import { lostService } from '@/services';
 
 const QUEUE_KEY = 'lost_queue';
 const ITEMS_CACHE_KEY = 'lost_items_cache';
+const LAST_ITEM_KEY = 'lost_last_item';
 
 interface QueueItem {
   itemId: number;
@@ -31,12 +32,23 @@ function readItemsCache(fallback: LostItemInfo[]): LostItemInfo[] {
   }
 }
 
-export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[]) {
+function readLastItemId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(LAST_ITEM_KEY);
+}
+
+export function useLostSync(
+  initialStats: LossStats,
+  initialItems: LostItemInfo[],
+  initialItemStats: LostItemStats[]
+) {
   const [serverStats, setServerStats] = useState<LossStats>(initialStats);
+  const [serverItemStats, setServerItemStats] = useState<LostItemStats[]>(initialItemStats);
   const [items, setItems] = useState<LostItemInfo[]>(() => readItemsCache(initialItems));
   const [queue, setQueue] = useState<QueueItem[]>(readQueue);
   const [isOnline, setIsOnline] = useState(true);
   const isOnlineRef = useRef(true);
+  const [lastItemId] = useState<string | null>(readLastItemId);
 
   const updateQueue = useCallback((q: QueueItem[]) => {
     setQueue(q);
@@ -54,10 +66,36 @@ export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[
     };
   }, [serverStats, queue]);
 
+  const itemStats = useMemo((): LostItemStats[] => {
+    const now = Date.now();
+    const result = new Map<number, LostItemStats>(serverItemStats.map(s => [s.itemId, { ...s }]));
+    for (const q of queue) {
+      const item = items.find(i => i.id === q.itemId);
+      if (!item) continue;
+      const s = result.get(q.itemId) ?? {
+        itemId: q.itemId,
+        name: item.name,
+        total: 0,
+        today: 0,
+        week: 0
+      };
+      const age = now - +new Date(q.timestamp);
+      s.total++;
+      if (age < 86_400_000) s.today++;
+      if (age < 604_800_000) s.week++;
+      result.set(q.itemId, s);
+    }
+    return [...result.values()].sort((a, b) => b.total - a.total);
+  }, [serverItemStats, queue, items]);
+
   const refreshStats = useCallback(async () => {
     try {
-      const fresh = await lostService.getStats();
+      const [fresh, freshItemStats] = await Promise.all([
+        lostService.getStats(),
+        lostService.getItemStats()
+      ]);
       setServerStats(fresh);
+      setServerItemStats(freshItemStats);
     } catch {}
   }, []);
 
@@ -111,6 +149,7 @@ export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[
 
   const recordLoss = useCallback(
     async (itemId: number) => {
+      localStorage.setItem(LAST_ITEM_KEY, String(itemId));
       const entry: QueueItem = { itemId, timestamp: new Date().toISOString() };
       const newQueue = [...queue, entry];
       updateQueue(newQueue);
@@ -125,5 +164,5 @@ export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[
     return item;
   }, []);
 
-  return { stats, items, recordLoss, addItem, isOnline };
+  return { stats, itemStats, items, recordLoss, addItem, isOnline, lastItemId };
 }

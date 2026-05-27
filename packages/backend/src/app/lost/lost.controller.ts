@@ -16,6 +16,7 @@ import {
   LossEventInfo,
   LossStats,
   LostShortcutInfo,
+  LostItemStats,
 } from '@paulislava/shared/lost/lost.types';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 import { Request } from 'express';
@@ -51,6 +52,12 @@ export class LostController implements LostApi {
   @UseGuards(JwtAuthGuard)
   getStats(@CurrentUser() user: RequestUser): Promise<LossStats> {
     return this.lostService.getStats(user.userId);
+  }
+
+  @Get(LOST_API.backendRoutes.getItemStats)
+  @UseGuards(JwtAuthGuard)
+  getItemStats(@CurrentUser() user: RequestUser): Promise<LostItemStats[]> {
+    return this.lostService.getItemStats(user.userId);
   }
 
   @Get(LOST_API.backendRoutes.getRecentEvents)

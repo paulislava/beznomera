@@ -21,3 +21,11 @@ export interface LostShortcutInfo {
   token: string;
   itemName: string;
 }
+
+export interface LostItemStats {
+  itemId: number;
+  name: string;
+  total: number;
+  today: number;
+  week: number;
+}
