@@ -1,4 +1,7 @@
-type PlistValue = string | number | boolean | PlistValue[] | Record<string, PlistValue>;
+interface PlistDict {
+  [key: string]: PlistValue;
+}
+type PlistValue = string | number | boolean | PlistValue[] | PlistDict;
 
 export function encodeBplist(root: PlistValue): Uint8Array {
   const objects: PlistValue[] = [];
