@@ -9,7 +9,7 @@ export function generateShortcutBlob(token: string, itemName: string, origin: st
     WFWorkflowName: `Я потеряла ${itemName}`,
     WFWorkflowIcon: {
       WFWorkflowIconGlyphNumber: 59499,
-      WFWorkflowIconStartColor: 4274264319,
+      WFWorkflowIconStartColor: 4274264319
     },
     WFWorkflowImportQuestions: [],
     WFWorkflowInputContentItemClasses: [],
@@ -20,10 +20,10 @@ export function generateShortcutBlob(token: string, itemName: string, origin: st
         WFWorkflowActionIdentifier: 'is.workflow.actions.downloadurl',
         WFWorkflowActionParameters: {
           WFHTTPMethod: 'GET',
-          WFURL: triggerUrl,
-        },
-      },
-    ],
+          WFURL: triggerUrl
+        }
+      }
+    ]
   });
   return new Blob([bytes], { type: 'application/octet-stream' });
 }

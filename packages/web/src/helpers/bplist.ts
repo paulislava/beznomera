@@ -9,7 +9,10 @@ export function encodeBplist(root: PlistValue): Uint8Array {
     const idx = objects.length;
     objects.push(val);
     if (Array.isArray(val)) {
-      arrayChildren.set(idx, val.map(item => collect(item)));
+      arrayChildren.set(
+        idx,
+        val.map(item => collect(item))
+      );
     } else if (val !== null && typeof val === 'object') {
       const keys: number[] = [];
       const vals: number[] = [];
@@ -47,7 +50,7 @@ export function encodeBplist(root: PlistValue): Uint8Array {
       (lo >>> 24) & 0xff,
       (lo >>> 16) & 0xff,
       (lo >>> 8) & 0xff,
-      lo & 0xff,
+      lo & 0xff
     ];
   }
 
@@ -94,8 +97,7 @@ export function encodeBplist(root: PlistValue): Uint8Array {
   }
 
   const offsetTableOffset = pos;
-  const offsetSize =
-    pos < 0x100 ? 1 : pos < 0x10000 ? 2 : pos < 0x1000000 ? 3 : 4;
+  const offsetSize = pos < 0x100 ? 1 : pos < 0x10000 ? 2 : pos < 0x1000000 ? 3 : 4;
 
   function writeOff(off: number): number[] {
     const r: number[] = [];
@@ -114,20 +116,32 @@ export function encodeBplist(root: PlistValue): Uint8Array {
       (lo >>> 24) & 0xff,
       (lo >>> 16) & 0xff,
       (lo >>> 8) & 0xff,
-      lo & 0xff,
+      lo & 0xff
     ];
   }
 
   const all = [
-    0x62, 0x70, 0x6c, 0x69, 0x73, 0x74, 0x30, 0x30, // "bplist00"
+    0x62,
+    0x70,
+    0x6c,
+    0x69,
+    0x73,
+    0x74,
+    0x30,
+    0x30, // "bplist00"
     ...serialized.flat(),
     ...offsets.flatMap(o => writeOff(o)),
-    0, 0, 0, 0, 0, 0, // padding
+    0,
+    0,
+    0,
+    0,
+    0,
+    0, // padding
     offsetSize,
     refSize,
     ...w64(numObjects),
     ...w64(0), // top object index
-    ...w64(offsetTableOffset),
+    ...w64(offsetTableOffset)
   ];
 
   return new Uint8Array(all);
