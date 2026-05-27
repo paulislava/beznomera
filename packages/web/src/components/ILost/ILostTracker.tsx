@@ -93,6 +93,7 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
                 optionKey='id'
                 optionValue='name'
                 onInputChange={setInputValue}
+                allowsCustomValue
               />
 
               <LossButton type='button' onClick={handleLoss} disabled={lossLoading || !canLose}>
