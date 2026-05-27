@@ -7,6 +7,7 @@ import { SelectField } from '@/ui/Select/SelectField';
 import { useLostSync } from '@/hooks/useLostSync';
 import { LostItemInfo, LossStats, LostItemStats } from '@shared/lost/lost.types';
 import { lostService } from '@/services';
+import { generateShortcutBlob } from '@/helpers/shortcut';
 
 interface FormData {
   itemId: string | null;
@@ -80,11 +81,9 @@ export function ILostTracker({ initialStats, initialItems, initialItemStats }: P
               const { token, itemName } = await lostService.getOrCreateShortcut({
                 itemId: Number(values.itemId)
               });
-              const fileUrl = `${window.location.origin}/api/lost/shortcut/${token}/file`;
-              try {
-                await navigator.clipboard.writeText(fileUrl);
-              } catch {}
-              window.location.href = fileUrl;
+              const blob = generateShortcutBlob(token, itemName, window.location.origin);
+              const url = URL.createObjectURL(blob);
+              window.location.href = url;
             } catch {
             } finally {
               setShortcutLoading(false);

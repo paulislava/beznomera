@@ -12,7 +12,6 @@ import {
   LostItemStats,
 } from '@paulislava/shared/lost/lost.types';
 import { MoreThan, Repository } from 'typeorm';
-import bplistCreator = require('bplist-creator');
 import { LostItem } from '../entities/lost/lost-item.entity';
 import { LossEvent } from '../entities/lost/loss-event.entity';
 import { LostShortcutToken } from '../entities/lost/lost-shortcut-token.entity';
@@ -143,40 +142,4 @@ export class LostService {
     await this.recordLoss(shortcut.itemId, shortcut.userId);
   }
 
-  async getOrCreateShortcutByToken(token: string): Promise<LostShortcutInfo> {
-    const shortcut = await this.shortcutRepo.findOne({
-      where: { token },
-      relations: ['item'],
-    });
-    if (!shortcut) throw new NotFoundException('Токен не найден');
-    return { token: shortcut.token, itemName: shortcut.item.name };
-  }
-
-  generateShortcutFile(token: string, itemName: string, baseUrl: string): Buffer {
-    const triggerUrl = `${baseUrl}/api/lost/shortcut/${token}`;
-    const data = {
-      WFWorkflowClientRelease: '2.0',
-      WFWorkflowClientVersion: 2190,
-      WFWorkflowMinimumClientVersion: 900,
-      WFWorkflowName: `Я потеряла ${itemName}`,
-      WFWorkflowIcon: {
-        WFWorkflowIconGlyphNumber: 59499,
-        WFWorkflowIconStartColor: 4274264319,
-      },
-      WFWorkflowImportQuestions: [],
-      WFWorkflowInputContentItemClasses: [],
-      WFWorkflowTypes: ['WatchKit'],
-      WFWorkflowHasShortcutInputVariables: false,
-      WFWorkflowActions: [
-        {
-          WFWorkflowActionIdentifier: 'is.workflow.actions.downloadurl',
-          WFWorkflowActionParameters: {
-            WFHTTPMethod: 'GET',
-            WFURL: triggerUrl,
-          },
-        },
-      ],
-    };
-    return bplistCreator(data);
-  }
 }
