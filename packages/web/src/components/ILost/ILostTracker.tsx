@@ -7,6 +7,7 @@ import { SelectField } from '@/ui/Select/SelectField';
 import { useLostSync } from '@/hooks/useLostSync';
 import { LostItemInfo, LossStats } from '@shared/lost/lost.types';
 import { processFormSubmit } from '@/utils/forms';
+import { lostService } from '@/services';
 
 // SelectField stores selected keys as strings
 interface FormData {
@@ -21,6 +22,7 @@ type Props = {
 export function ILostTracker({ initialStats, initialItems }: Props) {
   const { stats, items, recordLoss, addItem, isOnline } = useLostSync(initialStats, initialItems);
   const [inputValue, setInputValue] = useState('');
+  const [shortcutLoading, setShortcutLoading] = useState(false);
 
   const matchesExisting = items.some(i => i.name.toLowerCase() === inputValue.toLowerCase().trim());
   const showAddButton = inputValue.trim().length > 0 && !matchesExisting;
@@ -65,6 +67,20 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
             } catch {}
           };
 
+          const handleDownloadShortcut = async () => {
+            if (!values.itemId || shortcutLoading) return;
+            setShortcutLoading(true);
+            try {
+              const { token } = await lostService.getOrCreateShortcut({
+                itemId: Number(values.itemId)
+              });
+              window.location.href = `/api/lost/shortcut/${token}/file`;
+            } catch {
+            } finally {
+              setShortcutLoading(false);
+            }
+          };
+
           return (
             <>
               <SelectField<FormData>
@@ -94,6 +110,15 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
                   {selectedItem ? ` ${selectedItem.name}` : ''}
                 </span>
               </LossButton>
+
+              <ShortcutButton
+                type='button'
+                onClick={handleDownloadShortcut}
+                disabled={shortcutLoading || !values.itemId}
+              >
+                <ShortcutIcon />
+                <span>{shortcutLoading ? 'Создаём...' : 'Скачать команду'}</span>
+              </ShortcutButton>
             </>
           );
         }}
@@ -215,3 +240,46 @@ const AddItemButton = styled.button`
     background: rgba(124, 58, 237, 0.06);
   }
 `;
+
+const ShortcutButton = styled.button`
+  width: 100%;
+  max-width: 320px;
+  background: linear-gradient(135deg, #007aff, #5856d6);
+  border: none;
+  border-radius: 14px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    opacity: 0.8;
+  }
+`;
+
+function ShortcutIcon() {
+  return (
+    <svg width='22' height='22' viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <rect width='22' height='22' rx='6' fill='rgba(255,255,255,0.25)' />
+      <path
+        d='M7 11C7 8.79 8.79 7 11 7s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z'
+        stroke='white'
+        strokeWidth='1.5'
+        fill='none'
+      />
+      <path d='M11 9v2l1.5 1.5' stroke='white' strokeWidth='1.5' strokeLinecap='round' />
+    </svg>
+  );
+}
