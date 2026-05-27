@@ -37,8 +37,6 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
 
   return (
     <Wrapper>
-      <PageTitle>I Forgot</PageTitle>
-
       {!isOnline && <OfflineBadge>Офлайн — данные синхронизируются при подключении</OfflineBadge>}
 
       <StatsRow>
@@ -135,13 +133,6 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 28px;
-`;
-
-const PageTitle = styled.h1`
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  margin: 0;
 `;
 
 const OfflineBadge = styled.div`
@@ -242,44 +233,53 @@ const AddItemButton = styled.button`
 `;
 
 const ShortcutButton = styled.button`
-  width: 100%;
-  max-width: 320px;
-  background: linear-gradient(135deg, #007aff, #5856d6);
-  border: none;
-  border-radius: 14px;
-  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
+  margin: 0 auto;
+  padding: 14px 28px;
+  min-width: 220px;
+  background: linear-gradient(160deg, #7b6fe8 0%, #5e5ce6 45%, #3a38b0 100%);
+  border: none;
+  border-radius: 16px;
   color: #fff;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.15s;
+  box-shadow: 0 6px 24px rgba(94, 92, 230, 0.45);
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
 
   &:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+    box-shadow: none;
   }
 
   &:active:not(:disabled) {
-    opacity: 0.8;
+    transform: scale(0.95);
+    box-shadow: 0 3px 12px rgba(94, 92, 230, 0.35);
   }
 `;
 
 function ShortcutIcon() {
   return (
-    <svg width='22' height='22' viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'>
-      <rect width='22' height='22' rx='6' fill='rgba(255,255,255,0.25)' />
-      <path
-        d='M7 11C7 8.79 8.79 7 11 7s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z'
-        stroke='white'
-        strokeWidth='1.5'
-        fill='none'
+    <svg width='34' height='34' viewBox='0 0 34 34' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <rect x='1' y='9' width='19' height='19' rx='5' fill='white' transform='rotate(-18 10 18)' />
+      <rect
+        x='14'
+        y='6'
+        width='19'
+        height='19'
+        rx='5'
+        fill='white'
+        opacity='0.55'
+        transform='rotate(18 23 15)'
       />
-      <path d='M11 9v2l1.5 1.5' stroke='white' strokeWidth='1.5' strokeLinecap='round' />
     </svg>
   );
 }

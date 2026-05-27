@@ -68,7 +68,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const telegramAppLink = useMemo(() => transferLinkToTelegram(pathname), [pathname]);
   const isChatPage = pathname.startsWith('/messages') || /^\/g\/[^/]+\/chat/.test(pathname);
 
-  if (pathname.startsWith('/auth')) {
+  if (pathname.startsWith('/auth') || pathname.startsWith('/ilost')) {
     return <>{children}</>;
   }
 
