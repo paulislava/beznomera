@@ -15,7 +15,7 @@ export const createApi = (userToken?: string) => {
     user: createApiService(USER_API, userToken, undefined, false),
     notification: createApiService(NOTIFICATION_API, userToken, undefined, false),
     chat: createApiService(CHAT_API, userToken, undefined, false),
-    lost: createApiService(LOST_API, userToken, undefined, false),
+    lost: createApiService(LOST_API, userToken, undefined, false)
   };
 };
 

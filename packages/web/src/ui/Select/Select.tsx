@@ -14,7 +14,7 @@ export function Select<
   errors,
   value,
   onChange,
-  onInputChange,
+  onInputChange
 }: SelectProps<OptionData>) {
   const errorsContent = useErrorsContent(errors);
 

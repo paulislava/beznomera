@@ -33,9 +33,7 @@ function readItemsCache(fallback: LostItemInfo[]): LostItemInfo[] {
 
 export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[]) {
   const [serverStats, setServerStats] = useState<LossStats>(initialStats);
-  const [items, setItems] = useState<LostItemInfo[]>(() =>
-    readItemsCache(initialItems),
-  );
+  const [items, setItems] = useState<LostItemInfo[]>(() => readItemsCache(initialItems));
   const [queue, setQueue] = useState<QueueItem[]>(readQueue);
   const [isOnline, setIsOnline] = useState(true);
   const isOnlineRef = useRef(true);
@@ -47,16 +45,12 @@ export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[
 
   const stats = useMemo((): LossStats => {
     const now = Date.now();
-    const todayExtra = queue.filter(
-      q => now - +new Date(q.timestamp) < 86_400_000,
-    ).length;
-    const weekExtra = queue.filter(
-      q => now - +new Date(q.timestamp) < 604_800_000,
-    ).length;
+    const todayExtra = queue.filter(q => now - +new Date(q.timestamp) < 86_400_000).length;
+    const weekExtra = queue.filter(q => now - +new Date(q.timestamp) < 604_800_000).length;
     return {
       total: serverStats.total + queue.length,
       today: serverStats.today + todayExtra,
-      week: serverStats.week + weekExtra,
+      week: serverStats.week + weekExtra
     };
   }, [serverStats, queue]);
 
@@ -82,7 +76,7 @@ export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[
       updateQueue(remaining);
       if (!remaining.length) await refreshStats();
     },
-    [updateQueue, refreshStats],
+    [updateQueue, refreshStats]
   );
 
   useEffect(() => {
@@ -122,14 +116,12 @@ export function useLostSync(initialStats: LossStats, initialItems: LostItemInfo[
       updateQueue(newQueue);
       if (isOnlineRef.current) await drainQueue(newQueue);
     },
-    [queue, updateQueue, drainQueue],
+    [queue, updateQueue, drainQueue]
   );
 
   const addItem = useCallback(async (name: string): Promise<LostItemInfo> => {
     const item = await lostService.createItem({ name });
-    setItems(prev =>
-      [...prev, item].sort((a, b) => a.name.localeCompare(b.name, 'ru')),
-    );
+    setItems(prev => [...prev, item].sort((a, b) => a.name.localeCompare(b.name, 'ru')));
     return item;
   }, []);
 

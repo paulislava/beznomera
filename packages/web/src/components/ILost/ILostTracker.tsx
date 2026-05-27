@@ -19,36 +19,25 @@ type Props = {
 };
 
 export function ILostTracker({ initialStats, initialItems }: Props) {
-  const { stats, items, recordLoss, addItem, isOnline } = useLostSync(
-    initialStats,
-    initialItems,
-  );
+  const { stats, items, recordLoss, addItem, isOnline } = useLostSync(initialStats, initialItems);
   const [inputValue, setInputValue] = useState('');
 
-  const matchesExisting = items.some(
-    i => i.name.toLowerCase() === inputValue.toLowerCase().trim(),
-  );
+  const matchesExisting = items.some(i => i.name.toLowerCase() === inputValue.toLowerCase().trim());
   const showAddButton = inputValue.trim().length > 0 && !matchesExisting;
 
   const onSubmit = useCallback(
     async (data: FormData) => {
       if (!data.itemId) return;
-      await processFormSubmit(
-        recordLoss(Number(data.itemId)),
-        undefined,
-        'Ошибка при записи',
-      );
+      await processFormSubmit(recordLoss(Number(data.itemId)), undefined, 'Ошибка при записи');
     },
-    [recordLoss],
+    [recordLoss]
   );
 
   return (
     <Wrapper>
       <PageTitle>I Forgot</PageTitle>
 
-      {!isOnline && (
-        <OfflineBadge>Офлайн — данные синхронизируются при подключении</OfflineBadge>
-      )}
+      {!isOnline && <OfflineBadge>Офлайн — данные синхронизируются при подключении</OfflineBadge>}
 
       <StatsRow>
         <StatCard>
@@ -79,23 +68,23 @@ export function ILostTracker({ initialStats, initialItems }: Props) {
           return (
             <>
               <SelectField<FormData>
-                name="itemId"
-                label="Что потерял(а)"
+                name='itemId'
+                label='Что потерял(а)'
                 options={items as any[]}
-                optionKey="id"
-                optionValue="name"
+                optionKey='id'
+                optionValue='name'
                 required
                 onInputChange={setInputValue}
               />
 
               {showAddButton && (
-                <AddItemButton type="button" onClick={handleAddItem}>
+                <AddItemButton type='button' onClick={handleAddItem}>
                   + Добавить «{inputValue.trim()}» в базу
                 </AddItemButton>
               )}
 
               <LossButton
-                type="button"
+                type='button'
                 onClick={handleSubmit}
                 disabled={submitting || !values.itemId}
               >
@@ -187,7 +176,9 @@ const LossButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.12s, box-shadow 0.12s;
+  transition:
+    transform 0.12s,
+    box-shadow 0.12s;
   box-shadow: 0 8px 32px rgba(124, 58, 237, 0.35);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
