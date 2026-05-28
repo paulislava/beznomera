@@ -9,7 +9,8 @@ import {
   NavbarItem,
   NavbarMenu,
   NavbarMenuItem,
-  NavbarMenuToggle
+  NavbarMenuToggle,
+  Avatar
 } from '@heroui/react';
 import styled, { css } from 'styled-components';
 import { PageContainer, pagePaddingTop, Spacer } from '@/ui/Styled';
@@ -60,7 +61,8 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const menuItems = [
     { name: 'Мои авто', href: '/', requiresAuth: true },
     { name: 'Добавить авто', href: '/car/new', requiresAuth: true },
-    { name: 'Сообщения', href: '/messages', requiresAuth: true }
+    { name: 'Сообщения', href: '/messages', requiresAuth: true },
+    { name: 'Профиль', href: '/profile', requiresAuth: true }
   ];
 
   const filteredMenuItems = menuItems;
@@ -97,7 +99,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
             </NavbarContent>
 
             <NavbarContent className='hidden sm:flex gap-4' justify='center'>
-              {filteredMenuItems.map(item => (
+              {filteredMenuItems.slice(0, -1).map(item => (
                 <NavbarItem key={item.href} isActive={pathname === item.href}>
                   <Link
                     href={item.href}
@@ -107,6 +109,18 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
                   </Link>
                 </NavbarItem>
               ))}
+            </NavbarContent>
+
+            <NavbarContent justify='end'>
+              <NavbarItem>
+                <Link href='/profile'>
+                  <Avatar
+                    size='sm'
+                    isBordered={pathname.startsWith('/profile')}
+                    color={pathname.startsWith('/profile') ? 'primary' : 'default'}
+                  />
+                </Link>
+              </NavbarItem>
             </NavbarContent>
 
             <StyledMenu>
