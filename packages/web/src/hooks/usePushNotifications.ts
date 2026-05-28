@@ -37,6 +37,7 @@ async function subscribeAfterPermission() {
 
 export function usePushNotifications() {
   const [showBanner, setShowBanner] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>('default');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -44,8 +45,13 @@ export function usePushNotifications() {
       !('serviceWorker' in navigator) ||
       !('PushManager' in window) ||
       !('Notification' in window)
-    )
+    ) {
+      setPermission('unsupported');
       return;
+    }
+
+    setPermission(Notification.permission);
+
     if (sessionStorage.getItem(PUSH_SESSION_KEY)) return;
 
     if (Notification.permission === 'granted') {
@@ -66,8 +72,9 @@ export function usePushNotifications() {
     sessionStorage.setItem(PUSH_SESSION_KEY, '1');
     setShowBanner(false);
 
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return;
+    const result = await Notification.requestPermission();
+    setPermission(result);
+    if (result !== 'granted') return;
 
     await subscribeAfterPermission();
   }, []);
@@ -77,5 +84,5 @@ export function usePushNotifications() {
     setShowBanner(false);
   }, []);
 
-  return { showBanner, onEnable, onDismiss };
+  return { showBanner, permission, onEnable, onDismiss };
 }
