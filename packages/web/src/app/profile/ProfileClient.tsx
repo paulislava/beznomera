@@ -11,6 +11,7 @@ import FormField from '@/ui/FormField/FormField';
 import { Button, Avatar, Chip } from '@heroui/react';
 import { showErrorMessage } from '@/utils/messages';
 import { clearStoredAuthToken } from '@/utils/auth-storage';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 const PROVIDER_LABELS: Record<OAuthProvider, string> = {
   [OAuthProvider.GOOGLE]: 'Google',
@@ -151,6 +152,7 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { permission, onEnable } = usePushNotifications();
 
   const linkedStatus = searchParams.get('status');
   const linkedProvider = searchParams.get('provider');
@@ -323,6 +325,36 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
         <h2 className='text-lg font-semibold'>Привязанные аккаунты</h2>
         <LinkedAccountsSection accounts={profile.linkedAccounts ?? []} onUnlink={handleUnlink} />
       </section>
+
+      {permission !== 'unsupported' && (
+        <section className='space-y-3'>
+          <h2 className='text-lg font-semibold'>Уведомления</h2>
+          <div className='flex items-center justify-between gap-3'>
+            <span className='text-sm text-default-600'>Браузерные уведомления</span>
+            {permission === 'granted' ? (
+              <Chip color='success' variant='flat' size='sm'>
+                Включены
+              </Chip>
+            ) : permission === 'denied' ? (
+              <Chip color='danger' variant='flat' size='sm'>
+                Заблокированы
+              </Chip>
+            ) : (
+              <div className='flex items-center gap-2'>
+                <Chip color='default' variant='flat' size='sm'>
+                  Выключены
+                </Chip>
+                <Button size='sm' color='primary' variant='flat' onPress={onEnable}>
+                  Включить
+                </Button>
+              </div>
+            )}
+          </div>
+          {permission === 'denied' && (
+            <p className='text-xs text-default-400'>Разрешите уведомления в настройках браузера</p>
+          )}
+        </section>
+      )}
 
       <div className='pt-2 border-t border-default-200'>
         <Button
