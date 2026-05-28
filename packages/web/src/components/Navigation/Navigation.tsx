@@ -69,7 +69,7 @@ export const Navigation: React.FC<NavigationProps> = ({ children }) => {
   const isFullscreenChat = /^\/messages\/\d+/.test(pathname) || /^\/g\/[^/]+\/chat/.test(pathname);
   const isChatLayout = pathname.startsWith('/messages') || /^\/g\/[^/]+\/chat/.test(pathname);
 
-  if (pathname.startsWith('/auth')) {
+  if (pathname.startsWith('/auth') || pathname.startsWith('/ilost')) {
     return <>{children}</>;
   }
 

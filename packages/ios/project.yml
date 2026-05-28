@@ -1,0 +1,75 @@
+name: ILost
+options:
+  bundleIdPrefix: net.beznomera
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  createIntermediateGroups: true
+  xcodeVersion: "15"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  ILost:
+    type: application
+    platform: iOS
+    sources:
+      - path: Shared
+      - path: ILoss
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ilost
+        INFOPLIST_FILE: ILoss/Info.plist
+    entitlements:
+      path: ILoss/ILoss.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.net.beznomera.ilost
+    dependencies:
+      - target: ILostWidget
+        embed: true
+        codeSign: true
+      - target: ILostWatchApp
+        embed: true
+        codeSign: true
+
+  ILostWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Shared
+      - path: ILossWidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ilost.widget
+        INFOPLIST_FILE: ILossWidget/Info.plist
+    entitlements:
+      path: ILossWidget/ILossWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.net.beznomera.ilost
+
+  ILostWatchApp:
+    type: watchos.application
+    platform: watchOS
+    sources:
+      - path: Shared
+        excludes:
+          - "API/AuthService.swift"
+      - path: ILossWatchApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ilost.watchapp
+        INFOPLIST_FILE: ILossWatchApp/Info.plist
+        TARGETED_DEVICE_FAMILY: "4"
+    entitlements:
+      path: ILossWatchApp/ILossWatchApp.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.net.beznomera.ilost

@@ -17,6 +17,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ChatModule } from './app/chat/chat.module';
 import { AdminModule } from './app/admin/admin.module';
 import { NotificationModule } from './app/notification/notification.module';
+import { LostModule } from './app/lost/lost.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { NotificationModule } from './app/notification/notification.module';
     CarModule,
     AdminModule,
     NotificationModule,
+    LostModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

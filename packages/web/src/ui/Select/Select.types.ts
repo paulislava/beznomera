@@ -16,6 +16,9 @@ export type RawSelectProps<
   optionKey?: keyof OptionData;
   optionValue?: keyof OptionData;
   required?: boolean;
+  onInputChange?: (value: string) => void;
+  allowsCustomValue?: boolean;
+  onEnterKey?: () => void;
 };
 
 export type SelectProps<
