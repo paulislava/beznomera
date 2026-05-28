@@ -3,10 +3,11 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { LostApi, LOST_API } from '@paulislava/shared/lost/lost.api';
+import { LostApi, LOST_API, LOST_USER_ID_PARAM } from '@paulislava/shared/lost/lost.api';
 import {
   LostItemInfo,
   LossEventInfo,
@@ -16,6 +17,7 @@ import {
 } from '@paulislava/shared/lost/lost.types';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiClientAuthGuard } from '../auth/api-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import {
   CreateLostItemDto,
@@ -29,7 +31,7 @@ export class LostController implements LostApi {
   constructor(private readonly lostService: LostService) {}
 
   @Get(LOST_API.backendRoutes.getItems)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ApiClientAuthGuard)
   getItems(): Promise<LostItemInfo[]> {
     return this.lostService.getItems();
   }
@@ -49,10 +51,26 @@ export class LostController implements LostApi {
     return this.lostService.getStats(user.userId);
   }
 
+  @Get(LOST_API.backendRoutes.getStatsForUser)
+  @UseGuards(ApiClientAuthGuard)
+  getStatsForUser(
+    @Param(LOST_USER_ID_PARAM, ParseIntPipe) userId: number,
+  ): Promise<LossStats> {
+    return this.lostService.getStats(userId);
+  }
+
   @Get(LOST_API.backendRoutes.getItemStats)
   @UseGuards(JwtAuthGuard)
   getItemStats(@CurrentUser() user: RequestUser): Promise<LostItemStats[]> {
     return this.lostService.getItemStats(user.userId);
+  }
+
+  @Get(LOST_API.backendRoutes.getItemStatsForUser)
+  @UseGuards(ApiClientAuthGuard)
+  getItemStatsForUser(
+    @Param(LOST_USER_ID_PARAM, ParseIntPipe) userId: number,
+  ): Promise<LostItemStats[]> {
+    return this.lostService.getItemStats(userId);
   }
 
   @Get(LOST_API.backendRoutes.getRecentEvents)

@@ -16,12 +16,14 @@ import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { JwtAuthGuard, OptionalJwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ApiClientAuthGuard } from '../auth/api-auth.guard';
 import { CurrentUser } from '../users/user.decorator';
 import { RequestUser } from '@paulislava/shared/user/user.types';
 import CHAT_API, {
   CHAT_CODE_PARAM,
   CHAT_ID_PARAM,
   CHAT_MESSAGE_ID_PARAM,
+  CHAT_USER_ID_PARAM,
 } from '@paulislava/shared/chat/chat.api';
 import {
   ChatContactBody,
@@ -68,6 +70,14 @@ export class ChatController {
     return this.chatService.getMyChats(user.userId);
   }
 
+  @Get(CHAT_API.backendRoutes.myChatsForUser)
+  @UseGuards(ApiClientAuthGuard)
+  myChatsForUser(
+    @Param(CHAT_USER_ID_PARAM, ParseIntPipe) userId: number,
+  ): Promise<ChatInfo[]> {
+    return this.chatService.getMyChats(userId);
+  }
+
   @Get(CHAT_API.backendRoutes.chatDetails)
   @UseGuards(JwtAuthGuard)
   chatDetails(
@@ -75,6 +85,15 @@ export class ChatController {
     @CurrentUser() user: RequestUser,
   ): Promise<ChatDetails> {
     return this.chatService.getChatDetails(chatId, user.userId);
+  }
+
+  @Get(CHAT_API.backendRoutes.chatDetailsForUser)
+  @UseGuards(ApiClientAuthGuard)
+  chatDetailsForUser(
+    @Param(CHAT_ID_PARAM, ParseIntPipe) chatId: number,
+    @Param(CHAT_USER_ID_PARAM, ParseIntPipe) userId: number,
+  ): Promise<ChatDetails> {
+    return this.chatService.getChatDetails(chatId, userId);
   }
 
   @Get(CHAT_API.backendRoutes.chatByCarCode)

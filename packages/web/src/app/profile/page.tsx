@@ -1,9 +1,11 @@
 import { AuthComponent, withUser } from '@/context/Auth/withUser';
-import { userService } from '@/services';
+import { createApi } from '@/services';
 import { ProfileClient } from './ProfileClient';
 
+const api = createApi();
+
 const ProfilePage: AuthComponent = async ({ user }) => {
-  const profile = await userService.getProfile(user.userId);
+  const profile = await api.user.getProfile(user.userId);
 
   return <ProfileClient initialProfile={profile} />;
 };

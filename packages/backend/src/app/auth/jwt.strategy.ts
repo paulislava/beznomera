@@ -17,13 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
     super({
       jwtFromRequest(req: Request): string {
+        if (req.headers[AUTH_USER_TOKEN_HEADER]) {
+          return req.headers[AUTH_USER_TOKEN_HEADER] as string;
+        }
+
         const authHeader = req.headers.authorization as string | undefined;
         if (authHeader?.startsWith('Bearer ')) {
           return authHeader.slice(7);
-        }
-
-        if (req.headers[AUTH_USER_TOKEN_HEADER]) {
-          return req.headers[AUTH_USER_TOKEN_HEADER] as string;
         }
 
         const cookies: Record<string, string> = req.cookies as Record<
