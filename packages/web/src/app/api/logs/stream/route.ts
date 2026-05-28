@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   const upstream = await fetch(`${BACKEND_URL}/logs/stream`, {
-    headers: { Authorization: `Bearer ${BACKEND_API_TOKEN}` },
+    headers: { Authorization: `Bearer ${BACKEND_API_TOKEN}` }
   });
 
   if (!upstream.ok || !upstream.body) {
@@ -23,7 +23,7 @@ export async function GET() {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
-      'X-Accel-Buffering': 'no',
-    },
+      'X-Accel-Buffering': 'no'
+    }
   });
 }

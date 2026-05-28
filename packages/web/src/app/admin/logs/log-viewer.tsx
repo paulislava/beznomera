@@ -17,7 +17,7 @@ function getLevel(msg: string): 'error' | 'warn' | 'log' {
 const COLORS: Record<ReturnType<typeof getLevel>, string> = {
   error: '#ff6b6b',
   warn: '#ffd93d',
-  log: '#c9d1d9',
+  log: '#c9d1d9'
 };
 
 export function LogViewer() {
@@ -35,7 +35,7 @@ export function LogViewer() {
     es.onmessage = (e: MessageEvent<string>) => {
       if (pausedRef.current) return;
       const entry = JSON.parse(e.data) as LogEntry;
-      setLogs((prev) => [...prev.slice(-999), entry]);
+      setLogs(prev => [...prev.slice(-999), entry]);
     };
     return () => es.close();
   }, []);
@@ -51,7 +51,7 @@ export function LogViewer() {
         minHeight: '100dvh',
         padding: '8px',
         fontFamily: 'monospace',
-        fontSize: '12px',
+        fontSize: '12px'
       }}
     >
       <div
@@ -64,14 +64,12 @@ export function LogViewer() {
           top: 0,
           background: '#0d1117',
           padding: '4px 0',
-          zIndex: 1,
+          zIndex: 1
         }}
       >
-        <span style={{ color: '#8b949e' }}>
-          Logs ({logs.length})
-        </span>
+        <span style={{ color: '#8b949e' }}>Logs ({logs.length})</span>
         <button
-          onClick={() => setPaused((p) => !p)}
+          onClick={() => setPaused(p => !p)}
           style={{
             padding: '4px 12px',
             background: paused ? '#238636' : '#b62324',
@@ -79,7 +77,7 @@ export function LogViewer() {
             border: 'none',
             borderRadius: '6px',
             cursor: 'pointer',
-            fontSize: '12px',
+            fontSize: '12px'
           }}
         >
           {paused ? 'Resume' : 'Pause'}
@@ -87,13 +85,14 @@ export function LogViewer() {
       </div>
       <div>
         {logs.map((entry, i) => (
-          <div key={i} style={{ display: 'flex', gap: '8px', lineHeight: '1.5', wordBreak: 'break-all' }}>
+          <div
+            key={i}
+            style={{ display: 'flex', gap: '8px', lineHeight: '1.5', wordBreak: 'break-all' }}
+          >
             <span style={{ color: '#484f58', flexShrink: 0 }}>
               {new Date(entry.time).toLocaleTimeString()}
             </span>
-            <span style={{ color: COLORS[getLevel(entry.message)] }}>
-              {entry.message}
-            </span>
+            <span style={{ color: COLORS[getLevel(entry.message)] }}>{entry.message}</span>
           </div>
         ))}
         <div ref={bottomRef} />
