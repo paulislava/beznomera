@@ -18,6 +18,7 @@ import { ChatModule } from './app/chat/chat.module';
 import { AdminModule } from './app/admin/admin.module';
 import { NotificationModule } from './app/notification/notification.module';
 import { LostModule } from './app/lost/lost.module';
+import { LogsModule } from './app/logging/logs.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { LostModule } from './app/lost/lost.module';
     AdminModule,
     NotificationModule,
     LostModule,
+    LogsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],
