@@ -13,7 +13,10 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Response, Request } from 'express';
 import AUTH_API, { AuthApi } from '@paulislava/shared/auth/auth.api';
-import { LinkedAccount, OAuthProvider } from '@paulislava/shared/auth/auth.types';
+import {
+  LinkedAccount,
+  OAuthProvider,
+} from '@paulislava/shared/auth/auth.types';
 
 import { ConfigService } from '../config/config.service';
 
@@ -186,11 +189,11 @@ export class AuthController implements AuthApi {
 
     try {
       await this.authService.authOAuth(profile, currentUserId, res);
-      res.redirect(
-        `${frontendUrl}/profile?provider=${provider}&status=ok`,
-      );
+      res.redirect(`${frontendUrl}/profile?provider=${provider}&status=ok`);
     } catch {
-      res.redirect(`${frontendUrl}/auth?error=oauth_failed&provider=${provider}`);
+      res.redirect(
+        `${frontendUrl}/auth?error=oauth_failed&provider=${provider}`,
+      );
     }
   }
 

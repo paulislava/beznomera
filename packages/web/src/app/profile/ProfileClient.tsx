@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { userService, authService } from '@/services';
 import { UserProfile } from '@shared/user/user.types';
 import { LinkedAccount, OAuthProvider } from '@shared/auth/auth.types';
-import { BACKEND_URL } from '@/utils/api-service';
+import { BACKEND_URL, PUBLIC_BACKEND_URL } from '@/utils/api-service';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import FormField from '@/ui/FormField/FormField';
 import { Button, Avatar, Chip } from '@heroui/react';
@@ -80,7 +80,6 @@ function LinkedAccountsSection({
 }) {
   const [unlinking, setUnlinking] = useState<OAuthProvider | null>(null);
   const linkedProviders = new Set(accounts.map(a => a.provider));
-  const backendBase = BACKEND_URL.replace(/\/api$/, '');
 
   const handleUnlink = useCallback(
     async (provider: OAuthProvider) => {
@@ -132,7 +131,7 @@ function LinkedAccountsSection({
               </Button>
             ) : (
               <a
-                href={`${backendBase}/auth/${provider === OAuthProvider.APPLE ? 'apple' : provider}`}
+                href={`${PUBLIC_BACKEND_URL}/auth/${provider === OAuthProvider.APPLE ? 'apple' : provider}`}
               >
                 <Button size='sm' variant='flat' color='primary'>
                   Привязать

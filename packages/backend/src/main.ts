@@ -4,6 +4,20 @@ import { addAlias } from 'module-alias';
 
 addAlias('~', __dirname);
 
+import { pushLog } from './app/logging/log-buffer';
+
+const _origStdoutWrite = process.stdout.write.bind(process.stdout);
+(process.stdout as any).write = (chunk: any, ...args: any[]): boolean => {
+  if (chunk) pushLog(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString('utf8'));
+  return _origStdoutWrite(chunk, ...args);
+};
+
+const _origStderrWrite = process.stderr.write.bind(process.stderr);
+(process.stderr as any).write = (chunk: any, ...args: any[]): boolean => {
+  if (chunk) pushLog(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString('utf8'));
+  return _origStderrWrite(chunk, ...args);
+};
+
 import { Encoding } from 'crypto';
 import { ServerResponse } from 'http';
 

@@ -11,32 +11,39 @@ interface Props {
 }
 
 export function BrowserQrScanner({ onResult, onClose }: Props) {
-  const scannerRef = useRef<Html5Qrcode | null>(null);
   const resolvedRef = useRef(false);
 
   useEffect(() => {
-    const scanner = new Html5Qrcode(SCANNER_ELEMENT_ID);
-    scannerRef.current = scanner;
+    const el = document.getElementById(SCANNER_ELEMENT_ID);
+    if (el) el.innerHTML = '';
 
-    scanner
-      .start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 240, height: 240 } },
-        decodedText => {
-          if (resolvedRef.current) return;
-          resolvedRef.current = true;
-          onResult(decodedText);
-        },
-        undefined
-      )
+    const scanner = new Html5Qrcode(SCANNER_ELEMENT_ID);
+    let cancelled = false;
+
+    const onDecoded = (text: string) => {
+      if (cancelled || resolvedRef.current) return;
+      resolvedRef.current = true;
+      cancelled = true;
+      scanner.stop().catch(() => {});
+      onResult(text);
+    };
+
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+    const startPromise = scanner
+      .start({ facingMode: 'environment' }, config, onDecoded, undefined)
+      .catch(() => scanner.start({ facingMode: 'user' }, config, onDecoded, undefined))
       .catch(() => {
-        onClose();
+        if (!cancelled) onClose();
       });
 
     return () => {
-      if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop().catch(() => {});
-      }
+      cancelled = true;
+      startPromise
+        .then(() => {
+          if (scanner.isScanning) scanner.stop().catch(() => {});
+        })
+        .catch(() => {});
     };
   }, []);
 

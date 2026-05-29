@@ -9,7 +9,9 @@ import {
 
 export interface ChatApi {
   myChats(...args: any[]): Promise<ChatInfo[]>;
+  myChatsForUser(userId: number, ...args: any[]): Promise<ChatInfo[]>;
   chatDetails(chatId: number, ...args: any[]): Promise<ChatDetails>;
+  chatDetailsForUser(chatId: number, userId: number, ...args: any[]): Promise<ChatDetails>;
   chatByCarCode(code: string, ...args: any[]): Promise<ChatDetails>;
   sendOwnerMessage(body: ChatSendMessageBody, chatId: number, ...args: any[]): Promise<ChatMessageInfo>;
   updateContact(body: ChatContactBody, chatId: number, ...args: any[]): Promise<void>;
@@ -21,10 +23,13 @@ export interface ChatApi {
 export const CHAT_ID_PARAM = 'chatId';
 export const CHAT_CODE_PARAM = 'code';
 export const CHAT_MESSAGE_ID_PARAM = 'messageId';
+export const CHAT_USER_ID_PARAM = 'userId';
 
 const CHAT_ROUTES: APIRoutes<ChatApi> = {
   myChats: 'my',
+  myChatsForUser: (userId) => `my/user/${userId || `:${CHAT_USER_ID_PARAM}`}`,
   chatDetails: (chatId) => `${chatId || `:${CHAT_ID_PARAM}`}`,
+  chatDetailsForUser: (chatId, userId) => `${chatId || `:${CHAT_ID_PARAM}`}/user/${userId || `:${CHAT_USER_ID_PARAM}`}`,
   chatByCarCode: (code) => `by-car/${code || `:${CHAT_CODE_PARAM}`}`,
   sendOwnerMessage: {
     path: (chatId) => `${chatId || `:${CHAT_ID_PARAM}`}/message`,

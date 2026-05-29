@@ -158,9 +158,8 @@ export class S3Config {
 }
 
 export class OAuthProviderConfig {
-  @IsString()
   @IsDefined()
-  readonly clientId: string;
+  readonly clientId: string | number;
 
   @IsString()
   @IsDefined()
