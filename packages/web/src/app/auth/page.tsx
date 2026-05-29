@@ -10,7 +10,7 @@ import { TelegramLoginButtonWrapper } from '@/components/TelegramLoginButtonWrap
 import { showErrorMessage } from '@/utils/messages';
 import { isTelegramWebApp } from '@/utils/telegram';
 import { setStoredAuthToken } from '@/utils/auth-storage';
-import { BACKEND_URL } from '@/utils/api-service';
+import { PUBLIC_BACKEND_URL } from '@/utils/api-service';
 import { AuthMode } from '@shared/auth/auth.types';
 import { Form } from '@/ui/FormContainer/FormContainer';
 import FormField from '@/ui/FormField/FormField';
@@ -208,7 +208,7 @@ function AuthPageContent() {
     }
   }, [router, to]);
 
-  const backendBase = BACKEND_URL;
+  const backendBase = PUBLIC_BACKEND_URL;
 
   return (
     <div className='max-w-sm w-full mx-4'>
