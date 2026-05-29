@@ -39,9 +39,11 @@ export function BrowserQrScanner({ onResult, onClose }: Props) {
 
     return () => {
       cancelled = true;
-      startPromise.then(() => {
-        if (scanner.isScanning) scanner.stop().catch(() => {});
-      }).catch(() => {});
+      startPromise
+        .then(() => {
+          if (scanner.isScanning) scanner.stop().catch(() => {});
+        })
+        .catch(() => {});
     };
   }, []);
 
@@ -84,3 +86,4 @@ export function BrowserQrScanner({ onResult, onClose }: Props) {
     </div>
   );
 }
+π
