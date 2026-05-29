@@ -80,7 +80,6 @@ function LinkedAccountsSection({
 }) {
   const [unlinking, setUnlinking] = useState<OAuthProvider | null>(null);
   const linkedProviders = new Set(accounts.map(a => a.provider));
-  const backendBase = BACKEND_URL.replace(/\/api$/, '');
 
   const handleUnlink = useCallback(
     async (provider: OAuthProvider) => {
@@ -132,7 +131,7 @@ function LinkedAccountsSection({
               </Button>
             ) : (
               <a
-                href={`${backendBase}/auth/${provider === OAuthProvider.APPLE ? 'apple' : provider}`}
+                href={`${BACKEND_URL}/auth/${provider === OAuthProvider.APPLE ? 'apple' : provider}`}
               >
                 <Button size='sm' variant='flat' color='primary'>
                   Привязать
