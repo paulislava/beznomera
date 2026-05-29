@@ -325,7 +325,7 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
         <LinkedAccountsSection accounts={profile.linkedAccounts ?? []} onUnlink={handleUnlink} />
       </section>
 
-      {permission !== 'unsupported' && (
+      {permission !== null && (
         <section className='space-y-3'>
           <h2 className='text-lg font-semibold'>Уведомления</h2>
           <div className='flex items-center justify-between gap-3'>
@@ -337,6 +337,10 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
             ) : permission === 'denied' ? (
               <Chip color='danger' variant='flat' size='sm'>
                 Заблокированы
+              </Chip>
+            ) : permission === 'unsupported' ? (
+              <Chip color='warning' variant='flat' size='sm'>
+                Не поддерживается
               </Chip>
             ) : (
               <div className='flex items-center gap-2'>
@@ -351,6 +355,11 @@ function ProfileContent({ initialProfile }: { initialProfile: UserProfile }) {
           </div>
           {permission === 'denied' && (
             <p className='text-xs text-default-400'>Разрешите уведомления в настройках браузера</p>
+          )}
+          {permission === 'unsupported' && (
+            <p className='text-xs text-default-400'>
+              Добавьте сайт на главный экран для получения уведомлений
+            </p>
           )}
         </section>
       )}

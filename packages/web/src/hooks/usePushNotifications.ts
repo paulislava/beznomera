@@ -37,7 +37,7 @@ async function subscribeAfterPermission() {
 
 export function usePushNotifications() {
   const [showBanner, setShowBanner] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>('default');
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported' | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
