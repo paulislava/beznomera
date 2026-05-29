@@ -86,4 +86,3 @@ export function BrowserQrScanner({ onResult, onClose }: Props) {
     </div>
   );
 }
-π
