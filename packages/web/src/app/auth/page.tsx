@@ -4,9 +4,7 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/services';
 import { TELEGRAM_BOT_NAME } from '@/utils/env';
-import { initData, qrScanner } from '@telegram-apps/sdk-react';
-import { PRODUCTION_URL } from '@/constants/site';
-import { BrowserQrScanner } from '@/components/BrowserQrScanner/BrowserQrScanner';
+import { initData } from '@telegram-apps/sdk-react';
 import type { TelegramUser } from 'telegram-login-button';
 import { TelegramLoginButtonWrapper } from '@/components/TelegramLoginButtonWrapper';
 import { showErrorMessage } from '@/utils/messages';
@@ -210,7 +208,7 @@ function AuthPageContent() {
     }
   }, [router, to]);
 
-  const backendBase = BACKEND_URL.replace(/\/api$/, '');
+  const backendBase = BACKEND_URL;
 
   return (
     <div className='max-w-sm w-full mx-4'>
