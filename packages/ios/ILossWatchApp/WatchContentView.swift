@@ -1,10 +1,11 @@
 import SwiftUI
 
 struct WatchContentView: View {
-    @State private var vm = WatchViewModel()
+    @EnvironmentObject private var store: ILostStore
+    @State private var selectedIndex: Int = 0
 
     var body: some View {
-        if SharedDefaults.token == nil {
+        if !store.isAuthenticated {
             Text("Войди через iPhone")
                 .font(.caption)
                 .multilineTextAlignment(.center)
@@ -16,10 +17,9 @@ struct WatchContentView: View {
     private var mainContent: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // Item picker via Crown
-                if !vm.items.isEmpty {
-                    Picker("Предмет", selection: $vm.selectedIndex) {
-                        ForEach(Array(vm.items.enumerated()), id: \.offset) { idx, item in
+                if !store.items.isEmpty {
+                    Picker("Предмет", selection: $selectedIndex) {
+                        ForEach(Array(store.items.enumerated()), id: \.offset) { idx, item in
                             Text(item.name).tag(idx)
                         }
                     }
@@ -27,21 +27,16 @@ struct WatchContentView: View {
                     .frame(height: 60)
                 }
 
-                // Loss button
                 Button {
-                    Task { await vm.recordLoss() }
+                    Task { await recordLoss() }
                 } label: {
                     ZStack {
-                        if vm.showSuccess {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 32))
-                                .foregroundStyle(.green)
-                        } else if vm.isLoading {
+                        if store.isLoading {
                             ProgressView()
                         } else {
                             VStack(spacing: 4) {
                                 Text("😔").font(.title3)
-                                Text(vm.selectedItem.map { "Потеряла\n\($0.name)" } ?? "Потеряла")
+                                Text(buttonLabel)
                                     .font(.system(size: 11, weight: .semibold))
                                     .multilineTextAlignment(.center)
                             }
@@ -59,14 +54,15 @@ struct WatchContentView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                 }
                 .buttonStyle(.plain)
-                .disabled(vm.isLoading || vm.selectedItem == nil)
+                .disabled(store.isLoading || store.items.isEmpty)
 
-                // Top stats
-                if !vm.itemStats.isEmpty {
+                if !store.itemStats.isEmpty {
                     Divider()
-                    ForEach(vm.itemStats.prefix(3)) { stat in
+                    ForEach(store.itemStats.prefix(3)) { stat in
                         HStack {
-                            Text(stat.name).font(.system(size: 11)).lineLimit(1)
+                            Text(stat.name)
+                                .font(.system(size: 11))
+                                .lineLimit(1)
                             Spacer()
                             Text("\(stat.today)/\(stat.total)")
                                 .font(.system(size: 11, weight: .medium))
@@ -77,16 +73,29 @@ struct WatchContentView: View {
             }
             .padding(.horizontal, 4)
         }
-        .task { await vm.load() }
+        .task {
+            await store.load()
+            syncSelectedIndex()
+        }
+        .onChange(of: store.items) { _, _ in syncSelectedIndex() }
     }
-}
 
-extension Color {
-    init(hex: String) {
-        let v = UInt64(hex, radix: 16) ?? 0
-        let r = Double((v >> 16) & 0xFF) / 255
-        let g = Double((v >> 8) & 0xFF) / 255
-        let b = Double(v & 0xFF) / 255
-        self.init(red: r, green: g, blue: b)
+    private var buttonLabel: String {
+        guard !store.items.isEmpty else { return "Потеряла" }
+        let item = store.items[min(selectedIndex, store.items.count - 1)]
+        return "Потеряла\n\(item.name)"
+    }
+
+    private func recordLoss() async {
+        guard !store.items.isEmpty else { return }
+        let item = store.items[min(selectedIndex, store.items.count - 1)]
+        await store.recordLoss(itemId: item.id)
+    }
+
+    private func syncSelectedIndex() {
+        guard !store.items.isEmpty else { return }
+        if let id = store.selectedItemId, let idx = store.items.firstIndex(where: { $0.id == id }) {
+            selectedIndex = idx
+        }
     }
 }

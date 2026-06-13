@@ -9,6 +9,10 @@ enum LostService {
         try await APIClient.shared.get("/lost/stats/items")
     }
 
+    static func getRecentEvents() async throws -> [LossEvent] {
+        try await APIClient.shared.get("/lost/events")
+    }
+
     static func recordLoss(itemId: Int) async throws -> LossEvent {
         try await APIClient.shared.post("/lost/record", body: ["itemId": itemId])
     }

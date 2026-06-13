@@ -2,18 +2,16 @@ import SwiftUI
 
 @main
 struct ILostApp: App {
-    @State private var isLoggedIn = AuthService.isLoggedIn
+    @StateObject private var store = ILostStore()
 
     var body: some Scene {
         WindowGroup {
-            if isLoggedIn {
-                MainView()
-                    .onReceive(NotificationCenter.default.publisher(for: .didLogout)) { _ in
-                        isLoggedIn = false
-                    }
+            if store.isAuthenticated {
+                ContentView()
+                    .environmentObject(store)
             } else {
                 LoginView {
-                    isLoggedIn = true
+                    store.didLogin()
                 }
             }
         }

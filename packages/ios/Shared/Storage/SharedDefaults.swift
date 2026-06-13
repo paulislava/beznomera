@@ -3,7 +3,6 @@ import Foundation
 private let suiteName = "group.net.beznomera.ilost"
 private let tokenKey = "jwt_token"
 private let lastItemIdKey = "last_item_id"
-private let itemStatsKey = "item_stats_json"
 
 enum SharedDefaults {
     private static let defaults = UserDefaults(suiteName: suiteName)!
@@ -19,16 +18,5 @@ enum SharedDefaults {
             return v == 0 ? nil : v
         }
         set { defaults.set(newValue, forKey: lastItemIdKey) }
-    }
-
-    static var itemStats: [LostItemStats] {
-        get {
-            guard let data = defaults.data(forKey: itemStatsKey) else { return [] }
-            return (try? JSONDecoder().decode([LostItemStats].self, from: data)) ?? []
-        }
-        set {
-            let data = try? JSONEncoder().encode(newValue)
-            defaults.set(data, forKey: itemStatsKey)
-        }
     }
 }

@@ -11,7 +11,6 @@ enum AuthService {
         KeychainHelper.token = nil
         SharedDefaults.token = nil
         SharedDefaults.lastItemId = nil
-        SharedDefaults.itemStats = []
     }
 
     static var isLoggedIn: Bool {
