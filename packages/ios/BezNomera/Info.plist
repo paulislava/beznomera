@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>БезНомера</string>
+    <key>CFBundleDisplayName</key>
+    <string>БезНомера</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleVersion</key>
+    <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(MARKETING_VERSION)</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+    </dict>
+    <key>NSCameraUsageDescription</key>
+    <string>Для сканирования QR-кодов автомобилей</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Для загрузки фото автомобиля и аватара</string>
+    <key>GIDClientID</key>
+    <string>781738405177-ahpbpce2uken2bpfgb0v9v6njq6ipguk.apps.googleusercontent.com</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>beznomera</string>
+            </array>
+        </dict>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.781738405177-ahpbpce2uken2bpfgb0v9v6njq6ipguk</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
