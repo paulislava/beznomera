@@ -453,6 +453,29 @@ function formatTime(iso: string): string {
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
+const MONTHS_RU = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const DAYS_RU = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+
+function formatDateLabel(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const msgDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((today.getTime() - msgDay.getTime()) / 86400000);
+
+  if (diffDays === 0) return 'Сегодня';
+  if (diffDays === 1) return 'Вчера';
+  if (diffDays < 7) return `${DAYS_RU[d.getDay()]}, ${d.getDate()} ${MONTHS_RU[d.getMonth()]}`;
+  if (d.getFullYear() === now.getFullYear()) return `${d.getDate()} ${MONTHS_RU[d.getMonth()]}`;
+  return `${d.getDate()} ${MONTHS_RU[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function isSameDay(iso1: string, iso2: string): boolean {
+  const a = new Date(iso1);
+  const b = new Date(iso2);
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
 const CONTACT_OPTIONS = [
   { value: 'none', label: 'Без ответа' },
   { value: 'bot', label: 'Анонимно через бот' },
@@ -764,12 +787,22 @@ export function ChatWindow({
       )}
 
       <MsgList ref={listRef} onScroll={handleScroll}>
-        {messages.map(msg => {
+        {messages.map((msg, idx) => {
+          const showDateSep =
+            idx === 0 || !isSameDay(messages[idx - 1].createdAt, msg.createdAt);
+
           if (msg.type === MessageType.Call || msg.type === MessageType.System) {
             return (
-              <SystemMsgRow key={msg.id}>
-                <SystemMsgBubble>{msg.text}</SystemMsgBubble>
-              </SystemMsgRow>
+              <React.Fragment key={msg.id}>
+                {showDateSep && (
+                  <SystemMsgRow>
+                    <SystemMsgBubble>{formatDateLabel(msg.createdAt)}</SystemMsgBubble>
+                  </SystemMsgRow>
+                )}
+                <SystemMsgRow>
+                  <SystemMsgBubble>{msg.text}</SystemMsgBubble>
+                </SystemMsgRow>
+              </React.Fragment>
             );
           }
 
@@ -777,47 +810,54 @@ export function ChatWindow({
           const selected = selectedIds.has(msg.id);
 
           return (
-            <MsgRow key={msg.id} $out={out} $selectionMode={selectionMode}>
-              {selectionMode && (
-                <SelectionCheckmark $selected={selected} onClick={() => toggleSelect(msg.id)}>
-                  {selected && '✓'}
-                </SelectionCheckmark>
+            <React.Fragment key={msg.id}>
+              {showDateSep && (
+                <SystemMsgRow>
+                  <SystemMsgBubble>{formatDateLabel(msg.createdAt)}</SystemMsgBubble>
+                </SystemMsgRow>
               )}
-              <Bubble
-                $out={out}
-                $deleted={msg.isDeleted}
-                $selectionMode={selectionMode}
-                $selected={selected}
-                data-msgid={msg.id}
-                onClick={handleBubbleClick}
-                onContextMenu={handleContextMenu}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-                onTouchMove={handleTouchEnd}
-              >
-                {msg.attachmentUrl && !msg.isDeleted && (
-                  <>
-                    {!imgLoaded[msg.id] && <ImgSkeleton />}
-                    <AttachImg
-                      src={msg.attachmentUrl}
-                      alt='attachment'
-                      style={{ display: imgLoaded[msg.id] ? 'block' : 'none' }}
-                      onLoad={() => setImgLoaded(prev => ({ ...prev, [msg.id]: true }))}
-                      onClick={e => {
-                        e.stopPropagation();
-                        setLightboxUrl(msg.attachmentUrl!);
-                      }}
-                    />
-                  </>
+              <MsgRow $out={out} $selectionMode={selectionMode}>
+                {selectionMode && (
+                  <SelectionCheckmark $selected={selected} onClick={() => toggleSelect(msg.id)}>
+                    {selected && '✓'}
+                  </SelectionCheckmark>
                 )}
-                {msg.isDeleted ? (
-                  <DeletedText>Сообщение удалено</DeletedText>
-                ) : (
-                  msg.text && <BubbleText>{msg.text}</BubbleText>
-                )}
-                <BubbleTime $out={out}>{formatTime(msg.createdAt)}</BubbleTime>
-              </Bubble>
-            </MsgRow>
+                <Bubble
+                  $out={out}
+                  $deleted={msg.isDeleted}
+                  $selectionMode={selectionMode}
+                  $selected={selected}
+                  data-msgid={msg.id}
+                  onClick={handleBubbleClick}
+                  onContextMenu={handleContextMenu}
+                  onTouchStart={handleTouchStart}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchMove={handleTouchEnd}
+                >
+                  {msg.attachmentUrl && !msg.isDeleted && (
+                    <>
+                      {!imgLoaded[msg.id] && <ImgSkeleton />}
+                      <AttachImg
+                        src={msg.attachmentUrl}
+                        alt='attachment'
+                        style={{ display: imgLoaded[msg.id] ? 'block' : 'none' }}
+                        onLoad={() => setImgLoaded(prev => ({ ...prev, [msg.id]: true }))}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setLightboxUrl(msg.attachmentUrl!);
+                        }}
+                      />
+                    </>
+                  )}
+                  {msg.isDeleted ? (
+                    <DeletedText>Сообщение удалено</DeletedText>
+                  ) : (
+                    msg.text && <BubbleText>{msg.text}</BubbleText>
+                  )}
+                  <BubbleTime $out={out}>{formatTime(msg.createdAt)}</BubbleTime>
+                </Bubble>
+              </MsgRow>
+            </React.Fragment>
           );
         })}
       </MsgList>
