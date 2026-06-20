@@ -453,7 +453,20 @@ function formatTime(iso: string): string {
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
-const MONTHS_RU = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const MONTHS_RU = [
+  'янв',
+  'фев',
+  'мар',
+  'апр',
+  'май',
+  'июн',
+  'июл',
+  'авг',
+  'сен',
+  'окт',
+  'ноя',
+  'дек'
+];
 const DAYS_RU = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 
 function formatDateLabel(iso: string): string {
@@ -473,7 +486,11 @@ function formatDateLabel(iso: string): string {
 function isSameDay(iso1: string, iso2: string): boolean {
   const a = new Date(iso1);
   const b = new Date(iso2);
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 const CONTACT_OPTIONS = [
@@ -788,8 +805,7 @@ export function ChatWindow({
 
       <MsgList ref={listRef} onScroll={handleScroll}>
         {messages.map((msg, idx) => {
-          const showDateSep =
-            idx === 0 || !isSameDay(messages[idx - 1].createdAt, msg.createdAt);
+          const showDateSep = idx === 0 || !isSameDay(messages[idx - 1].createdAt, msg.createdAt);
 
           if (msg.type === MessageType.Call || msg.type === MessageType.System) {
             return (
