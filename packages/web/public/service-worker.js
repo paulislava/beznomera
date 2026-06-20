@@ -51,9 +51,11 @@ self.addEventListener('notificationclick', function (event) {
       ? `/messages/${chatId}`
       : type === 'message' && carCode
         ? `/g/${carCode}/chat`
-        : type === 'call' && carId
-          ? `/car/${carId}`
-          : '/';
+        : type === 'call' && chatId
+          ? `/messages/${chatId}`
+          : type === 'call' && carCode
+            ? `/g/${carCode}/chat`
+            : '/';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {

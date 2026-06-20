@@ -216,6 +216,7 @@ export class CarService {
       carId: id,
       carCode: car.code,
       carNo: no,
+      chatId: callResult?.message?.chatId,
       title: 'Вас вызвали',
       body: `Водителя вызвали к автомобилю ${no}`,
     } satisfies CarNotificationEvent);

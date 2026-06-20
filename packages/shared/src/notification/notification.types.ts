@@ -18,6 +18,7 @@ export interface CarNotificationEvent {
   carId: number;
   carCode: string;
   carNo: string;
+  chatId?: number;
   title: string;
   body: string;
 }

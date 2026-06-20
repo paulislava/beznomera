@@ -77,6 +77,7 @@ export class NotificationService {
       type: event.type,
       carId: event.carId,
       carCode: event.carCode,
+      chatId: event.chatId,
       title: event.title,
       body: event.body,
     });
