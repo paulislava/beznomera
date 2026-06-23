@@ -35,7 +35,7 @@ targets:
       - path: BezNomera/Resources/Assets.xcassets
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: net.beznomera.ios
+        PRODUCT_BUNDLE_IDENTIFIER: com.paulislava.beznomera
         INFOPLIST_FILE: BezNomera/Info.plist
         INFOPLIST_KEY_NSCameraUsageDescription: "Для сканирования QR-кодов автомобилей"
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "Для загрузки фото автомобиля и аватара"

@@ -3,6 +3,6 @@ git_branch("certificates")
 storage_mode("git")
 type("appstore")
 
-app_identifier(["net.beznomera.ios"])
+app_identifier(["com.paulislava.beznomera"])
 
 username("p-kondratov@mail.ru")

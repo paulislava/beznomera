@@ -1,7 +1,7 @@
-app_identifier("net.beznomera.ios")
+app_identifier("com.paulislava.beznomera")
 apple_id("p-kondratov@mail.ru")
 team_id("CS626W9QL6")
 
 for_lane :beta do
-  app_identifier("net.beznomera.ios")
+  app_identifier("com.paulislava.beznomera")
 end
