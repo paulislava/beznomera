@@ -44,7 +44,7 @@ struct ContentView: View {
 
             ChatsListView()
                 .tabItem { Label("Чаты", systemImage: "bubble.left.and.bubble.right.fill") }
-                .badge(chatsStore.unreadCount > 0 ? chatsStore.unreadCount : nil)
+                .badge(chatsStore.unreadCount > 0 ? chatsStore.unreadCount : 0)
                 .tag(1)
 
             ScannerView()
@@ -55,6 +55,6 @@ struct ContentView: View {
                 .tabItem { Label("Профиль", systemImage: "person.fill") }
                 .tag(3)
         }
-        .tint(.bzPrimary)
+        .tint(Color.bzPrimary)
     }
 }

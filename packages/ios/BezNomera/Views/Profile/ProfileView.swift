@@ -106,7 +106,7 @@ struct ProfileView: View {
             .overlay(
                 Text(profileStore.profile?.initials ?? "?")
                     .font(.title2.bold())
-                    .foregroundStyle(.bzPrimary)
+                    .foregroundStyle(Color.bzPrimary)
             )
     }
 

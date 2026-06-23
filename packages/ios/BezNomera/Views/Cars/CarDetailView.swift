@@ -103,7 +103,7 @@ struct CarDetailView: View {
                 VStack(spacing: 8) {
                     Image(systemName: "car.fill")
                         .font(.system(size: 48))
-                        .foregroundStyle(.bzPrimary.opacity(0.6))
+                        .foregroundStyle(Color.bzPrimary.opacity(0.6))
                     PlateView(no: liveCar.no)
                 }
             )
@@ -157,7 +157,7 @@ struct CarDetailView: View {
             Spacer()
             Image(systemName: "qrcode")
                 .font(.title2)
-                .foregroundStyle(.bzPrimary)
+                .foregroundStyle(Color.bzPrimary)
                 .onTapGesture { showQR = true }
         }
         .padding(16)
@@ -174,7 +174,7 @@ struct CarDetailView: View {
                     showAddDriver = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.bzPrimary)
+                        .foregroundStyle(Color.bzPrimary)
                 }
             }
 
@@ -238,7 +238,7 @@ struct DriverRow: View {
                 if driver.isOwner {
                     Text("Владелец")
                         .font(.caption2)
-                        .foregroundStyle(.bzPrimary)
+                        .foregroundStyle(Color.bzPrimary)
                 } else if let tel = driver.tel {
                     Text(tel)
                         .font(.caption)

@@ -1,0 +1,123 @@
+name: iOS TestFlight
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'packages/ios/**'
+      - '.github/workflows/ios.yml'
+  pull_request:
+    paths:
+      - 'packages/ios/**'
+      - '.github/workflows/ios.yml'
+  workflow_dispatch:
+    inputs:
+      upload:
+        description: 'Upload to TestFlight'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: iOS — Build
+    runs-on: [self-hosted, macOS]
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.upload == 'false')
+
+    env:
+      RBENV_ROOT: /Users/pkondratov/.rbenv
+      PATH: /Users/pkondratov/.rbenv/shims:/Users/pkondratov/.rbenv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Ruby
+        run: |
+          eval "$(rbenv init - bash)"
+          rbenv local 3.3.7
+        shell: bash
+        working-directory: packages/ios
+
+      - name: Install dependencies
+        run: |
+          eval "$(rbenv init - bash)"
+          bundle install
+        shell: bash
+        working-directory: packages/ios
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+        working-directory: packages/ios
+
+      - name: Build
+        run: |
+          eval "$(rbenv init - bash)"
+          bundle exec fastlane build
+        shell: bash
+        working-directory: packages/ios
+
+  testflight:
+    name: TestFlight — Build & Upload
+    runs-on: [self-hosted, macOS]
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && inputs.upload == 'true')
+    environment: dev
+    concurrency:
+      group: beznomera-testflight
+      cancel-in-progress: true
+
+    env:
+      RBENV_ROOT: /Users/pkondratov/.rbenv
+      PATH: /Users/pkondratov/.rbenv/shims:/Users/pkondratov/.rbenv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+      LANG: en_US.UTF-8
+      LC_ALL: en_US.UTF-8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unlock login keychain
+        run: |
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/login.keychain-db
+          security set-keychain-settings -t 7200 ~/Library/Keychains/login.keychain-db
+
+      - name: Select Ruby
+        run: |
+          eval "$(rbenv init - bash)"
+          rbenv local 3.3.7
+        shell: bash
+        working-directory: packages/ios
+
+      - name: Install dependencies
+        run: |
+          eval "$(rbenv init - bash)"
+          bundle install
+        shell: bash
+        working-directory: packages/ios
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+        working-directory: packages/ios
+
+      - name: Run Fastlane beta
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+        run: |
+          eval "$(rbenv init - bash)"
+          bundle exec fastlane beta
+        shell: bash
+        working-directory: packages/ios

@@ -60,7 +60,7 @@ struct CarsListView: View {
         } actions: {
             Button("Добавить авто") { showCreateCar = true }
                 .buttonStyle(.borderedProminent)
-                .tint(.bzPrimary)
+                .tint(Color.bzPrimary)
         }
     }
 }
@@ -128,7 +128,7 @@ struct CarRow: View {
             .fill(Color.bzPrimary.opacity(0.15))
             .overlay(
                 Image(systemName: "car.fill")
-                    .foregroundStyle(.bzPrimary)
+                    .foregroundStyle(Color.bzPrimary)
                     .font(.title2)
             )
     }

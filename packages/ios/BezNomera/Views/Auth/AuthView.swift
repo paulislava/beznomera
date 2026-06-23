@@ -26,7 +26,7 @@ struct AuthView: View {
                     VStack(spacing: 12) {
                         Image(systemName: "car.2.fill")
                             .font(.system(size: 56))
-                            .foregroundStyle(.bzPrimary)
+                            .foregroundStyle(Color.bzPrimary)
                         Text("БезНомера")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)

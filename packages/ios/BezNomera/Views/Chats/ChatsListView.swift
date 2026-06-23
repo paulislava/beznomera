@@ -90,7 +90,7 @@ struct ChatRow: View {
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(.bzPrimary)
+                            .background(.primary)
                             .clipShape(Capsule())
                     }
                 }

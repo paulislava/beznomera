@@ -83,7 +83,7 @@ struct PublicCarView: View {
                 } else {
                     Text("Спасибо за оценку!")
                         .font(.subheadline)
-                        .foregroundStyle(.bzPrimary)
+                        .foregroundStyle(Color.bzPrimary)
                         .padding(16)
                         .glassCard()
                 }
@@ -97,7 +97,7 @@ struct PublicCarView: View {
                         .padding(.vertical, 14)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(.bzPrimary)
+                .tint(Color.bzPrimary)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
@@ -127,7 +127,7 @@ struct PublicCarView: View {
     private var carPlaceholder: some View {
         RoundedRectangle(cornerRadius: 20, style: .continuous)
             .fill(Color.bzPrimary.opacity(0.1))
-            .overlay(Image(systemName: "car.fill").font(.system(size: 48)).foregroundStyle(.bzPrimary.opacity(0.5)))
+            .overlay(Image(systemName: "car.fill").font(.system(size: 48)).foregroundStyle(Color.bzPrimary.opacity(0.5)))
     }
 
     private func loadCar() async {

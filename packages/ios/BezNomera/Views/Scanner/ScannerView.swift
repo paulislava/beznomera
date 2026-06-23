@@ -72,7 +72,7 @@ struct ScannerView: View {
     private func cornerMark(rotate degrees: Double) -> some View {
         Image(systemName: "l.joystick.tilt.up")
             .font(.title2.bold())
-            .foregroundStyle(.bzPrimary)
+            .foregroundStyle(.primary)
             .rotationEffect(.degrees(degrees))
     }
 
@@ -88,7 +88,7 @@ struct ScannerView: View {
                 }
             }
             .buttonStyle(.borderedProminent)
-            .tint(.bzPrimary)
+            .tint(Color.bzPrimary)
         }
     }
 

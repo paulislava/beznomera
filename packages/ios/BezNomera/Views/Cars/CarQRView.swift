@@ -40,7 +40,7 @@ struct CarQRView: View {
                             .padding(.vertical, 14)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(.bzPrimary)
+                    .tint(Color.bzPrimary)
                     .padding(.horizontal, 32)
                 }
                 .padding()

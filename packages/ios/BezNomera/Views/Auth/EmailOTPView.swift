@@ -17,7 +17,7 @@ struct EmailOTPView: View {
 
                 Image(systemName: "envelope.badge.fill")
                     .font(.system(size: 48))
-                    .foregroundStyle(.bzPrimary)
+                    .foregroundStyle(Color.bzPrimary)
 
                 VStack(spacing: 8) {
                     Text(step == .email ? "Войти по email" : "Введите код")
@@ -54,7 +54,7 @@ struct EmailOTPView: View {
                             .frame(height: 50)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.bzPrimary)
+                        .tint(Color.bzPrimary)
                         .disabled(email.isEmpty || authStore.isLoading)
                     } else {
                         TextField("6-значный код", text: $code)
@@ -80,14 +80,14 @@ struct EmailOTPView: View {
                             .frame(height: 50)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.bzPrimary)
+                        .tint(Color.bzPrimary)
                         .disabled(code.count < 4 || authStore.isLoading)
 
                         Button("Отправить код снова") {
                             Task { await sendCode() }
                         }
                         .font(.subheadline)
-                        .foregroundStyle(.bzPrimary)
+                        .foregroundStyle(Color.bzPrimary)
                     }
                 }
                 .padding(.horizontal, 24)
