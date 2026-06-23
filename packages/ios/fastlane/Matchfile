@@ -1,4 +1,4 @@
-git_url("https://github.com/paulislava/NoSmoke.git")
+git_url("https://github.com/paulislava/beznomera.git")
 git_branch("certificates")
 storage_mode("git")
 type("appstore")
