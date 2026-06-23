@@ -2,8 +2,7 @@ name: iOS TestFlight
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
     paths:
       - 'packages/ios/**'
       - '.github/workflows/ios.yml'
@@ -16,7 +15,7 @@ on:
       upload:
         description: 'Upload to TestFlight'
         required: true
-        default: 'true'
+        default: 'false'
         type: choice
         options:
           - 'true'
@@ -27,8 +26,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # PR or manual build-only — fast feedback, no code signing
   build:
-    name: iOS — Build
+    name: Build (verify)
     runs-on: [self-hosted, macOS]
     if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.upload == 'false')
 
@@ -41,33 +41,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Ruby
+      - name: Select Ruby + install deps
+        working-directory: packages/ios
+        shell: bash
         run: |
           eval "$(rbenv init - bash)"
           rbenv local 3.3.7
-        shell: bash
-        working-directory: packages/ios
-
-      - name: Install dependencies
-        run: |
-          eval "$(rbenv init - bash)"
           bundle install
-        shell: bash
-        working-directory: packages/ios
 
       - name: Generate Xcode project
-        run: xcodegen generate
         working-directory: packages/ios
+        run: xcodegen generate
 
       - name: Build
+        working-directory: packages/ios
+        shell: bash
         run: |
           eval "$(rbenv init - bash)"
           bundle exec fastlane build
-        shell: bash
-        working-directory: packages/ios
 
+  # Push to master or manual with upload=true — full TestFlight
   testflight:
-    name: TestFlight — Build & Upload
+    name: TestFlight
     runs-on: [self-hosted, macOS]
     if: |
       (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
@@ -86,32 +81,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Unlock login keychain
+      - name: Unlock keychain
         run: |
           security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" ~/Library/Keychains/login.keychain-db
           security set-keychain-settings -t 7200 ~/Library/Keychains/login.keychain-db
 
-      - name: Select Ruby
+      - name: Select Ruby + install deps
+        working-directory: packages/ios
+        shell: bash
         run: |
           eval "$(rbenv init - bash)"
           rbenv local 3.3.7
-        shell: bash
-        working-directory: packages/ios
-
-      - name: Install dependencies
-        run: |
-          eval "$(rbenv init - bash)"
           bundle install
-        shell: bash
-        working-directory: packages/ios
 
       - name: Generate Xcode project
-        run: xcodegen generate
         working-directory: packages/ios
+        run: xcodegen generate
 
-      - name: Run Fastlane beta
+      - name: Fastlane beta
+        working-directory: packages/ios
+        shell: bash
         env:
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_PASSWORD: *** secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -119,5 +110,3 @@ jobs:
         run: |
           eval "$(rbenv init - bash)"
           bundle exec fastlane beta
-        shell: bash
-        working-directory: packages/ios
